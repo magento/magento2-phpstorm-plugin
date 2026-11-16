@@ -108,15 +108,31 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
-    /** Area of a view file: the folder after `view/`, or after `app/design/`; null when the path does not say. */
+    /**
+     * Area of a view file: the folder after `app/design/`, the area in a `theme-<area>-…` package name, or the
+     * folder after a module's `view/`. Null when the path does not say, as for theme packages named otherwise.
+     */
     fun viewArea(path: String): String? {
         val segments = path.replace('\\', '/').split('/')
-        val view = segments.lastIndexOf("view")
-        if (view >= 0 && view + 2 < segments.size) return segments[view + 1]
         val design = segments.indexOf("design")
         if (design > 0 && segments[design - 1] == "app" && design + 2 < segments.size) return segments[design + 1]
+        segments.firstNotNullOfOrNull { THEME_PACKAGE.matchEntire(it)?.groupValues?.get(1) }?.let { return it }
+        val view = segments.indexOf("view")
+        if (view >= 0 && view + 2 < segments.size) return segments[view + 1]
         return null
     }
+
+    /** Module named by a theme override folder, such as `Magento_Catalog` in `…/Magento_Catalog/layout/x.xml`. */
+    fun themeOverrideModule(path: String): String? {
+        val segments = path.replace('\\', '/').split('/')
+        return segments.indices.firstOrNull { index ->
+            index + 1 < segments.size && MODULE_FOLDER.matches(segments[index]) && segments[index + 1] in THEME_MODULE_FOLDERS
+        }?.let { segments[it] }
+    }
+
+    private val THEME_PACKAGE = Regex("theme-(frontend|adminhtml)-.+")
+    private val MODULE_FOLDER = Regex("[A-Z][A-Za-z0-9]*_[A-Z][A-Za-z0-9]*")
+    private val THEME_MODULE_FOLDERS = setOf("layout", "page_layout", "templates", "ui_component", "web", "email")
 
     /** Line starts of one file, built once so that each tag costs a binary search. */
     class LineIndex(text: CharSequence) {

@@ -34,7 +34,9 @@ internal data class InspectionRecord(
     val path: String?,
     val line: Int?,
     val area: String?,
-    val fields: Map<String, Any?>
+    val fields: Map<String, Any?>,
+    /** Module of a file outside any module directory, such as a theme override. */
+    val moduleHint: String? = null
 )
 
 internal object MagentoInspectionResults {
@@ -82,7 +84,7 @@ internal object MagentoInspectionResults {
         options: InspectionOptions
     ): String {
         val owners = if (records.isEmpty()) emptyMap() else MagentoMcpSnapshots.moduleOwners(project)
-        val owned = records.map { it to ownerOf(it.path, owners) }
+        val owned = records.map { it to (ownerOf(it.path, owners) ?: it.moduleHint) }
         val matching = owned.filter { (record, module) ->
             (options.module == null || module == options.module) &&
                 (options.area == null || record.area == options.area) &&

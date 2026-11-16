@@ -16,6 +16,7 @@ import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
 import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex
+import org.json.JSONObject
 
 internal object MagentoViewQueries {
     /**
@@ -69,7 +70,7 @@ internal object MagentoViewQueries {
 
         val truncated = handleMatches.size > MagentoMcpSupport.MAX_MATCHES ||
             listOf(blockMatches, containerMatches).any { matches ->
-                matches.size > MagentoMcpSupport.MAX_MATCHES ||
+                matches.drop(MagentoMcpSupport.MAX_MATCHES).any { it.second.isNotEmpty() } ||
                     matches.take(MagentoMcpSupport.MAX_MATCHES).any { it.second.size > MagentoMcpSupport.MAX_FILE_MATCHES }
             }
         val hint = if (truncated) "\n\n${MagentoInspectionResults.TEXT_TRUNCATED_HINT}" else ""
@@ -193,21 +194,23 @@ internal object MagentoViewQueries {
             val xmlFile = tag.containingFile as? XmlFile ?: return null
             val path = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile ?: return null)
             val line = lineIndexes.getOrPut(path) { MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents) }.lineOf(tag)
-            return InspectionRecord(kind, key, path, line, MagentoMcpSupport.viewArea(path), fields)
+            return InspectionRecord(kind, key, path, line, MagentoMcpSupport.viewArea(path), fields,
+                MagentoMcpSupport.themeOverrideModule(path))
         }
         fun declarations(kind: String, key: String, tags: Collection<XmlTag>, fields: (XmlTag) -> Map<String, Any?>) =
-            tags.mapNotNull { declaration(kind, key, it, fields(it)) }.distinctBy { it.path to it.line }
-                .sortedWith(compareBy({ it.path }, { it.line }))
+            tags.sortedWith(compareBy({ it.containingFile?.virtualFile?.path }, { it.textOffset }))
+                .mapNotNull { declaration(kind, key, it, fields(it)) }
         val handles = findLayoutHandles(project, query).map {
-            InspectionRecord("layout_handle", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath), linkedMapOf("name" to it.name))
+            InspectionRecord("layout_handle", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
+                linkedMapOf("name" to it.name), MagentoMcpSupport.themeOverrideModule(it.filePath))
         }
-        val blocks = MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(BlockNameIndex.KEY, project), query).flatMap { blockName ->
-            declarations("block", blockName, LayoutIndex.getBlockDeclarations(blockName, project)) {
+        val blocks = matchedBlocks(project, query).flatMap { (blockName, tags) ->
+            declarations("block", blockName, tags) {
                 linkedMapOf("name" to blockName, "class" to it.getAttributeValue("class"), "template" to it.getAttributeValue("template"))
             }
         }
-        val containers = MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project), query).flatMap { containerName ->
-            declarations("container", containerName, LayoutIndex.getContainerDeclarations(containerName, project)) {
+        val containers = matchedContainers(project, query).flatMap { (containerName, tags) ->
+            declarations("container", containerName, tags) {
                 linkedMapOf("name" to containerName, "htmlTag" to it.getAttributeValue("htmlTag"), "htmlClass" to it.getAttributeValue("htmlClass"))
             }
         }
@@ -216,7 +219,7 @@ internal object MagentoViewQueries {
 
     fun uiComponentRecords(project: Project, name: String): List<InspectionRecord> = uiComponents(project, name.trim()).map {
         InspectionRecord("ui_component", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
-            linkedMapOf("name" to it.name, "rootTag" to it.rootTag))
+            linkedMapOf("name" to it.name, "rootTag" to it.rootTag), MagentoMcpSupport.themeOverrideModule(it.filePath))
     }
 
     /** Every ACL resource declaration, then every menu entry, in match order. */
@@ -229,7 +232,7 @@ internal object MagentoViewQueries {
                     MagentoMcpSupport.determineConfigScope(record.filePath, ModuleAclXml.FILE_NAME), linkedMapOf(
                         "id" to id,
                         "title" to record.title,
-                        "tree" to record.tree.map { mapOf("id" to it.resourceId, "title" to it.resourceTitle) }
+                        "tree" to record.tree.map { mapOf("id" to it.resourceId, "title" to (it.resourceTitle ?: JSONObject.NULL)) }
                     ))
             }
         }
@@ -264,37 +267,34 @@ internal object MagentoViewQueries {
                     filePath = MagentoMcpSupport.relativePath(project, virtualFile)
                 )
             }
-            .sortedBy(LayoutHandleRecord::name)
+            .sortedWith(compareBy({ it.name }, { it.filePath }))
             .toList()
     }
 
-    private fun findBlockMatches(project: Project, query: String): List<Pair<String, List<BlockRecord>>> {
-        val blockNames = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(BlockNameIndex.KEY, project),
-            query
-        )
-
-        return blockNames.map { blockName ->
-            blockName to LayoutIndex.getBlockDeclarations(blockName, project)
+    private fun findBlockMatches(project: Project, query: String): List<Pair<String, List<BlockRecord>>> =
+        matchedBlocks(project, query).map { (blockName, tags) ->
+            blockName to tags
                 .mapNotNull { tag -> tag.toBlockRecord(project) }
                 .distinct()
                 .sortedWith(compareBy<BlockRecord>({ it.filePath }, { it.blockClass ?: "" }, { it.template ?: "" }))
         }
-    }
 
-    private fun findContainerMatches(project: Project, query: String): List<Pair<String, List<ContainerRecord>>> {
-        val containerNames = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project),
-            query
-        )
-
-        return containerNames.map { containerName ->
-            containerName to LayoutIndex.getContainerDeclarations(containerName, project)
+    private fun findContainerMatches(project: Project, query: String): List<Pair<String, List<ContainerRecord>>> =
+        matchedContainers(project, query).map { (containerName, tags) ->
+            containerName to tags
                 .mapNotNull { tag -> tag.toContainerRecord(project) }
                 .distinct()
                 .sortedWith(compareBy<ContainerRecord>({ it.filePath }, { it.htmlTag ?: "" }, { it.htmlClass ?: "" }))
         }
-    }
+
+    /** Block names matching the query with their declaration tags; text and structured replies share them. */
+    private fun matchedBlocks(project: Project, query: String): List<Pair<String, Collection<XmlTag>>> =
+        MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(BlockNameIndex.KEY, project), query)
+            .map { it to LayoutIndex.getBlockDeclarations(it, project) }
+
+    private fun matchedContainers(project: Project, query: String): List<Pair<String, Collection<XmlTag>>> =
+        MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project), query)
+            .map { it to LayoutIndex.getContainerDeclarations(it, project) }
 
     private fun XmlTag.toBlockRecord(project: Project): BlockRecord? {
         val filePath = containingXmlFilePath(project) ?: return null

@@ -35,9 +35,12 @@ internal object MagentoInspectionCommands {
         "acl_or_menu" to setOf("module", "area", "path")
     )
 
+    private val viewTypes = setOf("layout_entities", "ui_component")
+    private const val VIEW_AREA_HELP = "area: frontend, adminhtml or base, from app/design/<area>/, a theme-<area>- package or a module's view/<area>/ folder; null when the path does not say."
+
     private val filterHelp = mapOf(
         "module" to "module: exact name of the module that owns the file.",
-        "area" to "area: global, frontend, adminhtml or another etc/<area> folder; for view files, the folder after view/ or app/design/.",
+        "area" to "area: global, frontend, adminhtml or another etc/<area> folder.",
         "path" to "path: project-relative directory or file prefix."
     )
 
@@ -95,8 +98,8 @@ internal object MagentoInspectionCommands {
         return typeHelp(normalizedType) + "\n\n" + """
             Structured results (optional): add "format":"json" to parametersJson.
             Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}), cursor (nextCursor of the previous page, with the same parameters), filters ${filters.sorted().joinToString(", ")}.
-            ${filters.sorted().joinToString(" ") { filterHelp.getValue(it) }}
-            Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
+            ${filters.sorted().joinToString(" ") { if (it == "area" && normalizedType in viewTypes) VIEW_AREA_HELP else filterHelp.getValue(it) }}
+            Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line (null for whole-file records such as modules, layout handles and UI components), module, area and query-specific fields.
             Example parametersJson:
             {"$parameter":"…","format":"json","limit":50}
         """.trimIndent()

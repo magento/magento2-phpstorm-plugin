@@ -234,6 +234,49 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
             aclRecords.count { it.getString("kind") == "acl_resource" })
     }
 
+    fun testViewAreaAndThemeOverrideModuleFollowThePath() {
+        val cases = mapOf(
+            "vendor/magento/module-catalog/view/frontend/layout/x.xml" to ("frontend" to null),
+            "app/design/frontend/Acme/view/Magento_Catalog/layout/x.xml" to ("frontend" to "Magento_Catalog"),
+            "vendor/magento/theme-adminhtml-backend/Magento_Backend/layout/x.xml" to ("adminhtml" to "Magento_Backend"),
+            "vendor/hyva-themes/magento2-default-theme/Magento_Catalog/templates/x.phtml" to (null to "Magento_Catalog"),
+            "app/code/Foo/Bar/etc/di.xml" to (null to null)
+        )
+        for ((path, expected) in cases) {
+            assertEquals(path, expected.first, MagentoMcpSupport.viewArea(path))
+            assertEquals(path, expected.second, MagentoMcpSupport.themeOverrideModule(path))
+        }
+    }
+
+    fun testThemeOverridesAndSameLineDeclarationsAreRecords() {
+        myFixture.addFileToProject("app/design/frontend/Acme/luma/Magento_Catalog/layout/acme_theme.xml",
+            "<page><body><block name=\"acme.same\" template=\"a.phtml\"/><block name=\"acme.same\" template=\"b.phtml\"/></body></page>")
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val result = query("layout_entities", JSONObject().put("name", "acme.same").put("format", "json")
+            .put("module", "Magento_Catalog").put("area", "frontend"))
+        val blocks = records(result).filter { it.getString("kind") == "block" }
+        assertEquals(result.toString(), listOf("a.phtml", "b.phtml"), blocks.map { it.getString("template") })
+        assertTrue(blocks.all { it.getInt("line") == 1 })
+    }
+
+    fun testUiAndAclTextSayWhenTheyWereCut() {
+        val module = moduleDirectory()
+        for (index in 0 until 21) {
+            myFixture.addFileToProject("$module/view/adminhtml/ui_component/acme_grid_$index.xml", "<listing/>")
+        }
+        myFixture.addFileToProject("$module/etc/acl.xml", "<config><acl><resources>" +
+            (0 until 21).joinToString("") { "<resource id=\"Foo_Bar2::acme_cut_$it\" title=\"T$it\"/>" } + "</resources></acl></config>")
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+        val ui = MagentoViewQueries.findUiComponent(project, "acme_grid")
+        assertTrue(ui, ui.endsWith(MagentoInspectionResults.TEXT_TRUNCATED_HINT))
+        assertEquals(21, query("ui_component", JSONObject().put("name", "acme_grid").put("format", "json")).getInt("total"))
+        val acl = MagentoViewQueries.findAclOrMenu(project, "acme_cut")
+        assertTrue(acl, acl.endsWith(MagentoInspectionResults.TEXT_TRUNCATED_HINT))
+        val aclJson = query("acl_or_menu", JSONObject().put("identifier", "acme_cut").put("format", "json").put("limit", 100))
+        assertEquals(21, aclJson.getInt("total"))
+        assertEquals(21, records(aclJson).map { it.getString("key") }.toSet().size)
+    }
+
     fun testIndexingAndDisabledSupportAreStatuses() {
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
             assertEquals("indexing", events().getString("status"))
