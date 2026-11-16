@@ -1,0 +1,13 @@
+<idea-plugin>
+    <id>com.magento.idea.magento2plugin.hce</id>
+    <name>Magento 2 and Adobe Commerce for HCE</name>
+    <version>0.1.0</version>
+    <vendor>Magento Inc.</vendor>
+    <description>Magento 2 and Adobe Commerce integration for JetBrains Headless Code Engine.</description>
+    <idea-version since-build="271.2085" until-build="271.*"/>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.ls.plugin.mcp</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.ProjectToolset"/>
+    </extensions>
+</idea-plugin>

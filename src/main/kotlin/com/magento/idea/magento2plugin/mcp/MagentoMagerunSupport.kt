@@ -14,14 +14,9 @@ import java.security.MessageDigest
 
 /** Filesystem-only discovery shared by the environment description and magerun metadata tool. */
 internal object MagentoMagerunSupport {
-    private val MODERN_NAMES = listOf("n98-magerun2", "magerun2", "n98-magerun2.phar", "magerun2.phar")
-    private val LEGACY_NAMES = listOf("n98-magerun", "n98-magerun.phar", "magerun")
-    val DEFAULT_CANDIDATES = (MODERN_NAMES + LEGACY_NAMES).flatMap { name ->
-        listOf("bin/$name", "vendor/bin/$name", name)
-    }
-
-    fun isModernName(name: String): Boolean = name.lowercase() in MODERN_NAMES
-    fun isMagerunName(name: String): Boolean = isModernName(name) || name.lowercase() in LEGACY_NAMES
+    val DEFAULT_CANDIDATES = MagentoMagerunNames.DEFAULT_CANDIDATES
+    fun isModernName(name: String) = MagentoMagerunNames.isModernName(name)
+    fun isMagerunName(name: String) = MagentoMagerunNames.isMagerunName(name)
 
     fun discover(project: Project): Environment? {
         val root = MagentoCliToolQueries.projectRootPath(project) ?: return null
@@ -30,13 +25,13 @@ internal object MagentoMagerunSupport {
     }
 
     fun discover(projectRoot: Path, magentoRelative: String?, configured: List<String>,
-                 findDdev: () -> Path? = MagentoDdevEnvironment::findExecutable): Environment {
+                 findDdev: () -> Path? = MagentoCliToolQueries::findDdevExecutable): Environment {
         val root = projectRoot.toAbsolutePath().normalize()
         val searchRoots = MagentoCliToolQueries.buildSearchRoots(root, magentoRelative)
         val magentoRoot = MagentoCliToolQueries.resolveProjectPath(root, magentoRelative ?: ".")
         val tools = MagentoCliToolQueries.discoverTools(root, searchRoots, configured)
             .filter { isMagerunName(it.name) }
-            .sortedWith(compareBy<MagentoCliToolQueries.DetectedTool> { it.rootOrder }
+            .sortedWith(compareBy<MagentoCliEnvironment.DetectedTool> { it.rootOrder }
                 .thenBy { candidatePriority(it.command, configured) }
                 .thenBy { it.command })
         val candidates = tools.map { tool ->
@@ -49,18 +44,8 @@ internal object MagentoMagerunSupport {
         }))
     }
 
-    internal fun candidatePriority(command: String, configured: List<String>): Int {
-        val relative = command.removePrefix("./")
-        // Dedicated bin wrappers precede PHAR/Composer installations, including when aliases differ.
-        val pathRank = when {
-            relative.contains("/vendor/bin/") || relative.startsWith("vendor/bin/") -> 200
-            relative.endsWith(".phar") -> 100
-            else -> 0
-        }
-        val configuredIndex = configured.indexOfFirst { it.substringAfterLast('/') == relative.substringAfterLast('/') }
-        val nameRank = (MODERN_NAMES + LEGACY_NAMES).indexOf(relative.substringAfterLast('/')).coerceAtLeast(0)
-        return pathRank + if (configuredIndex >= 0) configuredIndex.coerceAtMost(50) else 50 + nameRank
-    }
+    internal fun candidatePriority(command: String, configured: List<String>): Int =
+        MagentoMagerunNames.candidatePriority(command, configured)
 
     data class Candidate(val path: Path, val cwd: Path, val displayPath: String, val modernName: Boolean,
                          val ddev: MagentoDdevEnvironment.Runtime? = null) {

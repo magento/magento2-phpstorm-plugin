@@ -1,0 +1,118 @@
+name: HCE integration
+
+on:
+  pull_request:
+    paths:
+      - 'modules/hce/**'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoCli*.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoDdev*.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoMagerun*.kt'
+      - 'src/main/java/com/magento/idea/magento2plugin/project/MagentoCliConfiguration.java'
+      - 'gradle/**'
+      - 'gradlew'
+      - '.github/workflows/hce.yml'
+      - '.github/actionlint.yaml'
+  workflow_dispatch:
+    inputs:
+      run_runtime_tests:
+        description: Run real HCE contracts on the provisioned licensed runner
+        type: boolean
+        default: false
+      accept_runtime_eula:
+        description: Accept the installed runtime EULA for this test execution
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  core-tests:
+    name: HCE core tests (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+      - name: Test without an IDE or HCE runtime
+        run: ./gradlew -p modules/hce test --no-daemon --console=plain
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: hce-core-tests-${{ matrix.os }}
+          path: |
+            modules/hce/build/reports/tests/test/**
+            modules/hce/build/test-results/test/**
+
+  host-package:
+    name: HCE host compilation and artifact contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - uses: actions/cache@v6.1.0
+        with:
+          path: build/hce-runtime
+          key: hce-linux-x64-${{ hashFiles('modules/hce/runtime.json') }}
+      - name: Obtain and verify the pinned API distribution
+        run: python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
+      - name: Compile the HCE host without launching or activating it
+        run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon --console=plain
+      - name: Verify plugin dependencies and packaging
+        run: python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: magento-hce-plugin
+          path: modules/hce/build/distributions/magento-hce.zip
+
+  runtime-contracts:
+    name: Real HCE settings and environment contracts
+    if: github.event_name == 'workflow_dispatch' && inputs.run_runtime_tests && inputs.accept_runtime_eula
+    runs-on: [self-hosted, hce, linux, x64]
+    timeout-minutes: 15
+    env:
+      HCE_RUNTIME: ${{ vars.HCE_RUNTIME }}
+      HCE_LICENSE_DIR: ${{ vars.HCE_LICENSE_DIR }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+      - name: Require the provisioned runtime and licensed store
+        run: |
+          test -x "$HCE_RUNTIME/bin/intellij-server"
+          test -d "$HCE_LICENSE_DIR"
+      - name: Build against the installed runtime
+        run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$HCE_RUNTIME" --no-daemon --console=plain
+      - name: Exercise the actual HCE transport and restart behavior
+        run: >-
+          python3 modules/hce/tests/runtime_contract_test.py
+          --runtime "$HCE_RUNTIME"
+          --plugin modules/hce/build/distributions/magento-hce.zip
+          --license-dir "$HCE_LICENSE_DIR"
+          --output "build/hce/contracts-${{ github.run_id }}-${{ github.run_attempt }}"
+          --accept-eula
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: hce-runtime-contracts
+          path: |
+            build/hce/contracts-*/results.json
+            build/hce/contracts-*/session-*/lsp.jsonl
+            build/hce/contracts-*/session-*/stderr.log
+            build/hce/contracts-*/session-*/log/intellij-server.log
