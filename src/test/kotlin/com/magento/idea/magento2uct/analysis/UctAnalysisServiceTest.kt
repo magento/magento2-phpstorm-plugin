@@ -8,8 +8,10 @@ import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.util.JDOMUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2uct.execution.output.ReportBuilder
@@ -269,6 +271,47 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(1, result.themes)
         assertFalse(result.findings.any { it.filePath.contains("Magento/Bundled") })
         assertTrue(result.findings.any { it.filePath.endsWith("layout/default.xml") })
+    }
+
+    fun testRequestedVendorModulesAreScannedIncludingBundledVendors() {
+        myFixture.addFileToProject("vendor/acme/module-custom/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Acme_Custom', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/acme/module-custom/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+        myFixture.addFileToProject("vendor/paypal/module-braintree-core/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'PayPal_Braintree', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/paypal/module-braintree-core/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+
+        val custom = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/acme/module-custom").path)))
+        assertEquals(1, custom.modules)
+        assertTrue(custom.findings.any { it.filePath.endsWith("module-custom/etc/di.xml") })
+        val file = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/paypal/module-braintree-core/etc/di.xml").path)))
+        assertTrue(file.findings.any { it.filePath.endsWith("module-braintree-core/etc/di.xml") })
+
+        val bundled = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/paypal/module-braintree-core").path)))
+        assertEquals(1, bundled.modules)
+        assertTrue(bundled.findings.any { it.filePath.endsWith("module-braintree-core/etc/di.xml") })
+
+        val all = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor").path)))
+        assertEquals(1, all.modules)
+        assertFalse(all.findings.any { it.filePath.contains("module-braintree-core") })
+    }
+
+    fun testRequestedVendorModuleInstalledAsSymlinkIsScanned() {
+        val target = myFixture.addFileToProject("packages/linked/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Acme_Linked', __DIR__);
+        """.trimIndent()).virtualFile.parent
+        myFixture.addFileToProject("packages/linked/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+        val link = Path.of(target.path).parent.parent.resolve("vendor/acme/module-linked")
+        Files.createDirectories(link.parent)
+        Files.createSymbolicLink(link, Path.of(target.path))
+        LocalFileSystem.getInstance().refreshAndFindFileByNioFile(link)
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val result = analyze(request().copy(paths = listOf(link.toString())))
+        assertEquals(1, result.modules)
+        assertTrue(result.findings.any { it.filePath.endsWith("etc/di.xml") })
     }
 
     fun testDetachedFindingsStillProduceTheExistingJsonReport() {

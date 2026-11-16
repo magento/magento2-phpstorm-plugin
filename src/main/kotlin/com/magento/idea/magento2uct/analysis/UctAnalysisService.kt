@@ -103,12 +103,17 @@ class UctAnalysisService @JvmOverloads constructor(
                 ?: throw IllegalArgumentException("Analysis path does not exist: $path")
         }.filterNot(::isExcluded)
         val excluded = ExcludeMagentoBundledFilter()
+        // A requested directory is scanned even when it is a bundled module or a symlink, as Composer path
+        // repositories install modules in vendor; the bundled filter and the symlink rule apply below the roots.
+        val requestedDirectories = roots.filter { it.isDirectory }.map { it.path }.toSet()
+        fun isSkippedLink(directory: VirtualFile) =
+            directory.path !in requestedDirectories && directory.`is`(VFileProperty.SYMLINK)
         val directories = ArrayDeque(roots.filter { it.isDirectory })
         roots.filterNot { it.isDirectory }.forEach { files[it.path] = it }
         val visited = hashSetOf<String>()
         while (directories.isNotEmpty()) {
             val directory = directories.removeFirst()
-            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK) || isExcluded(directory)) continue
+            if (!visited.add(directory.path) || isSkippedLink(directory) || isExcluded(directory)) continue
             require(visited.size <= 10000) { "Scan exceeds 10000 directories. Choose a narrower scope." }
             read {
                 val psiDirectory = PsiManager.getInstance(project).findDirectory(directory)
@@ -117,7 +122,7 @@ class UctAnalysisService @JvmOverloads constructor(
                 if (found.isEmpty()) {
                     directories.addAll(directory.children.filter { it.isDirectory })
                 } else {
-                    found.filterNot { excluded.isExcluded(it) }.forEach {
+                    found.filterNot { directory.path !in requestedDirectories && excluded.isExcluded(it) }.forEach {
                         components[directory.path] = Component(directory, it.type.toString() == "theme")
                     }
                 }
@@ -129,7 +134,7 @@ class UctAnalysisService @JvmOverloads constructor(
         visited.clear()
         while (pending.isNotEmpty()) {
             val directory = pending.removeFirst()
-            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK)) continue
+            if (!visited.add(directory.path) || isSkippedLink(directory)) continue
             require(visited.size <= 10000 && files.size <= 10000) { "Scan exceeds 10000 files or directories. Choose a narrower scope." }
             read {
                 directory.children.filterNot { it.`is`(VFileProperty.SYMLINK) || isExcluded(it) }.forEach {
