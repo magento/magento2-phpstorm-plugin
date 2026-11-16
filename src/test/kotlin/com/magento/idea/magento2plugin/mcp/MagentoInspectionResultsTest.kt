@@ -119,7 +119,8 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
     }
 
     fun testTextRepliesStayAsBefore() {
-        val expected = java.io.File("src/test/testData/mcp/inspect-text-replies.txt").readText()
+        // Git may check the file out with CRLF on Windows; the replies always use LF.
+        val expected = java.io.File("src/test/testData/mcp/inspect-text-replies.txt").readText().replace("\r\n", "\n")
         val cases = Regex("^### (\\S+) (.*)$", RegexOption.MULTILINE).findAll(expected).map { it.groupValues[1] to it.groupValues[2] }
         val actual = StringBuilder()
         for ((type, parameters) in cases) {
