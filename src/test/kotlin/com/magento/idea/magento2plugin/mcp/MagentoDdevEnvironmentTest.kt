@@ -141,8 +141,34 @@ class MagentoDdevEnvironmentTest {
         val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
         assertEquals(100, json.getJSONArray("commands").length())
         assertTrue(json.getBoolean("truncated"))
-        assertFalse(json.toString().contains("secret"))
+        assertFalse(json.getJSONArray("commands").toList().any { it.toString().contains("a-linked") })
         if (!SystemInfoRt.isWindows) assertTrue(json.getJSONArray("skipped").toList().contains("web/a-linked: unreadable or outside the project"))
+    }
+
+    @Test
+    fun projectCommandsFollowDdevNamingDirectivesAndLimits() = fixture { directory ->
+        val root = Files.createDirectories(directory.resolve("project"))
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/long-name", "## Usage: ln <path>\n## Description: first\n## Description: 'last'\n## Example:  ddev ln 'a b'  \n")
+        file(root, ".ddev/commands/db/shared", "## ProjectTypes: drupal11\n")
+        file(root, ".ddev/commands/web/shared", "## Description: from web\n")
+        file(root, ".ddev/commands/db/big", "#".repeat(262_145))
+        file(root, ".ddev/commands/web/big", "## Description: a later folder must not replace it\n")
+        val outside = Files.createDirectories(directory.resolve("outside-commands"))
+        file(outside, "planted", "## Description: outside\n")
+        if (!SystemInfoRt.isWindows) Files.createSymbolicLink(root.resolve(".ddev/commands/linked-service"), outside)
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("long-name", "shared"), commands.map { it.getString("name") }.sorted())
+        val long = commands.single { it.getString("name") == "long-name" }
+        assertEquals("ddev ln", long.getString("invocation"))
+        assertEquals("last", long.getString("description"))
+        assertEquals("ddev ln 'a b'", long.getString("example"))
+        assertEquals("from web", commands.single { it.getString("name") == "shared" }.getString("description"))
+        val skipped = json.getJSONArray("skipped").toList().map { it.toString() }
+        assertTrue(skipped.toString(), skipped.contains("db/big: larger than 262144 bytes, not read"))
+        if (!SystemInfoRt.isWindows) assertTrue(skipped.toString(), skipped.contains("linked-service: outside the project"))
+        assertFalse(json.toString().contains("planted"))
     }
 
     @Test
