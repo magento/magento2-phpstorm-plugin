@@ -24,7 +24,7 @@ internal object MagentoMagerunQueries {
         .put("command_help", "Return structured arguments/options for one exact command or alias from the installed catalogue. Requires command.")
         .put("mcp_config", "Generate native stdio MCP configuration if supported. Optional include/exclude command filters. Does not start a server or write client settings."))
         .put("cache", "Per project and selected invocation; expires after five minutes. refresh=true forces a new probe. Local launcher/config/Composer changes invalidate cached metadata.")
-        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
+        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Before ddev exec, ddev describe must report the project as running; otherwise the reply is environment_not_running and nothing else is run, because ddev exec would start the project. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
         .toString(2)
 
     fun execute(project: Project, request: MagerunRequest, checkCancelled: () -> Unit): String {
@@ -56,6 +56,7 @@ internal class MagentoMagerunService(
 ) {
     private val skillSuggestion = "Optional bundled magento-magerun skill: use magento_skills mode=status, then install it when requested. Installation returns a suggested AGENTS.md link. Verify the runtime before use."
     private val lock = ReentrantLock()
+    private var ddevRunningChecked = false
     private var cache: Snapshot? = null
     private val maxAge = TimeUnit.MINUTES.toNanos(5)
 
@@ -65,6 +66,7 @@ internal class MagentoMagerunService(
         while (!lock.tryLock(50, TimeUnit.MILLISECONDS)) checkCancelled()
         try {
             checkCancelled()
+            ddevRunningChecked = false
             validate(request)
             if (request.refresh) cache = null
             if (environment.selected == null) return base.put("status", "not_found")
@@ -171,6 +173,10 @@ internal class MagentoMagerunService(
     }
 
     private fun probe(plan: MagentoMagerunSupport.LaunchPlan, arguments: List<String>, checkCancelled: () -> Unit): String {
+        plan.ddev?.takeUnless { ddevRunningChecked }?.let {
+            requireDdevRunning(plan, it, checkCancelled)
+            ddevRunningChecked = true
+        }
         val result = runner.run(plan.argv + arguments, plan.cwd, checkCancelled)
         if (plan.runtime == "ddev" && result.exitCode != 0 && !result.timedOut && !result.outputLimited) {
             if (result.exitCode == 127) fail("missing_installation",
@@ -179,6 +185,24 @@ internal class MagentoMagerunService(
         }
         requireSuccess(result)
         return result.stdout
+    }
+
+    // ddev exec starts any project whose status is not "running", so nothing is executed in a stopped,
+    // paused or unhealthy project. The describe output also holds connection details; only the status is read.
+    private fun requireDdevRunning(plan: MagentoMagerunSupport.LaunchPlan, ddev: MagentoDdevEnvironment.Runtime,
+                                   checkCancelled: () -> Unit) {
+        val result = runner.run(listOf(plan.argv.first()) + ddev.statusArguments(), ddev.projectRoot, checkCancelled)
+        if (result.timedOut) fail("timeout", "DDEV did not report the project status within the probe timeout. ddev exec was not run.")
+        val lines = result.stdout.lines().mapNotNull { line -> runCatching { JSONObject(line) }.getOrNull() }
+        val status = lines.asReversed().firstNotNullOfOrNull { line ->
+            line.optJSONObject("raw")?.optString("status")?.takeIf { it.isNotEmpty() }
+        } ?: fail("runtime_unavailable", "DDEV did not report the project status (exit ${result.exitCode}). ddev exec was not run. " +
+            lines.lastOrNull { it.optString("level") in setOf("error", "fatal") }?.optString("msg").orEmpty().take(500))
+        if (status != "running") {
+            val name = ddev.configuration.string("name")?.let { " '$it'" }.orEmpty()
+            fail("environment_not_running", "DDEV project$name is $status. Magerun was not run, because ddev exec " +
+                "starts a project that is not running. Ask the developer to run `ddev start` in ${ddev.projectRoot}, then retry.")
+        }
     }
 
     private fun requireSuccess(result: MagerunProcessResult) {

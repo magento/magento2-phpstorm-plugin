@@ -90,6 +90,8 @@ class MagentoMcpProjectToolset : McpToolset {
         "candidate exists and .ddev/config.yaml is present.\n" +
         "- Magerun uses the shared DDEV CLI environment, including parsed project and container " +
         "working-directory settings. The host ddev executable is resolved from the IDE PATH.\n" +
+        "- A DDEV project that ddev describe does not report as running returns environment_not_running; " +
+        "nothing is run in it, because ddev exec would start it. Ask the developer to run ddev start.\n" +
         "- Commands never fall back to another runtime on failure.\n" +
         "- For interactive permissions, suggest the returned terminalGuidance command in PhpStorm's " +
         "Terminal (IDE console).\n\n" +

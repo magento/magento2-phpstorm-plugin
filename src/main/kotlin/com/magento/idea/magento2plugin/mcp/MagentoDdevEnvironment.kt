@@ -60,6 +60,11 @@ internal object MagentoDdevEnvironment {
             addAll(command)
         }
 
+        val projectRoot: Path get() = config.parent.parent
+
+        /** `ddev describe` reports the status and, unlike `ddev exec`, does not start a stopped project. */
+        fun statusArguments(): List<String> = listOf("describe", "--json-output") + listOfNotNull(configuration.string("name"))
+
         fun example(command: List<String>): String = (listOf("ddev") + execArguments(command))
             .joinToString(" ", transform = MagentoCliToolQueries::shellQuote)
 
@@ -74,14 +79,14 @@ internal object MagentoDdevEnvironment {
                 else -> "configured"
             })
             .put("configuration", configuration.json())
-            .put("projectRoot", config.parent.parent.toString()).put("cwd", cwd.toString())
+            .put("projectRoot", projectRoot.toString()).put("cwd", cwd.toString())
             .put("executable", executable?.toString() ?: JSONObject.NULL)
             .put("runtimeProbed", false)
             .apply {
                 if (configuration.error == null) {
                     put("execPrefix", JSONArray(listOf(executable?.toString() ?: "ddev") + execArguments(emptyList())))
                     put("terminalGuidance", terminalGuidance())
-                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed.")
+                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed. ddev exec starts a project that is not running, so check `ddev describe` first and ask the developer before starting it.")
                 }
             }
     }

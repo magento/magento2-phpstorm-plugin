@@ -29,17 +29,20 @@ class MagentoMagerunTest {
         assertEquals("ok", result.getString("status"))
         assertTrue(result.getString("skillSuggestion").contains("magento-magerun"))
         val prefix = listOf(launcher.toString(), "exec", "--raw", "--service=web", "--", "magerun2")
-        assertTrue(runner.calls.all { it.take(prefix.size) == prefix })
+        assertEquals(listOf(launcher.toString(), "describe", "--json-output"), runner.calls.first())
+        assertEquals(1, runner.calls.count { "describe" in it })
+        assertTrue(runner.calls.drop(1).all { it.take(prefix.size) == prefix })
         assertTrue(runner.calls.none { args -> args.any { it.startsWith("--root-dir=") } })
         val server = result.getJSONObject("configuration").getJSONObject("mcpServers").getJSONObject("magento-magerun2")
         assertEquals(prefix.drop(1), server.getJSONArray("args").toList().take(prefix.size - 1))
         val callsBefore = runner.calls.size
         file(root, ".ddev/config.yaml", "type: magento2\nname: changed\n")
         service.execute(env, MagerunRequest("commands"))
-        assertEquals(callsBefore + 2, runner.calls.size)
+        assertEquals(callsBefore + 3, runner.calls.size)
+        assertEquals(listOf(launcher.toString(), "describe", "--json-output"), runner.calls[callsBefore])
         file(directory, "host tools/ddev", "changed launcher", true)
         service.execute(env, MagerunRequest("commands"))
-        assertEquals(callsBefore + 4, runner.calls.size)
+        assertEquals(callsBefore + 6, runner.calls.size)
     }
 
     @Test
@@ -67,9 +70,10 @@ class MagentoMagerunTest {
             MagerunProcessResult(-1, outputLimited = true) to "output_limit"
         )) {
             var calls = 0
-            val service = MagentoMagerunService(MagerunRunner { _, cwd, _ ->
-                calls++
+            val service = MagentoMagerunService(MagerunRunner { argv, cwd, _ ->
                 assertEquals(root, cwd)
+                if ("describe" in argv) return@MagerunRunner MagerunProcessResult(0, RUNNING)
+                calls++
                 failure
             })
             val result = service.execute(env, MagerunRequest("commands"))
@@ -79,10 +83,53 @@ class MagentoMagerunTest {
             assertEquals(1, calls)
             assertEquals("detected", service.execute(env, MagerunRequest()).getString("status"))
         }
-        val unavailable = MagentoMagerunService(MagerunRunner { _, _, _ -> throw java.io.IOException("denied") })
+        val unavailable = MagentoMagerunService(MagerunRunner { argv, _, _ ->
+            if ("describe" in argv) MagerunProcessResult(0, RUNNING) else throw java.io.IOException("denied")
+        })
             .execute(env, MagerunRequest("commands"))
         assertEquals("runtime_unavailable", unavailable.getString("status"))
         assertTrue(unavailable.has("terminalGuidance"))
+    }
+
+    @Test
+    fun testDdevProjectThatIsNotRunningIsNotStarted() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\nname: shop\n")
+        val launcher = file(root, "host/ddev", "fixture", true)
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { launcher }
+        for (status in listOf("stopped", "paused", "unhealthy")) {
+            val runner = FakeRunner(describe = MagerunProcessResult(0, RUNNING.replace("running", status)))
+            for (mode in listOf("commands", "command_help", "mcp_config")) {
+                val result = MagentoMagerunService(runner).execute(env, MagerunRequest(mode, command = "sys:info"))
+                assertEquals("environment_not_running", result.getString("status"))
+                assertTrue(result.getString("message").contains("DDEV project 'shop' is $status"))
+                assertTrue(result.getString("message").contains("ddev start"))
+            }
+            assertEquals(List(3) { listOf(launcher.toString(), "describe", "--json-output", "shop") }, runner.calls)
+        }
+        val missing = FakeRunner(describe = MagerunProcessResult(1,
+            """{"level":"fatal","msg":"could not find requested project 'shop'"}"""))
+        val result = MagentoMagerunService(missing).execute(env, MagerunRequest("commands"))
+        assertEquals("runtime_unavailable", result.getString("status"))
+        assertTrue(result.getString("message").contains("could not find requested project 'shop'"))
+        assertEquals(1, missing.calls.size)
+        val slow = FakeRunner(describe = MagerunProcessResult(-1, timedOut = true))
+        assertEquals("timeout", MagentoMagerunService(slow).execute(env, MagerunRequest("commands")).getString("status"))
+        assertEquals(1, slow.calls.size)
+    }
+
+    @Test
+    fun testCachedDdevCatalogueDoesNotCheckStatusAgain() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        val launcher = file(root, "host/ddev", "fixture", true)
+        val env = MagentoMagerunSupport.discover(root, null, DEFAULTS) { launcher }
+        val runner = FakeRunner()
+        val service = MagentoMagerunService(runner)
+        assertEquals("ok", service.execute(env, MagerunRequest("commands")).getString("status"))
+        assertEquals(3, runner.calls.size)
+        assertEquals(true, service.execute(env, MagerunRequest("commands")).getBoolean("cached"))
+        assertEquals(3, runner.calls.size)
+        service.execute(env, MagerunRequest("command_help", command = "sys:info"))
+        assertEquals(listOf("describe", "help"), runner.calls.drop(3).map { if ("describe" in it) "describe" else "help" })
     }
 
     @Test
@@ -416,12 +463,14 @@ class MagentoMagerunTest {
     }
 
     private class FakeRunner(val version: String = "n98-magerun2 9.3.0 by netz98", val catalogue: String = CATALOGUE,
-                             val preflight: MagerunProcessResult = MagerunProcessResult(0), val help: String? = null) : MagerunRunner {
+                             val preflight: MagerunProcessResult = MagerunProcessResult(0), val help: String? = null,
+                             val describe: MagerunProcessResult = MagerunProcessResult(0, RUNNING)) : MagerunRunner {
         val calls = mutableListOf<List<String>>()
         override fun run(argv: List<String>, cwd: Path, checkCancelled: () -> Unit): MagerunProcessResult {
             calls.add(argv)
             return when {
                 "test" in argv -> preflight
+                "describe" in argv -> describe
                 "--version" in argv -> MagerunProcessResult(0, version)
                 "list" in argv -> MagerunProcessResult(0, catalogue)
                 "help" in argv -> MagerunProcessResult(0, help ?: JSONObject().put("name", argv[argv.indexOf("help") + 1])
@@ -455,6 +504,7 @@ class MagentoMagerunTest {
         }
     }
     companion object {
+        private const val RUNNING = """{"level":"info","msg":"","raw":{"name":"shop","status":"running"},"time":"2026-11-16T12:00:00+01:00"}"""
         private val DEFAULTS = listOf("bin/magento", "bin/n98-magerun2", "bin/n98-magerun", "bin/magerun")
         private val CATALOGUE = """{"application":{"name":"n98-magerun2","version":"9.3.0"},"commands":[
             {"name":"sys:info","description":"System info","usage":["sys:info","si"]},

@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
 
+### Fixed
+
+- `magento_magerun` no longer starts a DDEV project that is not running. `ddev exec` starts a stopped, paused or unhealthy project, so the tool now checks `ddev describe` first and answers `environment_not_running` with the project status and `ddev start` for the developer, instead of reporting a probe timeout while the project starts [#2806](https://github.com/magento/magento2-phpstorm-plugin/issues/2806).
+
 
 ## 2026.3.6-p1
 
