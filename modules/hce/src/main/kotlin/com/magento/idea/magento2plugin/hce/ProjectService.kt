@@ -28,7 +28,7 @@ class ProjectService(private val store: SettingsStore) {
             val target = if (magentoPath.isBlank()) current.magentoPath else resolveRoot(root, magentoPath).toString()
             val active = enabled ?: current.enabled
             require(!active || target != null) { "magentoPath is required when enabling Magento integration." }
-            target?.let { resolveRoot(root, it) }
+            if (active) target?.let { resolveRoot(root, it) }
             val candidates = cliToolCandidates?.let { validateCandidates(root, it) } ?: current.cliToolCandidates
             current.copy(enabled = active, magentoPath = target, cliToolCandidates = candidates)
         }
@@ -52,7 +52,7 @@ class ProjectService(private val store: SettingsStore) {
         ok().put("projectPath", root.toString()).put("magentoPath", magento.toString())
             .put("configurationRevision", state.revision).put("configurationWritten", false).put("runtimeProbed", false)
             .put("description", MagentoCliEnvironment.describeCliEnvironment(root, relative, state.cliToolCandidates,
-                magerunAvailable = false, skillsAvailable = false))
+                magerunAvailable = true, skillsAvailable = true))
     }
 
     private fun status(root: Path, state: ProjectSettings): JSONObject = ok()

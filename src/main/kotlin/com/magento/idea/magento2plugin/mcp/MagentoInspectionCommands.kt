@@ -35,7 +35,7 @@ internal object MagentoInspectionCommands {
         "acl_or_menu" to "Find ACL resource IDs and admin menu entries."
     )
 
-    fun help(): String = """
+    fun help(queryTypes: Set<String>? = null): String = """
         Magento inspection library
 
         Use this as a three-step lookup flow to keep context small:
@@ -44,21 +44,23 @@ internal object MagentoInspectionCommands {
         3. `query`: run the selected inspection with queryType and parametersJson.
 
         Queries:
-        ${availableTypes().joinToString("\n") { "- `$it`: ${querySummaries.getValue(it)}" }}
+        ${availableTypes().filter { queryTypes == null || it in queryTypes }.joinToString("\n") { "- `$it`: ${querySummaries.getValue(it)}" }}
         ${if (MagentoMethodPluginQueryProvider.isAvailable()) "" else MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE}
 
         Next: call mode `detailed_schema` with one queryType before querying.
     """.trimIndent()
 
-    fun detailedSchema(queryType: String): String {
+    fun detailedSchema(queryType: String, queryTypes: Set<String>? = null): String {
         val normalizedType = normalizeType(queryType)
         if (normalizedType.isEmpty()) {
             return MISSING_TYPE_MESSAGE
         }
 
         if (normalizedType !in supportedTypes) {
-            return unknownTypeMessage(normalizedType)
+            return unknownTypeMessage(normalizedType, queryTypes)
         }
+
+        hostUnavailable(normalizedType, queryTypes)?.let { return it }
 
         if (!isAvailable(normalizedType)) {
             return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
@@ -67,11 +69,16 @@ internal object MagentoInspectionCommands {
         return typeHelp(normalizedType)
     }
 
-    fun query(project: Project, queryType: String, parametersJson: String): String {
+    fun query(
+        project: Project, queryType: String, parametersJson: String,
+        queryTypes: Set<String>? = null, indexKeys: MagentoIndexKeys? = null
+    ): String {
         val normalizedType = normalizeType(queryType)
         if (normalizedType !in supportedTypes) {
-            return unknownTypeMessage(normalizedType)
+            return unknownTypeMessage(normalizedType, queryTypes)
         }
+
+        hostUnavailable(normalizedType, queryTypes)?.let { return it }
 
         if (!isAvailable(normalizedType)) {
             return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
@@ -87,7 +94,7 @@ internal object MagentoInspectionCommands {
             if (DumbService.getInstance(project).isDumb) {
                 return MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
             }
-            dispatch(project, normalizedType, parameters)
+            dispatch(project, normalizedType, parameters, indexKeys)
         } catch (exception: MissingParameterException) {
             "Missing required parameter `${exception.parameterName}` for queryType `$normalizedType`. Call magento_inspect with mode `detailed_schema` and queryType `$normalizedType` for the expected parameters."
         } catch (_: IndexNotReadyException) {
@@ -100,16 +107,22 @@ internal object MagentoInspectionCommands {
         return normalizedType in supportedTypes && isAvailable(normalizedType)
     }
 
+    private fun hostUnavailable(type: String, queryTypes: Set<String>?): String? =
+        if (queryTypes != null && type !in queryTypes)
+            "Query `$type` is unavailable in this host. Available queries: ${queryTypes.sorted().joinToString()}."
+        else null
+
     private fun availableTypes(): List<String> = supportedTypes.filter(::isAvailable)
 
     private fun isAvailable(queryType: String): Boolean =
         queryType != "plugins_for_method" || MagentoMethodPluginQueryProvider.isAvailable()
 
-    private fun dispatch(project: Project, queryType: String, parameters: JSONObject): String {
+    private fun dispatch(project: Project, queryType: String, parameters: JSONObject, indexKeys: MagentoIndexKeys?): String {
         return when (queryType) {
             "module" -> MagentoModuleQueries.findMagentoModule(
                 project = project,
-                moduleName = parameters.requireString("moduleName")
+                moduleName = parameters.requireString("moduleName"),
+                indexKeys = indexKeys
             )
 
             "di_config" -> MagentoDiQueries.findDiConfigForClass(
@@ -130,7 +143,8 @@ internal object MagentoInspectionCommands {
 
             "layout_entities" -> MagentoViewQueries.findLayoutEntities(
                 project = project,
-                name = parameters.requireString("name")
+                name = parameters.requireString("name"),
+                indexKeys = indexKeys
             )
 
             "ui_component" -> MagentoViewQueries.findUiComponent(
@@ -231,8 +245,8 @@ internal object MagentoInspectionCommands {
         else -> unknownTypeMessage(queryType)
     }
 
-    private fun unknownTypeMessage(queryType: String): String {
-        return "Unknown queryType `$queryType`. Supported values: ${availableTypes().joinToString(", ")}. Call magento_inspect with mode `help` for the compact query catalog."
+    private fun unknownTypeMessage(queryType: String, queryTypes: Set<String>? = null): String {
+        return "Unknown queryType `$queryType`. Supported values: ${availableTypes().filter { queryTypes == null || it in queryTypes }.joinToString(", ")}. Call magento_inspect with mode `help` for the compact query catalog."
     }
 
     private fun JSONObject.requireString(name: String): String {

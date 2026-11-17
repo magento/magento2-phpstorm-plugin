@@ -134,6 +134,69 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
         }
     }
 
+    @Test
+    fun testHostIndexKeysPreserveQueryResultsAndReadiness() {
+        val hostKeys = MagentoIndexKeys { id, _ ->
+            when (id) {
+                com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex.KEY ->
+                    listOf("Foo_Bar2", "Magento_Catalog", "Magento_CatalogGraphQl",
+                        "Magento_CatalogRuleConfigurable", "Missing_Module")
+                com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex.KEY ->
+                    listOf("test_index_index_block2")
+                com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex.KEY ->
+                    listOf("test_index_index_container2")
+                else -> error("Unexpected index: $id")
+            }
+        }
+        for ((type, parameters) in listOf(
+            "module" to """{"moduleName":"Foo_Bar2"}""",
+            "module" to """{"moduleName":"Magento_Catalog"}""",
+            "layout_entities" to """{"name":"test_index_index_block2"}""",
+            "layout_entities" to """{"name":"test_index_index_container2"}"""
+        )) {
+            assertEquals(MagentoInspectionCommands.query(project, type, parameters),
+                MagentoInspectionCommands.query(project, type, parameters, indexKeys = hostKeys))
+        }
+        // A key with no in-scope files must not be reported as a module.
+        assertContains(MagentoInspectionCommands.query(project, "module",
+            """{"moduleName":"Missing_Module"}""", indexKeys = hostKeys), "No Magento modules matched")
+        // No filesystem fallback: the host's indexed scope is authoritative.
+        assertContains(MagentoInspectionCommands.query(project, "module",
+            """{"moduleName":"Foo_Bar2"}""", indexKeys = MagentoIndexKeys { _, _ -> emptyList() }),
+            "No Magento modules matched")
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            for ((type, parameters) in listOf("module" to """{"moduleName":"Foo_Bar2"}""",
+                "layout_entities" to """{"name":"test_index_index_block2"}""")) {
+                assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
+                    MagentoInspectionCommands.query(project, type, parameters,
+                        indexKeys = MagentoIndexKeys { _, _ -> error("Index access during indexing") }))
+            }
+        }
+    }
+
+    @Test
+    fun testHostCapabilitiesFilterCatalogSchemaAndDispatchBeforeIndexAccess() {
+        val supported = setOf("di_config", "observers_for_event", "ui_component", "acl_or_menu")
+        val help = MagentoInspectionCommands.help(supported)
+        for (type in supported) assertContains(help, "- `$type`:")
+        for (type in listOf("module", "layout_entities", "plugins_for_method")) {
+            assertFalse(help.contains("- `$type`:"))
+            assertContains(MagentoInspectionCommands.detailedSchema(type, supported), "unavailable in this host")
+        }
+        // Default desktop catalog is unchanged, including its optional PHP provider.
+        assertContains(MagentoInspectionCommands.help(), "- `module`:")
+        assertContains(MagentoInspectionCommands.detailedSchema("di", supported), "Required: className")
+        val unknown = MagentoInspectionCommands.detailedSchema("unknown", supported)
+        assertFalse(unknown.contains("plugins_for_method"))
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            for (alias in listOf("modules", "layout", "plugins")) {
+                assertContains(MagentoInspectionCommands.query(project, alias, "{invalid", supported), "unavailable in this host")
+            }
+            assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
+                MagentoInspectionCommands.query(project, "di", "{\"className\":\"Missing\"}", supported))
+        }
+    }
+
     private fun assertContains(text: String, expected: String) {
         assertTrue("Expected to find <$expected> in:\n$text", text.contains(expected))
     }

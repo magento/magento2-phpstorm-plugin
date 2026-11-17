@@ -39,8 +39,13 @@ class ProjectToolset : McpToolset {
 
     private suspend fun withProject(action: (ProjectService, Path) -> String): String = withContext(Dispatchers.IO) {
         val root = requireNotNull(currentCoroutineContext().project.basePath) { "HCE project path is unavailable." }
-        val directory = System.getProperty("magento.hce.settings.dir")?.let(Path::of)
-            ?: Path.of(PathManager.getConfigPath(), "magento-hce")
-        action(ProjectService(SettingsStore(directory)), Path.of(root))
+        action(ProjectService(settingsStore()), Path.of(root))
     }
+}
+
+/** Every toolset resolves the same durable store, independent of analysis context lifetime. */
+internal fun settingsStore(): SettingsStore {
+    val directory = System.getProperty("magento.hce.settings.dir")?.let(Path::of)
+        ?: Path.of(PathManager.getConfigPath(), "magento-hce")
+    return SettingsStore(directory)
 }

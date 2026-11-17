@@ -19,15 +19,15 @@ internal object MagentoViewQueries {
     /**
      * Searches across layout handles, block declarations, and container declarations for the supplied name.
      */
-    fun findLayoutEntities(project: Project, name: String): String {
+    fun findLayoutEntities(project: Project, name: String, indexKeys: MagentoIndexKeys? = null): String {
         val query = name.trim()
         if (query.isEmpty()) {
             return "Provide a layout handle, block name, or container name."
         }
 
         val handleMatches = findLayoutHandles(project, query)
-        val blockMatches = findBlockMatches(project, query)
-        val containerMatches = findContainerMatches(project, query)
+        val blockMatches = findBlockMatches(project, query, indexKeys)
+        val containerMatches = findContainerMatches(project, query, indexKeys)
 
         val lines = mutableListOf<String>()
         if (handleMatches.isNotEmpty()) {
@@ -188,9 +188,9 @@ internal object MagentoViewQueries {
             .toList()
     }
 
-    private fun findBlockMatches(project: Project, query: String): List<Pair<String, List<BlockRecord>>> {
+    private fun findBlockMatches(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, List<BlockRecord>>> {
         val blockNames = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(BlockNameIndex.KEY, project),
+            indexKeys?.keys(BlockNameIndex.KEY, project) ?: LayoutIndex.getAllKeys(BlockNameIndex.KEY, project),
             query
         )
 
@@ -202,9 +202,9 @@ internal object MagentoViewQueries {
         }
     }
 
-    private fun findContainerMatches(project: Project, query: String): List<Pair<String, List<ContainerRecord>>> {
+    private fun findContainerMatches(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, List<ContainerRecord>>> {
         val containerNames = MagentoMcpSupport.prioritizeMatches(
-            LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project),
+            indexKeys?.keys(ContainerNameIndex.KEY, project) ?: LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project),
             query
         )
 

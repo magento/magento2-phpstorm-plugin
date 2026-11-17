@@ -67,12 +67,12 @@ internal object MagentoMagerunSupport {
         val candidates: List<Candidate>
     ) {
         val selected: Candidate? get() = candidates.firstOrNull()
-        fun json(): JSONObject = JSONObject().put("projectRoot", projectRoot.toString())
+        fun json(terminalName: String = "PhpStorm's Terminal (IDE console)"): JSONObject = JSONObject().put("projectRoot", projectRoot.toString())
             .put("magentoRoot", magentoRoot?.toString() ?: JSONObject.NULL)
             .put("searchRoots", JSONArray(searchRoots))
             .put("selected", selected?.json() ?: JSONObject.NULL)
             .put("alternatives", JSONArray(candidates.drop(1).map { it.json() }))
-            .apply { selected?.ddev?.takeIf { it.configuration.error == null }?.let { put("terminalGuidance", it.terminalGuidance(listOf("magerun2", "--version"))) } }
+            .apply { selected?.ddev?.takeIf { it.configuration.error == null }?.let { put("terminalGuidance", it.terminalGuidance(listOf("magerun2", "--version"), terminalName)) } }
     }
 
     data class LaunchPlan(

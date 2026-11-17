@@ -7,6 +7,20 @@ on:
       - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoCli*.kt'
       - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoDdev*.kt'
       - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoMagerun*.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoSkillCommands.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoIntelligenceToolset.kt'
+      - 'skills/magento-*/**'
+      - 'src/test/resources/magerun/**'
+      - 'src/test/resources/mcp/**'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoInspectionCommands.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoIndexKeys.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoXmlDiagnostics.kt'
+      - 'src/main/resources/magento2/inspection.properties'
+      - 'src/test/testData/project/magento2/**'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/Magento*Queries.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoMcp*.kt'
+      - 'src/main/kotlin/com/magento/idea/magento2plugin/mcp/MagentoMethodPluginQueryProvider.kt'
+      - 'src/main/java/com/magento/idea/magento2plugin/**'
       - 'src/main/java/com/magento/idea/magento2plugin/project/MagentoCliConfiguration.java'
       - 'gradle/**'
       - 'gradlew'
@@ -79,7 +93,7 @@ jobs:
           path: modules/hce/build/distributions/magento-hce.zip
 
   runtime-contracts:
-    name: Real HCE settings and environment contracts
+    name: Real HCE tool contracts
     if: github.event_name == 'workflow_dispatch' && inputs.run_runtime_tests && inputs.accept_runtime_eula
     runs-on: [self-hosted, hce, linux, x64]
     timeout-minutes: 15

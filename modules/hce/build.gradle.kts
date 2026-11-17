@@ -21,15 +21,41 @@ sourceSets.main {
 // The core and its tests need no IDE or HCE distribution. Only this host adapter
 // compiles against the pinned engine API and is included in the plugin archive.
 val host = sourceSets.create("host")
+kotlin.target.compilations.getByName("host").associateWith(kotlin.target.compilations.getByName("main"))
 val hceRuntime = providers.gradleProperty("hceRuntime")
 val engineJars = files(providers.provider {
     hceRuntime.orNull?.let { runtime -> fileTree(runtime) {
-        include("lib/*.jar", "plugins/mcp/lib/**/*.jar")
+        include("lib/*.jar", "plugins/mcp/lib/**/*.jar", "plugins/xml/lib/**/*.jar")
     } } ?: files()
 })
 configurations[host.implementationConfigurationName].extendsFrom(configurations.implementation.get())
 host.compileClasspath += sourceSets.main.get().output
 host.runtimeClasspath += sourceSets.main.get().output
+
+kotlin.sourceSets.named("host") {
+    kotlin.srcDir(shared.resolve("kotlin"))
+    kotlin.include("com/magento/idea/magento2plugin/hce/**")
+    listOf("MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
+        "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
+        "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",
+        "MagentoMagerunQueries", "MagentoMagerunSupport", "MagentoMagerunProcess", "MagentoCliToolQueries",
+        "MagentoIntelligenceToolset").forEach {
+        kotlin.include("com/magento/idea/magento2plugin/mcp/$it.kt")
+    }
+}
+host.java.srcDir(shared.resolve("java"))
+listOf("inspections/xml/CacheableFalseInDefaultLayoutInspection", "inspections/xml/ModuleDeclarationInModuleXmlInspection",
+    "inspections/xml/fix/XmlRemoveCacheableAttributeQuickFix", "inspections/xml/fix/XmlModuleNameQuickFix",
+    "inspections/util/GetEditableModuleNameByRootFileUtil", "bundles/InspectionBundle", "bundles/AbstractBundle",
+    "magento/files/LayoutXml", "magento/files/ModuleXml", "project/MagentoSkillInstaller", "indexes/ModuleIndex", "indexes/LayoutIndex", "indexes/UIComponentIndex", "project/Settings",
+    "magento/packages/Package", "magento/packages/File", "magento/files/ModuleFileInterface",
+    "magento/files/ModuleDiXml", "magento/files/ModuleAclXml", "magento/files/ModuleMenuXml",
+    "stubs/indexes/xml/ModuleXmlIndex", "stubs/indexes/xml/ThemeXmlIndex",
+    "stubs/indexes/BlockNameIndex", "stubs/indexes/ContainerNameIndex",
+    "stubs/indexes/NamedComponentIndex", "stubs/indexes/LayoutDataIndexer", "util/PhpNameUtil",
+    "util/RegExUtil", "util/magento/IsFileInEditableModuleUtil", "util/magento/MagentoPathUrlUtil").forEach {
+    host.java.include("com/magento/idea/magento2plugin/$it.java")
+}
 
 dependencies {
     implementation(libs.json)
@@ -50,6 +76,8 @@ val hcePluginJar = tasks.register<Jar>("hcePluginJar") {
     archiveClassifier = "hce"
     from(sourceSets.main.get().output)
     from(host.output)
+    from(shared.resolve("resources")) { include("magento2/inspection.properties") }
+    from("../../skills") { include("magento-inspect/**", "magento-magerun/**", "magento-scaffold/**"); into("skills") }
 }
 tasks.register<Zip>("packageHcePlugin") {
     dependsOn(hcePluginJar)

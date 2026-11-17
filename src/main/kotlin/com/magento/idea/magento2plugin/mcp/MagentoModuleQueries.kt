@@ -10,27 +10,29 @@ import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.magento.idea.magento2plugin.indexes.ModuleIndex
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex
 
 internal object MagentoModuleQueries {
     /**
      * Returns module metadata for exact or fuzzy Magento module name matches.
      */
-    fun findMagentoModule(project: Project, moduleName: String): String {
+    fun findMagentoModule(project: Project, moduleName: String, indexKeys: MagentoIndexKeys? = null): String {
         val query = moduleName.trim()
         if (query.isEmpty()) {
             return "Provide a Magento module name, for example Magento_Catalog."
         }
 
         return runWithReadyIndexes(project) {
-            findMagentoModuleWithReadyIndexes(project, query)
+            findMagentoModuleWithReadyIndexes(project, query, indexKeys)
         }
     }
 
-    private fun findMagentoModuleWithReadyIndexes(project: Project, query: String): String {
+    private fun findMagentoModuleWithReadyIndexes(project: Project, query: String, indexKeys: MagentoIndexKeys?): String {
         val moduleIndex = ModuleIndex(project)
         val candidateNames = linkedSetOf<String>()
-        candidateNames += moduleIndex.moduleNames
-        if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
+        candidateNames += if (indexKeys == null) moduleIndex.moduleNames
+            else moduleIndex.getModuleNames(indexKeys.keys(ModuleXmlIndex.KEY, project))
+        if (indexKeys == null && moduleIndex.getModuleDirectoryByModuleName(query) != null) {
             candidateNames += query
         }
         val matches = MagentoMcpSupport.prioritizeMatches(candidateNames, query)

@@ -1,7 +1,8 @@
 # Magento 2 and Adobe Commerce for HCE
 
 The HCE integration has its own plugin identity, build, tests, and CI. Project
-settings and CLI environment discovery are its first toolset. The plugin can add
+settings, CLI environment discovery, bundled skill delivery, Magerun metadata, and
+shared XML analysis are its initial toolsets. The plugin can add
 Magento analysis toolsets without changing its identity or loading desktop UI,
 PHP, or JavaScript dependencies into this module unconditionally.
 
@@ -12,6 +13,94 @@ PHP, or JavaScript dependencies into this module unconditionally.
 | `configure_magento_project` | `action=status` (default) reads settings; `action=help` describes supported settings; `action=configure` explicitly persists root, enabled state, and/or CLI wrapper candidates. |
 | `get_magento_root_path` | Reads the configured absolute root. Reports an unconfigured project explicitly. |
 | `describe_magento_cli_environment` | Uses the shared Magento discovery service for wrappers, Compose priority, working directories, and DDEV configuration/overrides. Requires enabled integration and a configured root. |
+| `magento_diagnostics` | Explicit file-scoped checks using selected existing XML inspections; reports rules, severity, explanations, and source ranges. |
+| `magento_inspect` | Shared Magento XML analysis: `help`, `detailed_schema`, and `query`; available when the host has XML support. |
+| `magento_intelligence` | Lists the tools actually available in this host. |
+| `magento_skills` | Read-only status/help and explicit bundled skill installation, without requiring Magento setup. |
+| `magento_magerun` | Read-only candidate discovery and bounded version/list/help metadata probes after Magento setup. |
+
+## Skills and Magerun
+
+`magento_skills` reuses the desktop installer and packaged `magento-inspect`,
+`magento-magerun`, and `magento-scaffold` instructions. Status never writes files.
+Installation requires explicit skill names and supports `project`, `agents`,
+`codex`, and `claude` targets under the opened project root. Customized files are
+preserved unless `overwrite=true`; identical files remain unchanged. Symlink
+boundaries and the complete installation plan are validated before writing.
+The tool returns suggested instruction links and never edits `AGENTS.md`.
+Installing instructions does not add unavailable host capabilities: PHP analysis,
+upgrade compatibility, and scaffolding remain unavailable in HCE.
+
+```json
+{"mode":"install","skills":["magento-inspect","magento-magerun"],"agentTarget":"agents"}
+```
+
+`magento_magerun` reuses the existing candidate/wrapper/DDEV discovery, invocation
+planning, process runner, JSON metadata parser, pagination, and cache. `help` and
+`status` do not launch processes. `commands`, `command_help`, and `mcp_config` may
+run bounded version/list/help probes against the selected installed runtime.
+They never run application commands, start containers/services, install or update
+Magerun, or fall back to another runtime. `mcp_config` returns configuration only;
+it neither writes settings nor starts an MCP server. Unsupported wrappers and
+unavailable/invalid runtime output have explicit statuses.
+
+```json
+{"mode":"commands","search":"sys","limit":10}
+```
+
+Metadata caches are separate by canonical project root, bounded to 16 projects
+per engine process, expire after five minutes, and invalidate on relevant local
+launcher/configuration/Composer changes. `refresh=true` clears cached metadata.
+The adapter reloads saved integration settings on every call.
+
+## XML analysis
+
+`magento_inspect` reuses the existing inspection catalog, argument validation,
+module/layout indexes, DI/event snapshots, UI component and ACL/menu queries,
+XML PSI, cache invalidation,
+bounded result formatting, and cancellation/index-readiness handling. The HCE
+adapter loads saved settings into each analysis context and supplies the actual
+host query capabilities. No alternate XML parser or duplicated Magento index is
+introduced. Results use project-relative declaration paths and cover the opened
+project's indexed scope, not an effective Magento configuration merge.
+
+Supported query types: `module`, `layout_entities`, `di_config`,
+`observers_for_event`, `ui_component`, `acl_or_menu`. Discover one schema before calling the query, for example:
+
+```json
+{"mode":"detailed_schema","queryType":"di_config"}
+```
+
+```json
+{"mode":"query","queryType":"di_config","parametersJson":"{\"className\":\"Magento\\\\Theme\\\\Block\\\\Html\\\\Topmenu\"}"}
+```
+
+Module lookup returns exact/fuzzy declaration names, module directories, editable
+status, and `etc`/`view` paths. Layout lookup covers handles, block declarations
+(including class/template attributes), and container declarations (including HTML
+attributes), with project-relative file paths. These are indexed declarations;
+references, effective layout merging, and PHP class validity are not inferred.
+
+HCE registers the existing `ModuleXmlIndex`, `BlockNameIndex`, and
+`ContainerNameIndex`. Its global key enumeration does not include arbitrary
+custom indexes in the tested build. The adapter uses public `FilenameIndex` and
+`FileBasedIndex.getFileData` APIs to enumerate the existing per-file index data;
+query matching, scope filtering, declaration lookup, and output remain shared.
+No analyzer internals, private allowlist mutations, or replacement indexes are
+used. The host's internal analysis settings keep these static indexes populated;
+query access still checks the durable project configuration. Enumeration visits
+matching XML files, so cost grows with indexed project size; production Magento
+project performance has not yet been benchmarked.
+
+After on-disk updates, use the engine's `wait-for-highwatermark` command before
+querying to wait for indexing. Live contracts verify renamed modules, blocks,
+and containers, alongside handles, missing matches, and clean shutdown.
+PHP queries remain unavailable.
+Unavailable queries are omitted from the catalog and explicitly rejected rather
+than returning no matches. Declaration results do not validate PHP classes,
+inheritance, Magento merge order, or application runtime behavior. Live-update
+contracts run in the actual HCE process. Controlled dumb-mode behavior is checked
+in the shared PhpStorm tests; it is not claimed as an observed HCE transition.
 
 Configure with, for example:
 
@@ -25,11 +114,49 @@ text with `status` and `successful`; inspect them even when the transport's
 `isError` is false. Disabled support, missing settings, invalid configuration,
 storage errors, and unsupported capabilities are distinct states.
 
-Discovery reads files only. It does not execute wrappers, PHP, Docker, DDEV, or
+CLI environment discovery reads files only. It does not execute wrappers, PHP, Docker, DDEV, or
 Magerun, start services, probe container state, or install skills. DDEV settings
 are a bounded static view; secret environment entries and hooks are not exported.
 Indexing exclusions are not implemented here: passing `excludeGeneratedFiles`
 returns `unsupported_capability` without changing settings.
+
+## XML diagnostics
+
+Discover `magento_diagnostics` with `mode=help`, then check one project-relative
+XML file. This runs the existing local inspection visitors, including their
+messages and XML suppression, without applying quick fixes or changing files.
+
+```json
+{"mode":"check","filePath":"src/app/code/Foo/Bar/view/frontend/layout/default.xml","limit":25}
+```
+
+The initial rules use the desktop inspection IDs:
+
+- `ModuleDeclarationInModuleXmlInspection` (error): declaration name disagrees
+  with the editable module directory. Vendor modules and dependency sequence
+  declarations retain the existing inspection's exclusions.
+- `CacheableFalseInDefaultLayoutInspection` (warning): `cacheable="false"` on
+  blocks/reference blocks in `layout/default.xml` affects full-page caching.
+
+An optional `ruleIds` array selects rules; unknown rules are rejected. Responses
+include applicable `ruleIds`, `skippedRules`, messages, explanations, project-relative
+paths, and ranges with 1-based line/column and UTF-16 offsets (exclusive end).
+Severities are fixed defaults; IDE profiles and quick fixes are not exposed.
+Coverage is limited to these rules, without schema, PHP, merge-order or runtime
+validation. A clean result applies only to the reported rule/file scope.
+
+`status=ok` and `complete=true` describe a completed check. Truncated results use
+`status=partial`, `complete=false`, and `truncated=true`. Indexing, cancellation,
+malformed XML, unavailable/out-of-scope files, and invalid arguments have explicit
+incomplete states. The check is bounded to 1 MiB, 50,000 PSI elements, and 1,000
+collected findings; `limit` controls the returned findings (1..100, default 25).
+There is no automatic whole-project scan. After on-disk changes, wait for the
+engine's `wait-for-highwatermark` barrier as with other XML queries.
+
+Runtime contracts verify both rules, positive/negative fixtures, exact ranges,
+read-only behavior, bounds, suppression, and live updates. Shared
+PhpStorm tests additionally inject cancellation and controlled dumb mode;
+these states are not claimed as forced transitions in the real HCE process.
 
 ## Configuration lifetime
 
@@ -84,7 +211,17 @@ an HCE distribution or license.
 existing repository fixture, initializes LSP, discovers tool schemas, and calls
 the actual tools. It verifies settings across calls and engine restart, project
 isolation, Compose wrappers, DDEV updates/errors, unsupported exclusions, and
-clean shutdown. It never executes the fixture wrappers.
+clean shutdown. XML contracts exercise the shared catalog/schemas, DI, observers,
+UI component and ACL/menu queries, module/layout lookups and live index updates,
+unavailable capabilities, invalid arguments,
+source paths, and an on-disk observer update. Skill contracts cover discovery,
+installation, customized-file preservation, explicit overwrite, and unchanged
+project instructions. Magerun contracts execute a deterministic Python container
+launcher fixture through the real shared process runner, using existing captured
+10.1.0 JSON metadata. They check read-only status, command/help/config responses,
+cache reuse/refresh/file invalidation, rejected arguments, and unsupported-wrapper
+nonexecution. This is not a test of a live PHP/Magerun installation or Docker/DDEV
+service. The settings/environment discovery fixtures never execute their wrappers.
 
 ```sh
 python3 modules/hce/tests/runtime_contract_test.py \
@@ -120,7 +257,7 @@ registration and project-context adaptation. Additional toolsets can reuse the
 same settings store and shared analysis services, with their own contracts and
 explicit capability gates. Keep optional language dependencies out of the core.
 
-Module/layout index enumeration, general IDE inspections, PHP semantics,
+General IDE inspections beyond the two scoped XML rules, PHP semantics,
 JavaScript semantics, GraphQL, upgrade compatibility, and command execution are
 separate capabilities; this implementation does not advertise them. The historical
 exploratory probes and report are kept outside the repository at the user's request.

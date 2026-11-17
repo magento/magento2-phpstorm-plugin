@@ -32,6 +32,10 @@ data class ProjectSettings(
 
 /** Durable host settings, independent of HCE's disposable analysis Project objects. */
 class SettingsStore(private val directory: Path) {
+    private companion object {
+        const val MAX_SETTINGS_BYTES = 65_536
+    }
+
     fun projectRoot(project: Path): Path = project.toRealPath().also {
         require(Files.isDirectory(it)) { "The project root must be an existing directory." }
     }
@@ -48,8 +52,8 @@ class SettingsStore(private val directory: Path) {
         val file = settingsFile(root)
         if (!Files.exists(file)) return ProjectSettings(root.toString())
         try {
-            val bytes = Files.newInputStream(file).use { it.readNBytes(65_537) }
-            require(bytes.size <= 65_536)
+            val bytes = Files.newInputStream(file).use { it.readNBytes(MAX_SETTINGS_BYTES + 1) }
+            require(bytes.size <= MAX_SETTINGS_BYTES)
             val json = JSONObject(bytes.toString(Charsets.UTF_8))
             require(json.get("schemaVersion") == 1 && json.getString("projectPath") == root.toString())
             val revision = json.get("revision")
@@ -78,9 +82,13 @@ class SettingsStore(private val directory: Path) {
                         val before = load(project)
                         val after = transform(before).copy(revision = before.revision + 1)
                         require(after.projectPath == before.projectPath) { "Settings cannot change project identity." }
+                        val bytes = (after.json().toString(2) + "\n").toByteArray(Charsets.UTF_8)
+                        require(bytes.size <= MAX_SETTINGS_BYTES) {
+                            "Magento settings must not exceed $MAX_SETTINGS_BYTES UTF-8 bytes."
+                        }
                         val temporary = Files.createTempFile(directory, ".magento-", ".tmp")
                         try {
-                            Files.writeString(temporary, after.json().toString(2) + "\n")
+                            Files.write(temporary, bytes)
                             try { Files.move(temporary, file, ATOMIC_MOVE, REPLACE_EXISTING) }
                             catch (_: AtomicMoveNotSupportedException) { Files.move(temporary, file, REPLACE_EXISTING) }
                         } finally { Files.deleteIfExists(temporary) }

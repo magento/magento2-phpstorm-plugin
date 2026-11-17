@@ -7,7 +7,14 @@
     <idea-version since-build="271.2085" until-build="271.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.ls.plugin.mcp</depends>
+    <depends optional="true" config-file="withXml.xml">com.intellij.modules.xml</depends>
+    <extensionPoints>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.methodPluginQueryProvider"
+                        interface="com.magento.idea.magento2plugin.mcp.MagentoMethodPluginQueryProvider"/>
+    </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.ProjectToolset"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.RuntimeToolset"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoIntelligenceToolset"/>
     </extensions>
 </idea-plugin>

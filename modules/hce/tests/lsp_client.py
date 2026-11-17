@@ -131,13 +131,16 @@ class HceClient:
             raise
 
     def call(self, name, **arguments):
+        return json.loads(self.call_text(name, **arguments))
+
+    def call_text(self, name, **arguments):
         schema = self.schemas[name]
         arguments["projectPath"] = str(self.project)
         assert set(schema.get("required", [])).issubset(arguments), schema
         result = self.request("workspace/executeCommand", {"command": "run-mcp-tool",
             "arguments": [{"tool": name, "arguments": arguments}]})
         assert result["isError"] is False, result
-        return json.loads(result["content"])
+        return result["content"]
 
     def close(self, graceful=True):
         if self.closed:

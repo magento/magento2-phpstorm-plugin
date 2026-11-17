@@ -61,6 +61,49 @@ class ProjectServiceTest {
         assertEquals(before, Files.readString(file))
     }
 
+    @Test fun `oversized UTF-8 updates preserve readable settings and allow correction`() {
+        val project = project()
+        service().configure(project, "configure", ".", true)
+        val file = store().settingsFile(project)
+        val before = Files.readAllBytes(file)
+        val previous = store().load(project)
+        // Each component fits filesystem limits; UTF-8 bytes exceed the limit even
+        // though the serialized character count remains below it.
+        val candidates = (1..100).map { "tools/$it/" + List(5) { "é".repeat(100) }.joinToString("/") }
+        val serialized = previous.copy(cliToolCandidates = candidates, revision = previous.revision + 1).json().toString(2) + "\n"
+        assertTrue(serialized.length < 65_536)
+        assertTrue(serialized.toByteArray(Charsets.UTF_8).size > 65_536)
+        val result = service().configure(project, "configure", cliToolCandidates = candidates)
+        assertEquals("invalid_request", result.getString("status"))
+        assertFalse(result.getBoolean("successful"))
+        assertFalse(result.getBoolean("configurationWritten"))
+        assertArrayEquals(before, Files.readAllBytes(file))
+        assertEquals(previous, store().load(project))
+        assertEquals("ok", service().configure(project).getString("status"))
+        assertEquals("ok", service().configure(project, "configure", cliToolCandidates = listOf("bin/magento")).getString("status"))
+        assertEquals(previous.revision + 1, store().load(project).revision)
+    }
+
+    @Test fun `missing retained root can be disabled but enabling and explicit replacements are validated`() {
+        val project = project()
+        val magento = Files.createDirectories(project.resolve("src"))
+        service().configure(project, "configure", "src", true, listOf("tools/cli"))
+        Files.delete(magento)
+        val before = store().load(project)
+        assertEquals("invalid_request", service().configure(project, "configure", cliToolCandidates = listOf("bin/magento")).getString("status"))
+        assertEquals(before, store().load(project))
+        val result = service().configure(project, "configure", enabled = false)
+        assertEquals("ok", result.getString("status"))
+        assertTrue(result.getBoolean("configurationWritten"))
+        val disabled = store().load(project)
+        assertEquals(before.copy(enabled = false, revision = before.revision + 1), disabled)
+        assertEquals("disabled", service().describeEnvironment(project).getString("status"))
+        assertEquals("invalid_request", service().configure(project, "configure", enabled = true).getString("status"))
+        assertEquals("invalid_request", service().configure(project, "configure", "missing", false).getString("status"))
+        assertEquals(disabled, store().load(project))
+        assertEquals("ok", service().configure(project, "configure", ".", true).getString("status"))
+    }
+
     @Test fun `project identities isolate settings and real paths share identity`() {
         val first = project("first")
         val second = project("second")

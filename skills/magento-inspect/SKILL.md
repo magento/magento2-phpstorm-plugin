@@ -7,6 +7,7 @@ description: Inspect Magento 2 or Adobe Commerce configuration, configure projec
 
 Call `magento_intelligence` to discover the connected IDE's Magento tools and verify the intended project before choosing a workflow. Available tools depend on the installed plugin version and IDE capabilities. Explain missing capabilities rather than presenting them as an empty result.
 
+- If discovery exposes `magento_diagnostics`, use `mode: "help"` for its supported XML rule IDs, then `mode: "check"` with one project-relative `filePath`. Read `complete`, truncation, applicability, and readiness before interpreting an empty diagnostic list. It reports default rule severities and source ranges; it does not apply fixes or provide PHP/schema/runtime validation.
 - For source configuration lookups, use `magento_inspect` with the preferred flow below.
 - For project command discovery or n98-magerun2 metadata, use the CLI workflow below. Filesystem discovery alone does not require a running container.
 - For backward compatibility or upgrade analysis, use `magento_compatibility` with the compatibility workflow below.

@@ -61,8 +61,8 @@ class HceRuntimeContracts(unittest.TestCase):
             description = client.call("describe_magento_cli_environment")
             self.assertFalse(description["runtimeProbed"])
             self.assertIn("fallback for ./bin/magento", description["description"])
-            self.assertNotIn("magento_magerun", description["description"])
-            self.assertNotIn("magento_skills", description["description"])
+            self.assertIn("magento_magerun", description["description"])
+            self.assertIn("magento_skills", description["description"])
             before = Path(configured["settingsFile"]).read_bytes()
             invalid = client.call("configure_magento_project", action="configure", magentoPath="../../outside", enabled=True)
             self.assertEqual("invalid_request", invalid["status"])
@@ -79,6 +79,220 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertFalse(client.call("configure_magento_project")["settings"]["enabled"])
         self.assertFalse((project / "executed").exists())
         self.assertFalse((project / "src/executed").exists())
+
+    def test_skill_delivery_preserves_customizations_and_instructions(self):
+        project = self.fixture("skills-project")
+        instructions = self.file(project, "AGENTS.md", "Existing project guidance\n")
+        with self.client(project) as client:
+            status = client.call_text("magento_skills", agentTarget="agents")
+            self.assertIn("missing", status)
+            self.assertFalse((project / ".agents").exists())
+            installed = client.call_text("magento_skills", mode="install",
+                skills=["magento-inspect", "magento-magerun"], agentTarget="agents")
+            self.assertIn("success", installed)
+            skill = project / ".agents/skills/magento-inspect/SKILL.md"
+            self.assertTrue(skill.is_file())
+            skill.write_text("My customized skill\n")
+            blocked = client.call_text("magento_skills", mode="install", skills=["magento-inspect"], agentTarget="agents")
+            self.assertIn("Customized skill preserved", blocked)
+            self.assertEqual("My customized skill\n", skill.read_text())
+            replaced = client.call_text("magento_skills", mode="install", skills=["magento-inspect"], agentTarget="agents", overwrite=True)
+            self.assertIn("updated", replaced)
+            self.assertEqual("Existing project guidance\n", instructions.read_text())
+            discovery = client.call_text("magento_intelligence")
+            self.assertIn("magento_skills", discovery)
+            self.assertIn("magento_magerun", discovery)
+
+    def test_magerun_metadata_process_cache_and_failure_boundaries(self):
+        project = self.fixture("magerun-project")
+        repo = Path(__file__).resolve().parents[3]
+        self.file(project, "compose.yaml", "services: {}")
+        self.file(project, "bin/n98-magerun2", 'bin/cli php bin/n98-magerun2.phar "$@"', True)
+        self.file(project, "bin/n98-magerun2.phar", "<?php // fixture installation marker")
+        self.file(project, "bin/clinotty", (Path(__file__).parent / "metadata_launcher.py").read_text(), True)
+        catalogue = json.loads((repo / "src/test/resources/magerun/10.1.0-catalogue.json").read_text())
+        catalogue["commands"].append({"name": "mcp:server:start", "description": "Fixture MCP server command"})
+        self.file(project, ".metadata/catalogue.json", json.dumps(catalogue))
+        self.file(project, ".metadata/sys-info-help.json",
+            (repo / "src/test/resources/magerun/10.1.0-sys-info-help.json").read_text())
+        with self.client(project) as client:
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            status = client.call("magento_magerun")
+            self.assertEqual("detected", status["status"])
+            self.assertFalse((project / "metadata-calls.jsonl").exists())
+            commands = client.call("magento_magerun", mode="commands", search="sys", limit=1)
+            self.assertEqual("ok", commands["status"])
+            self.assertEqual("sys:info", commands["commands"][0]["name"])
+            self.assertFalse(commands["cached"])
+            calls = (project / "metadata-calls.jsonl").read_text()
+            cached = client.call("magento_magerun", mode="commands", search="sys")
+            self.assertTrue(cached["cached"])
+            self.assertEqual(calls, (project / "metadata-calls.jsonl").read_text())
+            help_result = client.call("magento_magerun", mode="command_help", command="sys:info")
+            self.assertEqual("sys:info", help_result["command"]["name"])
+            native = client.call("magento_magerun", mode="mcp_config", include="sys:info")
+            self.assertEqual("ok", native["status"])
+            self.assertFalse(native["serverStarted"])
+            self.assertFalse(native["configurationWritten"])
+            self.assertEqual("invalid_request", client.call("magento_magerun", mode="command_help", command="sys:info; touch bad")["status"])
+            client.call("magento_magerun", refresh=True)
+            self.assertFalse(client.call("magento_magerun", mode="commands")["cached"])
+            self.file(project, "composer.lock", '{"packages": []}')
+            self.assertFalse(client.call("magento_magerun", mode="commands")["cached"])
+            self.file(project, "bin/n98-magerun2", "#!/bin/sh\ntouch unsupported-executed", True)
+            self.assertEqual("unsupported_wrapper", client.call("magento_magerun", mode="commands")["status"])
+            self.assertFalse((project / "unsupported-executed").exists())
+            self.assertFalse((project / "unexpected-operation").exists())
+
+    def test_xml_diagnostics_rules_locations_limits_and_updates(self):
+        project = self.fixture("diagnostics-project")
+        layout_path = "src/app/code/Foo/Bar2/view/frontend/layout/default.xml"
+        module_path = "src/app/code/Foo/Bar2/etc/module.xml"
+        bad_layout = '<page>\n  <body><referenceBlock name="test" cacheable="false"/></body>\n</page>'
+        layout = self.file(project, layout_path, bad_layout)
+        module = project / module_path
+        original_module = module.read_text()
+        module.write_text(original_module.replace("Foo_Bar2", "Wrong_Module"))
+        with self.client(project) as client:
+            def check(path=layout_path, **parameters):
+                return client.call("magento_diagnostics", mode="check", filePath=path, **parameters)
+            self.assertIn("magento_diagnostics", client.schemas)
+            help_result = client.call("magento_diagnostics")
+            ids = {r["ruleId"] for r in help_result["rules"]}
+            self.assertEqual({"CacheableFalseInDefaultLayoutInspection", "ModuleDeclarationInModuleXmlInspection"}, ids)
+            self.assertEqual("disabled", check()["status"])
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            found = check()
+            self.assertEqual("ok", found["status"])
+            self.assertTrue(found["complete"])
+            self.assertEqual(1, len(found["diagnostics"]))
+            finding = found["diagnostics"][0]
+            self.assertEqual("warning", finding["severity"])
+            self.assertEqual(layout_path, finding["path"])
+            start, end = finding["range"]["start"], finding["range"]["end"]
+            self.assertEqual('cacheable="false"', bad_layout[start["offset"]:end["offset"]])
+            self.assertEqual(2, start["line"])
+            wrong = check(module_path)
+            self.assertEqual("error", wrong["diagnostics"][0]["severity"])
+            self.assertIn("Foo_Bar2", wrong["diagnostics"][0]["message"])
+            self.assertEqual(module_path, wrong["diagnostics"][0]["path"])
+            self.assertEqual(bad_layout, layout.read_text())  # Inspection quick fixes are never applied.
+            self.assertEqual("invalid_request", check(ruleIds=["PhpClassExistence"])["status"])
+            self.assertEqual("invalid_request", check(limit=0)["status"])
+            self.assertEqual("invalid_request", check("../outside.xml")["status"])
+            self.assertEqual("invalid_request", check(str(layout))["status"])
+            layout.write_text('<page><body>' + '<block name="test" cacheable="false"/>' * 3 + '</body></page>')
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            partial = check(limit=1)
+            self.assertEqual("partial", partial["status"])
+            self.assertFalse(partial["complete"])
+            self.assertTrue(partial["truncated"])
+            self.assertEqual(3, partial["collectedFindings"])
+            self.assertEqual(1, len(partial["diagnostics"]))
+            layout.write_text(bad_layout.replace('cacheable="false"', 'cacheable="true"'))
+            module.write_text(original_module)
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertEqual([], check()["diagnostics"])
+            self.assertEqual([], check(module_path)["diagnostics"])
+            layout.write_text('<page><body><!--suppress CacheableFalseInDefaultLayoutInspection -->'
+                '<referenceBlock name="test" cacheable="false"/></body></page>')
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertEqual([], check()["diagnostics"])
+            layout.write_text('<page><body><block></page>')
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            invalid = check()
+            self.assertEqual("invalid_xml", invalid["status"])
+            self.assertFalse(invalid["complete"])
+
+    def test_module_and_layout_indexes_and_live_updates(self):
+        project = self.fixture("module-layout-project")
+        with self.client(project) as client:
+            def inspect(kind, **parameters):
+                return client.call_text("magento_inspect", mode="query", queryType=kind,
+                    parametersJson=json.dumps(parameters))
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            module = inspect("module", moduleName="Foo_Bar2")
+            self.assertIn("path: src/app/code/Foo/Bar2", module)
+            self.assertIn("editable: yes", module)
+            vendor = inspect("module", moduleName="Magento_Catalog")
+            self.assertIn("path: src/vendor/magento/module-catalog", vendor)
+            self.assertIn("editable: no", vendor)
+            self.assertIn("Foo_Bar2", inspect("module", moduleName="Bar2"))
+            client.call("configure_magento_project", action="configure", enabled=False)
+            self.assertIn("disabled", inspect("module", moduleName="Foo_Bar2"))
+            self.assertIn("disabled", inspect("layout_entities", name="test_index_index"))
+            client.call("configure_magento_project", action="configure", enabled=True)
+            self.assertIn("No Magento modules matched", inspect("module", moduleName="NoSuchModuleHce"))
+            path = "src/vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml"
+            for name, section in [("test_index_index", "layout handles"),
+                                  ("test_index_index_block2", "blocks"),
+                                  ("test_index_index_container2", "containers")]:
+                result = inspect("layout_entities", name=name)
+                self.assertIn(section, result)
+                self.assertIn(path, result)
+            self.assertIn("No layout handles, blocks, or containers matched",
+                inspect("layout_entities", name="NoSuchLayoutHce"))
+            layout = project / path
+            layout.write_text(layout.read_text().replace("test_index_index_block2", "hce_updated_block")
+                .replace("test_index_index_container2", "hce_updated_container"))
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("hce_updated_block -> " + path, inspect("layout_entities", name="hce_updated_block"))
+            self.assertIn("hce_updated_container -> " + path, inspect("layout_entities", name="hce_updated_container"))
+            self.assertIn("No layout handles, blocks, or containers matched",
+                inspect("layout_entities", name="test_index_index_block2"))
+            module_xml = project / "src/app/code/Foo/Bar2/etc/module.xml"
+            module_xml.write_text(module_xml.read_text().replace("Foo_Bar2", "Foo_HceUpdated"))
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("path: src/app/code/Foo/Bar2", inspect("module", moduleName="Foo_HceUpdated"))
+            self.assertIn("No Magento modules matched", inspect("module", moduleName="Foo_Bar2"))
+            created = self.file(project, "src/app/code/Foo/Bar2/view/frontend/layout/hce_added_handle.xml",
+                '<page><body><container name="hce_added_container" htmlTag="section" htmlClass="hce">'
+                '<block name="hce_added_block" class="Foo\\Bar\\Block" template="Foo_Bar2::added.phtml"/>'
+                '</container></body></page>')
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("hce_added_handle ->", inspect("layout_entities", name="hce_added_handle"))
+            self.assertIn("template=Foo_Bar2::added.phtml", inspect("layout_entities", name="hce_added_block"))
+            self.assertIn("htmlTag=section htmlClass=hce", inspect("layout_entities", name="hce_added_container"))
+            created.unlink()
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("No layout handles, blocks, or containers matched",
+                inspect("layout_entities", name="hce_added_block"))
+
+    def test_shared_xml_queries_and_live_updates(self):
+        project = self.fixture("analysis-project")
+        self.file(project, "src/app/code/Foo/Bar/etc/adminhtml/menu.xml",
+            '<config><menu><add id="Foo_Bar::hce" title="HCE Menu" resource="Magento_Catalog::test"/></menu></config>')
+        with self.client(project) as client:
+            def inspect(kind, parameters):
+                return client.call_text("magento_inspect", mode="query", queryType=kind,
+                    parametersJson=json.dumps(parameters))
+            help_text = client.call_text("magento_inspect", mode="help")
+            for kind in ["module", "layout_entities", "di_config", "observers_for_event", "ui_component", "acl_or_menu"]:
+                self.assertIn("- `" + kind + "`", help_text)
+                self.assertIn("queryType: " + kind, client.call_text("magento_inspect", mode="detailed_schema", queryType=kind))
+            for kind in ["plugins_for_method"]:
+                self.assertNotIn("- `" + kind + "`", help_text)
+            self.assertIn("disabled", inspect("di_config", {"className": "Magento\\Theme\\Block\\Html\\Topmenu"}))
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            di = inspect("di_config", {"className": "Magento\\Theme\\Block\\Html\\Topmenu"})
+            self.assertIn("plugin name=catalogTopmenu", di)
+            self.assertIn("src/vendor/magento/module-catalog/etc/di.xml", di)
+            observers = inspect("observers_for_event", {"eventName": "test_event_in_test_class"})
+            self.assertIn("observer=test_observer", observers)
+            self.assertIn("src/vendor/magento/module-catalog/etc/events.xml", observers)
+            self.assertIn("Test Resource", inspect("acl_or_menu", {"identifier": "Magento_Catalog::test"}))
+            menu = inspect("acl_or_menu", {"identifier": "Foo_Bar::hce"})
+            self.assertIn("title=HCE Menu", menu)
+            self.assertIn("src/app/code/Foo/Bar/etc/adminhtml/menu.xml", menu)
+            self.assertIn("recently_viewed_2", inspect("ui_component", {"name": "recently_viewed_2"}))
+            self.assertIn("No Magento events matched", inspect("observers_for_event", {"eventName": "__absent__"}))
+            self.assertIn("Missing required parameter", inspect("di_config", {}))
+            for kind in ["plugins_for_method"]:
+                self.assertIn("unavailable in this host", inspect(kind, {}))
+            events = project / "src/vendor/magento/module-catalog/etc/events.xml"
+            events.write_text(events.read_text().replace('name="test_observer"', 'name="updated_observer"'))
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("observer=updated_observer", inspect("observers_for_event", {"eventName": "test_event_in_test_class"}))
 
     def test_ddev_override_refresh_and_invalid_configuration(self):
         project = self.fixture("ddev-project")

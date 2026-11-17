@@ -61,7 +61,7 @@ class CliEnvironmentTest {
         assertTrue(initial.contains("/var/www/html/src with spaces"), initial)
         assertTrue(initial.contains("your terminal"), initial)
         assertFalse(initial.contains("PhpStorm"))
-        assertFalse(initial.contains("magento_magerun"))
+        assertTrue(initial.contains("magento_magerun"))
         assertFalse(initial.contains("magento_skills"))
         assertFalse(initial.contains("never-export"))
         file(root, ".ddev/config.local.yaml", "name: [invalid-private-value")
@@ -87,14 +87,14 @@ class CliEnvironmentTest {
         assertTrue(service().describeEnvironment(root).getString("description").contains("No project-local CLI wrappers"))
     }
 
-    @Test fun `Magerun candidates do not advertise tools absent from the HCE host`() {
+    @Test fun `Magerun candidates advertise the shared metadata and skill tools`() {
         val root = Files.createDirectories(directory.resolve("project")).toRealPath()
         file(root, "bin/n98-magerun2", "<?php throw new Exception('do not run');")
         service().configure(root, "configure", ".", true)
         val description = service().describeEnvironment(root).getString("description")
         assertTrue(description.contains("./bin/n98-magerun2"))
-        assertTrue(description.contains("unavailable in this host"))
-        assertFalse(description.contains("magento_magerun"))
-        assertFalse(description.contains("magento_skills"))
+        assertFalse(description.contains("unavailable in this host"))
+        assertTrue(description.contains("magento_magerun"))
+        assertTrue(description.contains("magento_skills"))
     }
 }

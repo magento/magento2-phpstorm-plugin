@@ -78,14 +78,28 @@ public final class ModuleIndex {
         return getNames(ThemeXmlIndex.KEY, withinProject);
     }
 
+    /** Enumerates supplied keys through the same scoped module lookup as desktop indexing. */
+    public List<String> getModuleNames(final Collection<String> candidateNames) {
+        return getNames(ModuleXmlIndex.KEY, false, candidateNames);
+    }
+
     private List<String> getNames(
             final ID<String, String> indexKey,
             final boolean withinProject
     ) {
+        return getNames(indexKey, withinProject, null);
+    }
+
+    private List<String> getNames(
+            final ID<String, String> indexKey,
+            final boolean withinProject,
+            final @Nullable Collection<String> candidateNames
+    ) {
         return ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> {
             final Set<String> names = new LinkedHashSet<>();
             final FileBasedIndex index = FileBasedIndex.getInstance();
-            final Collection<String> allNames = index.getAllKeys(indexKey, project);
+            final Collection<String> allNames = candidateNames == null
+                    ? index.getAllKeys(indexKey, project) : candidateNames;
             for (final String name : allNames) {
                 final Collection<VirtualFile> files = index.getContainingFiles(
                         indexKey,
