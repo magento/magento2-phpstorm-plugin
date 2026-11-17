@@ -17,6 +17,7 @@ internal object MagentoInspectionCommands {
 
     private val supportedTypes = listOf(
         "module",
+        "module_dependencies",
         "di_config",
         "plugins_for_method",
         "observers_for_event",
@@ -28,6 +29,7 @@ internal object MagentoInspectionCommands {
 
     private val querySummaries = mapOf(
         "module" to "Find modules by exact or partial Magento module name.",
+        "module_dependencies" to "Inspect declared sequence ordering and Composer package requirements in either direction.",
         "di_config" to "Find di.xml declarations related to a PHP FQN or virtual type.",
         "plugins_for_method" to "Find plugins that intercept a target class or interface method.",
         "observers_for_event" to "Find observer declarations by full or partial Magento event name.",
@@ -130,6 +132,11 @@ internal object MagentoInspectionCommands {
                 indexKeys = indexKeys
             )
 
+            "module_dependencies" -> MagentoModuleDependencyQueries.query(
+                project, parameters.requireString("moduleName"), parameters.optString("direction", "both"),
+                if (parameters.has("limit")) parameters.opt("limit") else 20
+            )
+
             "di_config" -> MagentoDiQueries.findDiConfigForClass(
                 project = project,
                 className = parameters.requireString("className")
@@ -200,6 +207,19 @@ internal object MagentoInspectionCommands {
             Required: moduleName. Use `Vendor_Module` when known, or partial searches such as `Catalog`, `Magento_`, or `Foo`.
             Example parametersJson:
             {"moduleName":"Magento_Catalog"}
+        """.trimIndent()
+
+        "module_dependencies" -> """
+            queryType: module_dependencies
+            Requires XML and JSON PSI. Reads native module indexes and cached PSI snapshots.
+            Required: moduleName (exact declaration name). Optional: direction=dependencies|dependents|both (default both), limit=1..100 (JSON integer, default 20).
+            Returns JSON: typed sequence_after, composer_require, composer_require_dev edges with source ranges and raw version constraints, reverse references, explicit module-root package mappings, counts, truncation and metadata problems.
+            sequence_after declares ordering, not a hard dependency. Composer facts come only from composer.json directly at module roots; parent and multi-module package ownership is not inferred. Unmapped packages remain package edges.
+            No Composer solving, installed/enabled-state checks, transitive closure, effective load order, PHP or runtime validation.
+            Status is ok, partial, module_not_found, or invalid_request; complete=false marks truncated scans/results or malformed metadata. Host/indexing/parameter errors may be plain text, like other inspection queries.
+            Limits: 2000 module files, 256 KiB per metadata file, 20000 edges, 20 returned declarations/problems. Ranges are 1-based line/column and UTF-16 offsets, exclusive end.
+            Example parametersJson:
+            {"moduleName":"Magento_Catalog","direction":"dependents","limit":20}
         """.trimIndent()
 
         "di_config" -> """

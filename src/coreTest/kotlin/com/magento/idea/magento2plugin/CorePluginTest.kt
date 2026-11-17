@@ -37,6 +37,21 @@ class CorePluginTest : BaseProjectTestCase() {
         com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(project)
     }
 
+    @Test fun testModuleDependenciesUseNativeJsonWithoutJavaScriptOrPhp() {
+        Settings.getInstance(project).apply {
+            pluginEnabled = true
+            magentoPath = myFixture.tempDirFixture.getFile("")!!.path
+        }
+        myFixture.addFileToProject("app/code/Graph/Core/etc/module.xml", "<config><module name=\"Graph_Core\"/></config>")
+        myFixture.addFileToProject("app/code/Graph/Core/composer.json", """{"name":"graph/core","require":{"php":">=8.2"}}""")
+        myFixture.addFileToProject("app/code/Graph/Feature/etc/module.xml", "<config><module name=\"Graph_Feature\"><sequence><module name=\"Graph_Core\"/></sequence></module></config>")
+        com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val result = org.json.JSONObject(MagentoInspectionCommands.query(project, "module_dependencies", """{"moduleName":"Graph_Core"}"""))
+        assertEquals(result.toString(), "ok", result.getString("status"))
+        assertEquals(2, result.getInt("totalEdges"))
+        assertTrue(result.getJSONArray("edges").toString().contains("composer_require"))
+    }
+
     @Test fun testAllSharedQueriesAndDiagnosticsRemainAvailable() {
         Settings.getInstance(project).apply {
             pluginEnabled = true

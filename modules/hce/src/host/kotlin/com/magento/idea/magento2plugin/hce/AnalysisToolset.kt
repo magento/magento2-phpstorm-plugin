@@ -4,6 +4,7 @@
  */
 package com.magento.idea.magento2plugin.hce
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.mcpserver.McpToolset
 import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
@@ -23,7 +24,8 @@ class AnalysisToolset : McpToolset {
     override fun alwaysIncluded() = true
     override fun isExperimental() = false
 
-    private val queries = setOf("module", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu")
+    private val queries = (setOf("module", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu") +
+        if (PluginManagerCore.loadedPlugins.any { it.pluginId.idString == "com.intellij.modules.json" }) setOf("module_dependencies") else emptySet())
 
     @McpTool(name = "magento_diagnostics")
     @McpToolHints(readOnlyHint = TRUE)
@@ -47,7 +49,7 @@ class AnalysisToolset : McpToolset {
 
     @McpTool(name = "magento_inspect")
     @McpToolHints(readOnlyHint = TRUE)
-    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Returns project-relative source paths. PHP semantics are unavailable; XML declarations do not establish merge order or runtime behavior.")
+    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, module_dependencies (requires JSON PSI), layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Returns project-relative source paths. PHP semantics are unavailable; XML declarations do not establish merge order or runtime behavior.")
     suspend fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String {
         when (mode.trim().lowercase()) {
             "help" -> return MagentoInspectionCommands.help(queries)

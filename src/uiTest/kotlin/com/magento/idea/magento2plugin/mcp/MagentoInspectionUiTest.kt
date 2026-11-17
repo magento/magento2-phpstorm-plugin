@@ -21,6 +21,7 @@ class MagentoInspectionUiTest {
         "file-generators",
         prepareProject = { root ->
             val files = mapOf(
+                "app/code/Acme/Shipping/composer.json" to """{"name":"acme/shipping","require":{"php":">=8.2"}}""",
                 "app/code/Acme/Shipping/view/frontend/web/template/shipping.html" to "<div>Shipping template</div>",
                 "app/code/Acme/Shipping/view/frontend/layout/default.xml" to
                     "<page><body><referenceBlock name=\"test\" cacheable=\"false\"/></body></page>",
@@ -58,6 +59,11 @@ class MagentoInspectionUiTest {
                 check(mcp.tools().any { it.getString("name") == "magento_diagnostics" })
                 val result = org.json.JSONObject(mcp.callText("magento_diagnostics", org.json.JSONObject()
                     .put("mode", "check").put("filePath", "app/code/Acme/Shipping/view/frontend/layout/default.xml")))
+                val dependencies = org.json.JSONObject(mcp.callText("magento_inspect", org.json.JSONObject()
+                    .put("mode", "query").put("queryType", "module_dependencies")
+                    .put("parametersJson", """{"moduleName":"Acme_Shipping","direction":"dependencies"}""")))
+                check(dependencies.getString("status") == "ok") { dependencies.toString() }
+                check(dependencies.getJSONArray("edges").toString().contains("composer_require")) { dependencies.toString() }
                 check(result.getString("status") == "ok") { result.toString() }
                 check(result.getJSONArray("diagnostics").getJSONObject(0).getString("ruleId") == "CacheableFalseInDefaultLayoutInspection")
             }

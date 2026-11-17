@@ -40,7 +40,7 @@ This separate test task launches an IntelliJ IDEA test application with JavaScri
 PHP, CSS, and GraphQL disabled. PhpStorm treats its own language plugins as
 essential, so disabling them in a PhpStorm sandbox does not establish this boundary.
 The tests assert actual loaded plugins and classloader isolation, shared XML
-completion registration, active-only reindexing, all seven shared query types, and
+completion registration, active-only reindexing, all eight shared query types, and
 XML diagnostics, and literal UI template navigation (attributes, item values,
 vendor/theme candidates, and live renames). Literal template lookup is shared;
 JavaScript property extraction and dynamic region/component resolution remain in
@@ -127,3 +127,19 @@ If you are a new GitHub user, we recommend that you create your own [free github
 3. Create and test your work.
 4. Fork this repository and create a pull request.
 5. Once your contribution is received the Magento 2 development team will review the contribution and collaborate with you as needed.
+
+The `module_dependencies` query shares native module indexing, XML/JSON PSI, and
+PSI-cached snapshots between desktop IDEs and HCE. Its fixture is
+`src/test/resources/mcp/module-dependencies-query.json`. Focused checks:
+
+```bash
+./gradlew mcpE2eTest --tests '*MagentoMcpHttpTest.testModuleDependenciesOverHttp' --tests '*MagentoMcpHttpTest.testInspectionReportsIndexingAndUnavailableCapabilityOverHttp'
+./gradlew coreTest -PideaPlatformLocalPath='/path/to/IntelliJ IDEA.app/Contents'
+./gradlew uiTest --tests '*MagentoInspectionUiTest'
+```
+
+The first command is the PhpStorm HTTP baseline; the second disables PHP and
+JavaScript in IntelliJ IDEA; the third exercises WebStorm without PHP. Actual HCE
+transport and live filesystem updates are verified separately by the standalone
+[HCE runtime suite](../modules/hce/README.md). These checks do not run Composer or
+validate installed module state, version satisfaction, effective order, or PHP.

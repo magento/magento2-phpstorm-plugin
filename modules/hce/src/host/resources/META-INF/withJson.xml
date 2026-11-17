@@ -1,0 +1,2 @@
+<!-- Makes native JSON PSI available to the shared analysis implementation when installed. -->
+<idea-plugin/>

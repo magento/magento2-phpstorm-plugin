@@ -158,6 +158,22 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
     }
 
     @Test
+    fun testModuleDependencyCapabilityAndCancellation() {
+        val available = setOf("module")
+        assertFalse(MagentoInspectionCommands.help(available).contains("- `module_dependencies`:"))
+        assertContains(MagentoInspectionCommands.query(project, "module_dependencies", "{}", available), "unavailable")
+        val indicator = com.intellij.openapi.progress.EmptyProgressIndicator()
+        try {
+            com.intellij.openapi.progress.ProgressManager.getInstance().runProcess(
+                com.intellij.openapi.util.Computable {
+                    indicator.cancel()
+                    MagentoInspectionCommands.query(project, "module_dependencies", """{"moduleName":"Foo_Bar2"}""")
+                }, indicator)
+            fail("Cancellation must propagate instead of becoming an empty dependency graph")
+        } catch (_: com.intellij.openapi.progress.ProcessCanceledException) { }
+    }
+
+    @Test
     fun testUiTemplateCancellationDoesNotBecomeAnEmptyResult() {
         val indicator = com.intellij.openapi.progress.EmptyProgressIndicator()
         try {

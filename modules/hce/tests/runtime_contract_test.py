@@ -204,6 +204,70 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertEqual("invalid_xml", invalid["status"])
             self.assertFalse(invalid["complete"])
 
+    def test_module_dependencies_native_psi_and_live_updates(self):
+        project = self.fixture("dependencies-project")
+        repo = Path(__file__).resolve().parents[3]
+        fixture = json.loads((repo / "src/test/resources/mcp/module-dependencies-query.json").read_text())
+        for path, content in fixture["files"].items():
+            self.file(project, path, content)
+        with self.client(project) as client:
+            self.assertIn("- `module_dependencies`:", client.call_text("magento_inspect", mode="help"))
+            self.assertIn("Required: moduleName", client.call_text("magento_inspect", mode="detailed_schema", queryType="module_dependencies"))
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            def query(name, direction="both", limit=20):
+                return json.loads(client.call_text("magento_inspect", mode="query", queryType="module_dependencies",
+                    parametersJson=json.dumps({"moduleName": name, "direction": direction, "limit": limit})))
+            def refresh():
+                client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            result = query("Graph_Feature", "dependencies")
+            self.assertEqual("ok", result["status"], result)
+            self.assertEqual(5, result["totalEdges"], result)
+            self.assertEqual({"sequence_after", "composer_require", "composer_require_dev"}, {e["kind"] for e in result["edges"]})
+            for edge in result["edges"]:
+                source = edge["source"]
+                body = (project / source["path"]).read_text()
+                self.assertEqual('"' + edge.get("toPackage", edge.get("toModule")) + '"', body[source["startOffset"]:source["endOffset"]])
+                self.assertEqual(body[:source["startOffset"]].count("\n") + 1, source["line"])
+                if edge.get("toPackage") == "graph/core":
+                    self.assertEqual(["Graph_Core"], edge["targetModules"])
+                if edge.get("toPackage") == "php":
+                    self.assertEqual([], edge["targetModules"])
+            core = query("Graph_Core", "dependents")
+            self.assertEqual(2, core["declarationCount"])
+            self.assertEqual(3, core["totalEdges"])
+            self.assertEqual("module_not_found", query("Graph_Missing")["status"])
+            self.assertEqual(1, query("Graph_Missing")["totalEdges"])
+            self.assertEqual(0, query("Graph_Nothing")["totalEdges"])
+            self.assertEqual("absent", query("Graph_Loose")["declarations"][0]["composerStatus"])
+            self.assertEqual("partial", query("Graph_Feature", limit=1)["status"])
+            for limit in [0, 101, 1.5, "2"]:
+                self.assertEqual("invalid_request", query("Graph_Core", limit=limit)["status"])
+            self.assertEqual("invalid_request", query("Graph_Core", direction="sideways")["status"])
+            path = project / fixture["featureModule"]
+            path.write_text(path.read_text().replace("Graph_Missing", "Graph_New"))
+            refresh()
+            self.assertEqual(0, query("Graph_Missing")["totalEdges"])
+            self.assertEqual(1, query("Graph_New")["totalEdges"])
+            manifest = project / fixture["featureComposer"]
+            body = json.loads(manifest.read_text())
+            body["require"]["graph/dev"] = "^2.0"
+            manifest.write_text(json.dumps(body))
+            refresh()
+            self.assertEqual(6, query("Graph_Feature")["totalEdges"])
+            added = self.file(project, "src/app/code/Graph/Added/etc/module.xml", '<config><module name="Graph_Added"><sequence><module name="Graph_Core"/></sequence></module></config>')
+            refresh()
+            self.assertEqual(4, query("Graph_Core", "dependents")["totalEdges"])
+            added.unlink()
+            refresh()
+            self.assertEqual(3, query("Graph_Core", "dependents")["totalEdges"])
+            manifest.write_text("{broken")
+            refresh()
+            partial = query("Graph_Feature")
+            self.assertEqual("partial", partial["status"])
+            self.assertFalse(partial["complete"])
+            self.assertEqual(2, partial["totalEdges"])
+            self.assertIn("invalid_json", {p["code"] for p in partial["problems"]})
+
     def test_ui_template_candidates_shared_fixture_and_live_updates(self):
         project = self.fixture("ui-template-project")
         repo = Path(__file__).resolve().parents[3]
@@ -311,7 +375,7 @@ class HceRuntimeContracts(unittest.TestCase):
                 return client.call_text("magento_inspect", mode="query", queryType=kind,
                     parametersJson=json.dumps(parameters))
             help_text = client.call_text("magento_inspect", mode="help")
-            for kind in ["module", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu"]:
+            for kind in ["module", "module_dependencies", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu"]:
                 self.assertIn("- `" + kind + "`", help_text)
                 self.assertIn("queryType: " + kind, client.call_text("magento_inspect", mode="detailed_schema", queryType=kind))
             for kind in ["plugins_for_method"]:

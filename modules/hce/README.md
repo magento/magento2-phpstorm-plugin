@@ -65,7 +65,7 @@ introduced. Results use project-relative declaration paths and cover the opened
 project's indexed scope, not an effective Magento configuration merge.
 
 Supported query types: `module`, `layout_entities`, `di_config`,
-`observers_for_event`, `ui_component`, `ui_template`, `acl_or_menu`. Discover one schema before calling the query, for example:
+`observers_for_event`, `ui_component`, `ui_template`, `acl_or_menu`, and (when native JSON PSI is loaded) `module_dependencies`. Discover one schema before calling the query, for example:
 
 ```json
 {"mode":"detailed_schema","queryType":"di_config"}
@@ -74,6 +74,35 @@ Supported query types: `module`, `layout_entities`, `di_config`,
 ```json
 {"mode":"query","queryType":"di_config","parametersJson":"{\"className\":\"Magento\\\\Theme\\\\Block\\\\Html\\\\Topmenu\"}"}
 ```
+
+`module_dependencies` answers which modules/packages a module declares and which
+modules refer to it, using the existing module index, native XML/JSON PSI, and
+PSI/root modification tracking for cached snapshots. It requires the runtime's
+optional `com.intellij.modules.json` plugin; without it the query is omitted from
+the HCE catalog. JSON PSI comes from the runtime; no IDE classes are bundled.
+
+```json
+{"mode":"query","queryType":"module_dependencies","parametersJson":"{\"moduleName\":\"Vendor_Module\",\"direction\":\"both\",\"limit\":20}"}
+```
+
+The JSON response separates `sequence_after` ordering from `composer_require`
+and `composer_require_dev` package declarations. It preserves duplicate module
+declarations and returns native source ranges, raw version constraints, counts,
+limits, and metadata problems. Package-to-module candidates require an explicit
+`composer.json` directly at a module root. Parent/multi-module package ownership,
+Composer solving, enabled/installed state, transitive closure, effective load
+order, and PHP validation are outside coverage. Missing module-root manifests
+are reported as `absent`; external/platform requirements remain package edges.
+`partial`/`complete=false` means a scan/result limit or malformed metadata prevents
+a complete answer; `module_not_found` can still carry inbound sequence references.
+Indexing readiness and unavailable capabilities remain distinct host responses.
+
+The runtime contract suite consumes the same
+`src/test/resources/mcp/module-dependencies-query.json` as the desktop HTTP tests.
+It checks both directions, declaration/package ambiguity, source ranges,
+validation/truncation, missing declarations/manifests, and XML/JSON live updates
+through the runtime's native high-watermark barrier. Run it with the build and
+runtime-contract commands above; it needs no PHP runtime or external service.
 
 `ui_template` resolves a literal template alias through the same shared resolver
 as desktop XML navigation:

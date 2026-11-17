@@ -150,7 +150,7 @@ class MagentoMcpProjectToolset : McpToolset {
         "small: list, inspect one schema, then query.\n\n" +
 
         "Available inspections:\n" +
-        "- Shared queryType values are `module`, `di_config`, `observers_for_event`, " +
+        "- Shared queryType values are `module`, `module_dependencies`, `di_config`, `observers_for_event`, " +
         "`layout_entities`, `ui_component`, `ui_template`, and `acl_or_menu`.\n" +
         "- `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the " +
         "capabilities available in this IDE.\n\n" +

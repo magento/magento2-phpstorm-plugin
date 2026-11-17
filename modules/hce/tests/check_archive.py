@@ -26,6 +26,8 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                 assert "magento2/inspection.properties" in names
                 assert "com/magento/idea/magento2plugin/util/magento/ui/TemplatePathResolver.class" in names
                 assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" not in names
+                assert "com/magento/idea/magento2plugin/mcp/MagentoModuleDependencyQueries.class" in names
+                assert "META-INF/withJson.xml" in names
                 assert "META-INF/withXml.xml" in names
                 xml = ET.fromstring(contents.read("META-INF/withXml.xml"))
                 assert {e.get("implementation") for e in xml.findall(".//fileBasedIndex")} == {
@@ -40,4 +42,5 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
     assert {element.text for element in descriptor.findall("depends") if element.get("optional") != "true"} == {
         "com.intellij.modules.platform", "org.jetbrains.ls.plugin.mcp"}
     assert descriptor.find("depends[@config-file='withXml.xml']").text == "com.intellij.modules.xml"
+    assert descriptor.find("depends[@config-file='withJson.xml']").text == "com.intellij.modules.json"
 print("HCE archive boundary verified: one host plugin, JSON/YAML libraries, no bundled IDE or PHP classes")

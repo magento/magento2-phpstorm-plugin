@@ -59,6 +59,60 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
+    fun testModuleDependenciesOverHttp() {
+        val fixture = JSONObject(javaClass.getResource("/mcp/module-dependencies-query.json")!!.readText())
+        val files = fixture.getJSONObject("files")
+        for (path in files.keySet()) myFixture.addFileToProject(path, files.getString(path))
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(inspect("help").contains("- `module_dependencies`:"))
+        assertTrue(inspect("detailed_schema", "module_dependencies").contains("Required: moduleName"))
+        fun query(name: String, direction: String = "both", limit: Any = 20) = JSONObject(inspect("query", "module_dependencies",
+            JSONObject().put("moduleName", name).put("direction", direction).put("limit", limit).toString()))
+        val feature = query("Graph_Feature", "dependencies")
+        assertEquals(feature.toString(), "ok", feature.getString("status"))
+        assertEquals(5, feature.getInt("totalEdges"))
+        val edges = feature.getJSONArray("edges").let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
+        assertEquals(setOf("sequence_after", "composer_require", "composer_require_dev"), edges.map { it.getString("kind") }.toSet())
+        assertEquals("Graph_Core", edges.single { it.optString("toPackage") == "graph/core" }.getJSONArray("targetModules").getString(0))
+        assertEquals(0, edges.single { it.optString("toPackage") == "php" }.getJSONArray("targetModules").length())
+        for (edge in edges) {
+            val source = edge.getJSONObject("source")
+            val body = files.getString(source.getString("path"))
+            val expected = edge.optString("toPackage", edge.optString("toModule"))
+            assertEquals("\"$expected\"", body.substring(source.getInt("startOffset"), source.getInt("endOffset")))
+            assertEquals(body.take(source.getInt("startOffset")).count { it == '\n' } + 1, source.getInt("line"))
+        }
+        val core = query("Graph_Core", "dependents")
+        assertEquals(2, core.getInt("declarationCount"))
+        assertEquals(3, core.getInt("totalEdges"))
+        assertEquals("module_not_found", query("Graph_Missing").getString("status"))
+        assertEquals(1, query("Graph_Missing").getInt("totalEdges"))
+        assertEquals(0, query("Graph_Nothing").getInt("totalEdges"))
+        assertEquals("absent", query("Graph_Loose").getJSONArray("declarations").getJSONObject(0).getString("composerStatus"))
+        assertEquals("partial", query("Graph_Feature", limit = 1).getString("status"))
+        for (limit in listOf(0, 101, 1.5, "2")) assertEquals("invalid_request", query("Graph_Core", limit = limit).getString("status"))
+        assertEquals("invalid_request", query("Graph_Core", "sideways").getString("status"))
+        // Committed, unsaved editor changes must invalidate the same native PSI cache used by MCP.
+        val path = fixture.getString("featureModule")
+        val psi = myFixture.findFileInTempDir(path).let { com.intellij.psi.PsiManager.getInstance(project).findFile(it)!! }
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) {
+            val manager = com.intellij.psi.PsiDocumentManager.getInstance(project)
+            val document = manager.getDocument(psi)!!
+            document.setText(files.getString(path).replace("Graph_Missing", "Graph_New"))
+            manager.commitDocument(document)
+        }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertEquals(0, query("Graph_Missing").getInt("totalEdges"))
+        assertEquals(1, query("Graph_New").getInt("totalEdges"))
+        myFixture.addFileToProject(fixture.getString("featureComposer"), "{broken")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val partial = query("Graph_Feature")
+        assertEquals("partial", partial.getString("status"))
+        assertFalse(partial.getBoolean("complete"))
+        assertEquals(2, partial.getInt("totalEdges"))
+        assertTrue(partial.getJSONArray("problems").toString().contains("invalid_json"))
+    }
+
     fun testSharedUiTemplateCandidatesOverHttp() {
         val fixture = JSONObject(javaClass.getResource("/mcp/ui-template-query.json")!!.readText())
         val files = fixture.getJSONObject("files")
@@ -203,7 +257,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, emptyList(), testRootDisposable)
         mcp()
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
-            for (type in listOf("module", "ui_template", "di_config", "observers_for_event", "layout_entities",
+            for (type in listOf("module", "module_dependencies", "ui_template", "di_config", "observers_for_event", "layout_entities",
                 "ui_component", "acl_or_menu")) {
                 assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                     inspect("query", type, "{}"))

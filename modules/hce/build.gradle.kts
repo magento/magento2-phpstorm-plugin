@@ -25,7 +25,7 @@ kotlin.target.compilations.getByName("host").associateWith(kotlin.target.compila
 val hceRuntime = providers.gradleProperty("hceRuntime")
 val engineJars = files(providers.provider {
     hceRuntime.orNull?.let { runtime -> fileTree(runtime) {
-        include("lib/*.jar", "plugins/mcp/lib/**/*.jar", "plugins/xml/lib/**/*.jar")
+        include("lib/*.jar", "plugins/mcp/lib/**/*.jar", "plugins/xml/lib/**/*.jar", "plugins/json/lib/**/*.jar")
     } } ?: files()
 })
 configurations[host.implementationConfigurationName].extendsFrom(configurations.implementation.get())
@@ -35,7 +35,7 @@ host.runtimeClasspath += sourceSets.main.get().output
 kotlin.sourceSets.named("host") {
     kotlin.srcDir(shared.resolve("kotlin"))
     kotlin.include("com/magento/idea/magento2plugin/hce/**")
-    listOf("MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
+    listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
         "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
         "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",
         "MagentoMagerunQueries", "MagentoMagerunSupport", "MagentoMagerunProcess", "MagentoCliToolQueries",
