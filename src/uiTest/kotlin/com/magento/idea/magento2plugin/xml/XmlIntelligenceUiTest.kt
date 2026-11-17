@@ -40,6 +40,14 @@ class XmlIntelligenceUiTest {
         assertNavigation("$CONSUMER/etc/events.xml", "name=\"acme_observer", "$DECLARATIONS/etc/events.xml")
         assertNavigation("$CONSUMER/etc/events.xml", "name=\"acme_declared_one", "$DECLARATIONS/etc/events.xml")
 
+        val templates = "$CONSUMER/view/frontend/ui_component/literal_templates.xml"
+        for (attribute in listOf("template", "childTemplate", "elementTmpl")) {
+            assertNavigation(templates, "$attribute=\"Acme_Declarations/widgets/ca",
+                "$DECLARATIONS/view/frontend/web/template/widgets/card.html")
+        }
+        assertNavigation(templates, ">Acme_Declarations/widgets/it",
+            "$DECLARATIONS/view/frontend/web/template/widgets/item.html")
+
         assertInspection("$CONSUMER/etc/di.xml", "This plugin does not exist to be disabled.", "missing_plugin", "acme_plugin")
         assertInspection("$CONSUMER/etc/events.xml", "This observer does not exist to be disabled.", "missing_observer", "acme_observer")
         assertInspection("$CONSUMER/etc/di.xml", "Attribute value \"type\" can not be empty", "\"\"", "AcmeVirtualOne")
@@ -98,6 +106,18 @@ class XmlIntelligenceUiTest {
         }
         file("$DECLARATIONS/etc/module.xml", "<config><module name=\"Acme_Declarations\"/></config>")
         file("$CONSUMER/etc/module.xml", "<config><module name=\"Acme_Consumer\"/></config>")
+        file("$DECLARATIONS/view/frontend/web/template/widgets/card.html", "<div>Card template</div>")
+        file("$DECLARATIONS/view/frontend/web/template/widgets/item.html", "<div>Item template</div>")
+        file("$CONSUMER/view/frontend/ui_component/literal_templates.xml", """
+            <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  template="Acme_Declarations/widgets/card"
+                  childTemplate="Acme_Declarations/widgets/card"
+                  elementTmpl="Acme_Declarations/widgets/card">
+                <argument name="data" xsi:type="array">
+                    <item name="elementTmpl" xsi:type="string">Acme_Declarations/widgets/item</item>
+                </argument>
+            </form>
+        """)
         file("$DECLARATIONS/etc/di.xml", """
             <config>
                 <virtualType name="AcmeVirtualOne" type="Acme\Model"/>

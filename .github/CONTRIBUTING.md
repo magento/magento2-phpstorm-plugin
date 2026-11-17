@@ -41,7 +41,12 @@ PHP, CSS, and GraphQL disabled. PhpStorm treats its own language plugins as
 essential, so disabling them in a PhpStorm sandbox does not establish this boundary.
 The tests assert actual loaded plugins and classloader isolation, shared XML
 completion registration, active-only reindexing, all six shared query types, and
-XML diagnostics. They use the existing repository fixture and require no PHP CLI.
+XML diagnostics, and literal UI template navigation (attributes, item values,
+vendor/theme candidates, and live renames). Literal template lookup is shared;
+JavaScript property extraction and dynamic region/component resolution remain in
+`withJs.xml`. Candidate files do not establish Magento's effective theme fallback
+or configuration merge. The tests use the existing repository fixture and require
+no PHP CLI.
 The dedicated `test-intellij-idea` CI job runs this independently of the ordinary
 PhpStorm and WebStorm jobs and uploads its own test reports.
 
