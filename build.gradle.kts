@@ -88,11 +88,21 @@ project(":mcp-skills") {
 }
 
 sourceSets {
+    create("coreTest") {
+        compileClasspath += sourceSets.test.get().compileClasspath
+        runtimeClasspath += sourceSets.test.get().runtimeClasspath - sourceSets.test.get().output
+        java.srcDir("src/test/java")
+        java.include("com/magento/idea/magento2plugin/BaseProjectTestCase.java")
+    }
     create("uiTest") {
         compileClasspath += sourceSets.main.get().output
         runtimeClasspath += sourceSets.main.get().output
     }
 }
+
+kotlin.target.compilations.getByName("coreTest").associateWith(kotlin.target.compilations.getByName("main"))
+configurations["coreTestImplementation"].extendsFrom(configurations.testImplementation.get())
+configurations["coreTestRuntimeOnly"].extendsFrom(configurations.testRuntimeOnly.get())
 
 val uiTestImplementation = configurations.getByName("uiTestImplementation") {
     extendsFrom(configurations.testImplementation.get())
@@ -205,6 +215,11 @@ intellijPlatform {
         ides {
             // Use IDE distributions containing the October 2026 eMudhra security fixes.
             create(IntelliJPlatformType.PhpStorm, providers.gradleProperty("platformVersion").get())
+            if (providers.gradleProperty("verifyIntellijIdea").map(String::toBoolean).getOrElse(false)) {
+                val ideaLocalPath = providers.gradleProperty("ideaPlatformLocalPath")
+                if (ideaLocalPath.isPresent) local(ideaLocalPath)
+                else create(IntelliJPlatformType.IntellijIdea, providers.gradleProperty("platformVersion").get())
+            }
             if (providers.gradleProperty("verifyWebStorm").map(String::toBoolean).getOrElse(false)) {
                 create(IntelliJPlatformType.WebStorm, providers.gradleProperty("uiTestPlatformVersion").get())
                 create(IntelliJPlatformType.WebStorm, "2026.3")
@@ -383,5 +398,36 @@ intellijPlatformTesting.testIde.register("mcpE2eTest") {
             }
         }
         testLogging { events("passed", "skipped", "failed") }
+    }
+}
+
+// Development launcher for the same shared plugin in IntelliJ IDEA.
+intellijPlatformTesting.runIde.register("runIntellijIdea") {
+    type = IntelliJPlatformType.IntellijIdea
+    version = providers.gradleProperty("platformVersion")
+    providers.gradleProperty("ideaPlatformLocalPath").orNull?.let { localPath.set(file(it)) }
+}
+
+// Proves base registrations and shared intelligence load with optional languages disabled.
+intellijPlatformTesting.testIde.register("coreTest") {
+    type = IntelliJPlatformType.IntellijIdea
+    version = providers.gradleProperty("platformVersion")
+    providers.gradleProperty("corePlatformLocalPath").orElse(providers.gradleProperty("ideaPlatformLocalPath"))
+        .orNull?.let { localPath.set(file(it)) }
+    testFramework(TestFrameworkType.Platform)
+    testFramework(TestFrameworkType.JUnit5)
+    plugins {
+        disablePlugins(listOf("JavaScript", "com.jetbrains.php", "com.intellij.css", "com.intellij.lang.jsgraphql"))
+    }
+    task {
+        val core = sourceSets.getByName("coreTest")
+        testClassesDirs = core.output.classesDirs
+        classpath += core.output
+        // Compile against the full SDK, but deny optional language jars to the test parent loader.
+        val optionalLanguagePath = Regex("(?i)/plugins/(javascript[^/]*|php|css[^/]*|jsgraphql)/")
+        classpath = classpath.filter { !optionalLanguagePath.containsMatchIn(it.invariantSeparatorsPath) }
+        useJUnitPlatform()
+        systemProperty("intellij.platform.kernel.disable", "true")
+        systemProperty("ide.fleet.launch", "false")
     }
 }

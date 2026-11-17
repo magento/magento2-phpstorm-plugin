@@ -35,6 +35,7 @@ internal object MagentoInspectionCommands {
         "acl_or_menu" to "Find ACL resource IDs and admin menu entries."
     )
 
+    @JvmOverloads
     fun help(queryTypes: Set<String>? = null): String = """
         Magento inspection library
 
@@ -50,6 +51,7 @@ internal object MagentoInspectionCommands {
         Next: call mode `detailed_schema` with one queryType before querying.
     """.trimIndent()
 
+    @JvmOverloads
     fun detailedSchema(queryType: String, queryTypes: Set<String>? = null): String {
         val normalizedType = normalizeType(queryType)
         if (normalizedType.isEmpty()) {
@@ -69,6 +71,7 @@ internal object MagentoInspectionCommands {
         return typeHelp(normalizedType)
     }
 
+    @JvmOverloads
     fun query(
         project: Project, queryType: String, parametersJson: String,
         queryTypes: Set<String>? = null, indexKeys: MagentoIndexKeys? = null

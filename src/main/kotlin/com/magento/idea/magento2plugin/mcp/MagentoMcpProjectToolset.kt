@@ -8,6 +8,8 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.mcpserver.McpToolset
 import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
+import com.intellij.mcpserver.annotations.McpToolHints
+import com.intellij.mcpserver.annotations.McpToolHintValue.TRUE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -116,6 +118,17 @@ class MagentoMcpProjectToolset : McpToolset {
                 MagentoMagerunQueries.execute(it,
                     MagerunRequest(mode, command, search, offset, limit, refresh, include, exclude)) { context.ensureActive() }
             }
+        }
+    }
+
+    @McpTool(name = "magento_diagnostics")
+    @McpToolHints(readOnlyHint = TRUE)
+    @McpDescription("Read-only Magento XML diagnostics shared with HCE. mode=help discovers supported inspection rule IDs and limits. mode=check requires one project-relative filePath; optional ruleIds selects checks and limit bounds findings (1..100). Returns severity, explanation and exact source ranges, applicability, truncation and incomplete states. Default severities, XML suppression, no quick fixes or PHP/schema/runtime validation.")
+    suspend fun magentoDiagnostics(mode: String = "help", filePath: String = "", ruleIds: List<String> = emptyList(), limit: Int = 25): String {
+        if (mode == "help") return MagentoXmlDiagnostics.help()
+        if (mode != "check") return MagentoXmlDiagnostics.failure("invalid_request", "mode must be help or check.").toString()
+        return MagentoMcpToolsetSupport.withProjectReadAction(requireSmartMode = false) {
+            MagentoXmlDiagnostics.check(it, filePath, ruleIds, limit).toString()
         }
     }
 

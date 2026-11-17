@@ -31,6 +31,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val discoveredTools = mcp().tools()
         assertEquals(1, discoveredTools.count { it.getString("name") == "magento_inspect" })
         val tools = discoveredTools.associateBy { it.getString("name") }
+        assertTrue(tools.getValue("magento_diagnostics").getJSONObject("annotations").getBoolean("readOnlyHint"))
         assertEquals(MAGENTO_TOOLS, tools.keys.filter { it != "execute_tool" }.toSet())
         val properties = tools.getValue("magento_magerun").getJSONObject("inputSchema").getJSONObject("properties")
         for ((name, type) in listOf("mode" to "string", "command" to "string", "search" to "string",
@@ -56,6 +57,23 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val exclusionsStatus = text("get_magento_indexing_exclusions")
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Exclusions cannot be applied: Magento installation path is invalid"))
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
+    }
+
+    fun testSharedXmlDiagnosticsOverHttp() {
+        val path = "src/app/code/Inspect/Module/view/frontend/layout/default.xml"
+        myFixture.addFileToProject(path, "<page><body><referenceBlock name=\"test\" cacheable=\"false\"/></body></page>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val help = JSONObject(text("magento_diagnostics"))
+        assertEquals(2, help.getJSONArray("rules").length())
+        val result = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)))
+        assertEquals("ok", result.getString("status"))
+        val diagnostic = result.getJSONArray("diagnostics").getJSONObject(0)
+        assertEquals("CacheableFalseInDefaultLayoutInspection", diagnostic.getString("ruleId"))
+        assertEquals("warning", diagnostic.getString("severity"))
+        assertEquals(path, diagnostic.getString("path"))
+        val invalid = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)
+            .put("ruleIds", org.json.JSONArray(listOf("PhpClassExistence")))))
+        assertEquals("invalid_request", invalid.getString("status"))
     }
 
     fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {
