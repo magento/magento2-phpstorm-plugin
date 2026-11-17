@@ -21,6 +21,7 @@ class MagentoInspectionUiTest {
         "file-generators",
         prepareProject = { root ->
             val files = mapOf(
+                "app/code/Acme/Shipping/view/frontend/web/template/shipping.html" to "<div>Shipping template</div>",
                 "app/code/Acme/Shipping/view/frontend/layout/default.xml" to
                     "<page><body><referenceBlock name=\"test\" cacheable=\"false\"/></body></page>",
                 "app/code/Acme/Shipping/etc/di.xml" to """
@@ -73,6 +74,7 @@ class MagentoInspectionUiTest {
             Triple("layout_entities", """{"name":"shipping_block"}""", "template=Acme_Shipping::example.phtml"),
             Triple("layout_entities", """{"name":"shipping_mcp"}""", "shipping_mcp -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),
             Triple("layout_entities", """{"name":"shipping_container"}""", "shipping_container -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),
+            Triple("ui_template", """{"templatePath":"Acme_Shipping/shipping"}""", "file: app/code/Acme/Shipping/view/frontend/web/template/shipping.html"),
             Triple("ui_component", """{"name":"shipping_listing"}""", "rootTag: listing"),
             Triple("acl_or_menu", """{"identifier":"Acme_Shipping::root"}""", "Acme_Shipping::root -> title=Shipping root"),
             Triple("acl_or_menu", """{"identifier":"Acme_Shipping::root"}""", "Acme_Shipping::root -> title=Shipping menu resource=Acme_Shipping::root")

@@ -44,7 +44,8 @@ kotlin.sourceSets.named("host") {
     }
 }
 host.java.srcDir(shared.resolve("java"))
-listOf("inspections/xml/CacheableFalseInDefaultLayoutInspection", "inspections/xml/ModuleDeclarationInModuleXmlInspection",
+listOf("util/magento/ui/TemplatePathResolver", "reference/provider/util/GetModuleFileUtil",
+    "reference/provider/util/GetModuleNameUtil", "util/magento/MagentoVfsUtil", "inspections/xml/CacheableFalseInDefaultLayoutInspection", "inspections/xml/ModuleDeclarationInModuleXmlInspection",
     "inspections/xml/fix/XmlRemoveCacheableAttributeQuickFix", "inspections/xml/fix/XmlModuleNameQuickFix",
     "inspections/util/GetEditableModuleNameByRootFileUtil", "bundles/InspectionBundle", "bundles/AbstractBundle",
     "magento/files/LayoutXml", "magento/files/ModuleXml", "project/MagentoSkillInstaller", "indexes/ModuleIndex", "indexes/LayoutIndex", "indexes/UIComponentIndex", "project/Settings",

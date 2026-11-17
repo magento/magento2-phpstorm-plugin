@@ -109,6 +109,7 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             "observers_for_event" to "eventName",
             "layout_entities" to "name",
             "ui_component" to "name",
+            "ui_template" to "templatePath",
             "acl_or_menu" to "identifier"
         )
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
@@ -132,6 +133,41 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
                 MagentoInspectionCommands.query(project, "plugins_for_method", "{}"))
         }
+    }
+
+    @Test
+    fun testUiTemplateResultBoundsAndInvalidPaths() {
+        for (index in 0..20) myFixture.addFileToProject(
+            "app/code/Foo/Bar2/view/frontend/web/template/$index/ui-template-bounded-case.html", "<div/>")
+        com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val result = MagentoInspectionCommands.query(project, "ui_template", """{"templatePath":"ui-template-bounded-case"}""")
+        assertContains(result, "totalCandidates: 21")
+        assertContains(result, "returnedCandidates: 20")
+        assertContains(result, "truncated: true")
+        val paths = result.lineSequence().filter { it.startsWith("file: ") }.toList()
+        assertEquals(20, paths.size)
+        assertEquals(paths.sorted(), paths)
+        for (path in listOf("../outside", "/absolute", "file:///outside", "''")) {
+            assertContains(MagentoInspectionCommands.query(project, "ui_template", JSONObject().put("templatePath", path).toString()),
+                "Invalid templatePath")
+        }
+        assertContains(MagentoInspectionCommands.query(project, "ui_template", JSONObject().put("templatePath", "x".repeat(4097)).toString()),
+            "maximum length is 4096")
+        assertContains(MagentoInspectionCommands.query(project, "ui_template", "{}"), "Missing required parameter `templatePath`")
+        assertContains(MagentoInspectionCommands.query(project, "ui_template", "{invalid"), "parametersJson must be a valid JSON object")
+    }
+
+    @Test
+    fun testUiTemplateCancellationDoesNotBecomeAnEmptyResult() {
+        val indicator = com.intellij.openapi.progress.EmptyProgressIndicator()
+        try {
+            com.intellij.openapi.progress.ProgressManager.getInstance().runProcess(
+                com.intellij.openapi.util.Computable {
+                    indicator.cancel()
+                    MagentoInspectionCommands.query(project, "ui_template", """{"templatePath":"Foo_Bar2/missing"}""")
+                }, indicator)
+            fail("Cancellation must propagate to the host adapter rather than returning no matches")
+        } catch (_: com.intellij.openapi.progress.ProcessCanceledException) { }
     }
 
     @Test

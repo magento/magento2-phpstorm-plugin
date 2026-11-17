@@ -65,7 +65,7 @@ introduced. Results use project-relative declaration paths and cover the opened
 project's indexed scope, not an effective Magento configuration merge.
 
 Supported query types: `module`, `layout_entities`, `di_config`,
-`observers_for_event`, `ui_component`, `acl_or_menu`. Discover one schema before calling the query, for example:
+`observers_for_event`, `ui_component`, `ui_template`, `acl_or_menu`. Discover one schema before calling the query, for example:
 
 ```json
 {"mode":"detailed_schema","queryType":"di_config"}
@@ -74,6 +74,28 @@ Supported query types: `module`, `layout_entities`, `di_config`,
 ```json
 {"mode":"query","queryType":"di_config","parametersJson":"{\"className\":\"Magento\\\\Theme\\\\Block\\\\Html\\\\Topmenu\"}"}
 ```
+
+`ui_template` resolves a literal template alias through the same shared resolver
+as desktop XML navigation:
+
+```json
+{"mode":"query","queryType":"ui_template","parametersJson":"{\"templatePath\":\"Vendor_Module/widget\"}"}
+```
+
+Discover its schema before querying. `text!` prefixes and `.html` suffixes are
+normalized. Results contain sorted file paths, `normalizedPath`, candidate counts,
+and explicit truncation after 20 files. Missing modules/templates return a distinct
+no-match result; incomplete indexing and cancellation remain separate states.
+The search covers indexed scope and returns file candidates, without selecting
+the effective theme, active area, RequireJS maps, or runtime configuration. No
+JavaScript/PHP plugin is required, and queries do not change project files.
+
+The HTTP and HCE transport contracts use the same
+`src/test/resources/mcp/ui-template-query.json` fixture for module, vendor, theme,
+library, alias and missing-file cases. They also verify bounded results and live
+creation/rename/deletion. Index readiness and cancellation are exercised under
+controlled conditions in shared desktop tests; HCE live updates use the engine's
+indexing barrier.
 
 Module lookup returns exact/fuzzy declaration names, module directories, editable
 status, and `etc`/`view` paths. Layout lookup covers handles, block declarations

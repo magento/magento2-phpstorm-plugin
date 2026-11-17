@@ -24,6 +24,8 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                 for inspection in ("CacheableFalseInDefaultLayoutInspection", "ModuleDeclarationInModuleXmlInspection"):
                     assert f"com/magento/idea/magento2plugin/inspections/xml/{inspection}.class" in names
                 assert "magento2/inspection.properties" in names
+                assert "com/magento/idea/magento2plugin/util/magento/ui/TemplatePathResolver.class" in names
+                assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" not in names
                 assert "META-INF/withXml.xml" in names
                 xml = ET.fromstring(contents.read("META-INF/withXml.xml"))
                 assert {e.get("implementation") for e in xml.findall(".//fileBasedIndex")} == {

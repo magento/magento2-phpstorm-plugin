@@ -59,6 +59,48 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
+    fun testSharedUiTemplateCandidatesOverHttp() {
+        val fixture = JSONObject(javaClass.getResource("/mcp/ui-template-query.json")!!.readText())
+        val files = fixture.getJSONObject("files")
+        for (path in files.keySet()) myFixture.addFileToProject(path, files.getString(path))
+        for (index in 0 until fixture.getInt("boundedCount")) myFixture.addFileToProject(
+            "src/app/code/Foo/Bar2/view/frontend/web/template/bounds/$index/wire-bounded.html", "<div/>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(inspect("help").contains("- `ui_template`:"))
+        assertTrue(inspect("detailed_schema", "ui_template").contains("Required: templatePath"))
+        fun query(path: String) = inspect("query", "ui_template", JSONObject().put("templatePath", path).toString())
+        val cases = fixture.getJSONArray("cases")
+        for (index in 0 until cases.length()) {
+            val case = cases.getJSONObject(index)
+            val result = query(case.getString("templatePath"))
+            val paths = case.getJSONArray("paths").let { values -> (0 until values.length()).map { values.getString(it) } }
+            assertEquals(paths, result.lineSequence().filter { it.startsWith("file: ") }.map { it.removePrefix("file: ") }.toList())
+            assertTrue(result, result.contains("normalizedPath: " + case.getString("normalizedPath")))
+            assertTrue(result, result.contains("truncated: false"))
+            assertTrue(result, result.contains("no effective theme fallback"))
+            if (paths.isEmpty()) assertTrue(result, result.contains("No UI template files matched"))
+        }
+        val bounded = query("wire-bounded")
+        val boundedPaths = bounded.lineSequence().filter { it.startsWith("file: ") }.toList()
+        assertEquals(20, boundedPaths.size)
+        assertEquals(boundedPaths.sorted(), boundedPaths)
+        assertTrue(bounded, bounded.contains("totalCandidates: 21") && bounded.contains("truncated: true"))
+        for (path in listOf("../outside", "/absolute", "https://example.test/template")) {
+            assertTrue(query(path).contains("Invalid templatePath"))
+        }
+        assertTrue(inspect("query", "ui_template", "{}").contains("Missing required parameter `templatePath`"))
+        val live = myFixture.addFileToProject("src/app/code/Foo/Bar2/view/frontend/web/template/live.html", "<div>Live update</div>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/live").contains("file: src/app/code/Foo/Bar2/view/frontend/web/template/live.html"))
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) { live.virtualFile.rename(this, "renamed.html") }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/live").contains("No UI template files matched"))
+        assertTrue(query("Foo_Bar2/renamed").contains("file: src/app/code/Foo/Bar2/view/frontend/web/template/renamed.html"))
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) { live.virtualFile.delete(this) }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/renamed").contains("No UI template files matched"))
+    }
+
     fun testSharedXmlDiagnosticsOverHttp() {
         val path = "src/app/code/Inspect/Module/view/frontend/layout/default.xml"
         myFixture.addFileToProject(path, "<page><body><referenceBlock name=\"test\" cacheable=\"false\"/></body></page>")
@@ -161,7 +203,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, emptyList(), testRootDisposable)
         mcp()
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
-            for (type in listOf("module", "di_config", "observers_for_event", "layout_entities",
+            for (type in listOf("module", "ui_template", "di_config", "observers_for_event", "layout_entities",
                 "ui_component", "acl_or_menu")) {
                 assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                     inspect("query", type, "{}"))

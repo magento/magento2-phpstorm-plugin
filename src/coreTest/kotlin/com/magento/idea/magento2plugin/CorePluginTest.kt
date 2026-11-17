@@ -42,6 +42,7 @@ class CorePluginTest : BaseProjectTestCase() {
             pluginEnabled = true
             magentoPath = myFixture.tempDirFixture.getFile("")!!.path
         }
+        myFixture.addFileToProject("app/code/Foo/Bar2/view/frontend/web/template/core-widget.html", "<div>Core template</div>")
         IndexManager.manualReindex()
         com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(project)
         for ((kind, parameters, expected) in listOf(
@@ -49,6 +50,7 @@ class CorePluginTest : BaseProjectTestCase() {
             Triple("layout_entities", """{"name":"test_index_index_block2"}""", "blocks"),
             Triple("di_config", """{"className":"Magento\\Theme\\Block\\Html\\Topmenu"}""", "catalogTopmenu"),
             Triple("observers_for_event", """{"eventName":"test_event_in_test_class"}""", "test_observer"),
+            Triple("ui_template", """{"templatePath":"Foo_Bar2/core-widget"}""", "app/code/Foo/Bar2/view/frontend/web/template/core-widget.html"),
             Triple("ui_component", """{"name":"recently_viewed_2"}""", "recently_viewed_2"),
             Triple("acl_or_menu", """{"identifier":"Magento_Catalog::test"}""", "Test Resource")
         )) {

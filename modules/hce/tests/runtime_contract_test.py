@@ -204,6 +204,50 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertEqual("invalid_xml", invalid["status"])
             self.assertFalse(invalid["complete"])
 
+    def test_ui_template_candidates_shared_fixture_and_live_updates(self):
+        project = self.fixture("ui-template-project")
+        repo = Path(__file__).resolve().parents[3]
+        fixture = json.loads((repo / "src/test/resources/mcp/ui-template-query.json").read_text())
+        for path, content in fixture["files"].items():
+            self.file(project, path, content)
+        for index in range(fixture["boundedCount"]):
+            self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/template/bounds/%d/wire-bounded.html" % index, "<div/>")
+        with self.client(project) as client:
+            def query(path):
+                return client.call_text("magento_inspect", mode="query", queryType="ui_template",
+                    parametersJson=json.dumps({"templatePath": path}))
+            self.assertIn("- `ui_template`:", client.call_text("magento_inspect", mode="help"))
+            self.assertIn("Required: templatePath", client.call_text("magento_inspect", mode="detailed_schema", queryType="ui_template"))
+            self.assertIn("disabled", query("Foo_Bar2/widget"))
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            for case in fixture["cases"]:
+                result = query(case["templatePath"])
+                self.assertEqual(case["paths"], [line[6:] for line in result.splitlines() if line.startswith("file: ")], result)
+                self.assertIn("normalizedPath: " + case["normalizedPath"], result)
+                self.assertIn("truncated: false", result)
+                self.assertIn("no effective theme fallback", result)
+                if not case["paths"]:
+                    self.assertIn("No UI template files matched", result)
+            bounded = query("wire-bounded")
+            paths = [line[6:] for line in bounded.splitlines() if line.startswith("file: ")]
+            self.assertEqual(20, len(paths), bounded)
+            self.assertEqual(sorted(paths), paths)
+            self.assertIn("totalCandidates: 21", bounded)
+            self.assertIn("truncated: true", bounded)
+            for invalid in ["../outside", "/absolute", "https://example.test/template"]:
+                self.assertIn("Invalid templatePath", query(invalid))
+            added = self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/template/live.html", "<div>Live update</div>")
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("file: src/app/code/Foo/Bar2/view/frontend/web/template/live.html", query("Foo_Bar2/live"))
+            renamed = added.with_name("renamed.html")
+            added.rename(renamed)
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("No UI template files matched", query("Foo_Bar2/live"))
+            self.assertIn("file: src/app/code/Foo/Bar2/view/frontend/web/template/renamed.html", query("Foo_Bar2/renamed"))
+            renamed.unlink()
+            client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
+            self.assertIn("No UI template files matched", query("Foo_Bar2/renamed"))
+
     def test_module_and_layout_indexes_and_live_updates(self):
         project = self.fixture("module-layout-project")
         with self.client(project) as client:
@@ -267,7 +311,7 @@ class HceRuntimeContracts(unittest.TestCase):
                 return client.call_text("magento_inspect", mode="query", queryType=kind,
                     parametersJson=json.dumps(parameters))
             help_text = client.call_text("magento_inspect", mode="help")
-            for kind in ["module", "layout_entities", "di_config", "observers_for_event", "ui_component", "acl_or_menu"]:
+            for kind in ["module", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu"]:
                 self.assertIn("- `" + kind + "`", help_text)
                 self.assertIn("queryType: " + kind, client.call_text("magento_inspect", mode="detailed_schema", queryType=kind))
             for kind in ["plugins_for_method"]:

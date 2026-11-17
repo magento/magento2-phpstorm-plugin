@@ -22,6 +22,7 @@ internal object MagentoInspectionCommands {
         "observers_for_event",
         "layout_entities",
         "ui_component",
+        "ui_template",
         "acl_or_menu"
     )
 
@@ -32,6 +33,7 @@ internal object MagentoInspectionCommands {
         "observers_for_event" to "Find observer declarations by full or partial Magento event name.",
         "layout_entities" to "Find layout handles, block names, and container names.",
         "ui_component" to "Find UI component XML definitions by component file name.",
+        "ui_template" to "Resolve a literal UI template alias to candidate HTML files.",
         "acl_or_menu" to "Find ACL resource IDs and admin menu entries."
     )
 
@@ -155,6 +157,11 @@ internal object MagentoInspectionCommands {
                 name = parameters.requireString("name")
             )
 
+            "ui_template" -> MagentoViewQueries.findUiTemplate(
+                project = project,
+                templatePath = parameters.requireString("templatePath")
+            )
+
             "acl_or_menu" -> MagentoViewQueries.findAclOrMenu(
                 project = project,
                 identifier = parameters.requireString("identifier")
@@ -235,6 +242,16 @@ internal object MagentoInspectionCommands {
             Required: name. Use the UI component XML base name without `.xml`, such as `product_form`, `sales_order_grid`, or `category_form`.
             Example parametersJson:
             {"name":"product_form"}
+        """.trimIndent()
+
+        "ui_template" -> """
+            queryType: ui_template
+            Resolves a literal UI template path to candidate HTML files using the shared editor resolver.
+            Required: templatePath. Use a forward-slash alias such as Vendor_Module/widget, optionally prefixed with text! or ending in .html. Maximum length: 4096 characters. Absolute paths, URLs and parent traversal are unsupported.
+            Returns normalizedPath, deterministic project-relative file paths, candidate counts and truncation (maximum ${MagentoMcpSupport.MAX_MATCHES} files). Requires ready indexes. Reads indexed scope only; no writes or JavaScript/PHP plugin required.
+            Candidates do not establish effective theme fallback, the active area, RequireJS maps, PHP semantics or runtime behavior.
+            Example parametersJson:
+            {"templatePath":"Magento_Ui/form/element/input"}
         """.trimIndent()
 
         "acl_or_menu" -> """

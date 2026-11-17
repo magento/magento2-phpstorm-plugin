@@ -40,7 +40,7 @@ This separate test task launches an IntelliJ IDEA test application with JavaScri
 PHP, CSS, and GraphQL disabled. PhpStorm treats its own language plugins as
 essential, so disabling them in a PhpStorm sandbox does not establish this boundary.
 The tests assert actual loaded plugins and classloader isolation, shared XML
-completion registration, active-only reindexing, all six shared query types, and
+completion registration, active-only reindexing, all seven shared query types, and
 XML diagnostics, and literal UI template navigation (attributes, item values,
 vendor/theme candidates, and live renames). Literal template lookup is shared;
 JavaScript property extraction and dynamic region/component resolution remain in
@@ -60,6 +60,14 @@ To use an installed IntelliJ IDEA distribution instead of downloading one:
 the same file-scoped runner as HCE. Its help lists the two initial rules, scope,
 resource limits, default severities, XML suppression, and incomplete states.
 A focused HTTP contract verifies discovery and diagnostic source evidence.
+
+The `ui_template` inspection query exposes the shared literal template resolver
+to both desktop MCP and HCE. Its required `templatePath` parameter accepts aliases
+such as `Vendor_Module/widget`; results include normalized paths, sorted file
+candidates and explicit truncation at 20. Candidates do not establish effective
+Magento theme fallback. The HTTP/HCE contracts share
+`src/test/resources/mcp/ui-template-query.json`, including missing modules,
+normalization, bounds and live updates.
 
 # MCP HTTP end-to-end tests
 
