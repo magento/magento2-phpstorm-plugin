@@ -121,6 +121,19 @@ class MagentoMcpProjectToolset : McpToolset {
         }
     }
 
+    @McpTool(name = "magento_maintenance")
+    @McpDescription(MaintenanceService.description)
+    suspend fun maintenance(mode: String = "check", checkIds: List<String> = emptyList(),
+                            changedFiles: List<String> = emptyList(), newlyEnabledModules: List<String> = emptyList(),
+                            devMode: String = "dev"): String = withContext(Dispatchers.IO) {
+        val context = currentCoroutineContext()
+        MagentoMcpToolsetSupport.withProjectAction(validateProject = false, requireSmartMode = false) {
+            MaintenanceDesktop.execute(it, mode, checkIds, changedFiles, newlyEnabledModules, devMode) {
+                context.ensureActive()
+            }.toString()
+        }
+    }
+
     @McpTool(name = "magento_diagnostics")
     @McpToolHints(readOnlyHint = TRUE)
     @McpDescription("Read-only Magento XML diagnostics shared with HCE. mode=help discovers supported inspection rule IDs and limits. mode=check requires one project-relative filePath; optional ruleIds selects checks and limit bounds findings (1..100). Returns severity, explanation and exact source ranges, applicability, truncation and incomplete states. Default severities, XML suppression, no quick fixes or PHP/schema/runtime validation.")

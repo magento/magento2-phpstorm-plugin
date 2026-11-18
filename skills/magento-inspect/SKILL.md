@@ -116,6 +116,20 @@ Follow every returned continuation verbatim, including scope, severity, suppress
 {"projectPath":"<IDE-project-directory>","mode":"upgrade","moduleName":"Foo_Bar"}
 ```
 
+## Maintenance after edits
+
+Call `magento_maintenance` with `mode="check"` and `changedFiles` relative to the configured Magento root.
+Include deleted and renamed paths. Setup checks compare the exported module list with the previous observation in this session. For the first observation, pass newly enabled module names from the configuration diff in
+`newlyEnabledModules`. For an explicitly requested runtime observation, use `mode="verify"`.
+The optional `checkIds` select `composer_install`, `ece_patches`, `setup_upgrade`, and `cache_clean`.
+Use `devMode="no-dev"` for a production Composer installation.
+
+Read each finding's item, evidence, environment, and next action. Resolve Composer drift first,
+then recheck Cloud patches, database setup, and cache state. Reverify after each maintenance
+action. A layout edit can justify a targeted advisory even when Magento records no invalidations.
+Only suggest the returned argument vector from its working directory. An unknown result calls
+for investigation. Running a remediation is a separate decision.
+
 ## Preferred Flow
 
 1. Use `magento_inspect` as the lookup entry point:

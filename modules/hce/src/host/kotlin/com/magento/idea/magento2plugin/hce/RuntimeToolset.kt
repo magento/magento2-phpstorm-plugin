@@ -12,6 +12,7 @@ import com.magento.idea.magento2plugin.mcp.MagentoSkillCommands
 import com.magento.idea.magento2plugin.mcp.MagentoMagerunQueries
 import com.magento.idea.magento2plugin.mcp.MagentoMagerunService
 import com.magento.idea.magento2plugin.mcp.MagentoMagerunSupport
+import com.magento.idea.magento2plugin.mcp.MaintenanceService
 import com.magento.idea.magento2plugin.mcp.MagerunRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -31,6 +32,21 @@ class RuntimeToolset : McpToolset {
                        overwrite: Boolean = false): String = withContext(Dispatchers.IO) {
         if (mode == "help") return@withContext MagentoSkillCommands.help()
         MagentoSkillCommands.execute(currentCoroutineContext().project, mode, skills, agentTarget, overwrite, "", refreshVfs = false)
+    }
+
+    @McpTool(name = "magento_maintenance")
+    @McpDescription(MaintenanceService.description)
+    suspend fun maintenance(mode: String = "check", checkIds: List<String> = emptyList(),
+                            changedFiles: List<String> = emptyList(), newlyEnabledModules: List<String> = emptyList(),
+                            devMode: String = "dev"): String = withContext(Dispatchers.IO) {
+        val context = currentCoroutineContext()
+        val root = Path.of(requireNotNull(context.project.basePath)).toRealPath()
+        val state = settingsStore().load(root)
+        if (!state.enabled || state.magentoPath == null) return@withContext MaintenanceService.error(
+            "invalid_configuration", "Configure and enable Magento integration first.").toString()
+        val relative = root.relativize(Path.of(state.magentoPath)).toString()
+        MaintenanceService(root, relative, state.cliToolCandidates).execute(mode, checkIds, changedFiles,
+            newlyEnabledModules, devMode) { context.ensureActive() }.toString()
     }
 
     @McpTool(name = "magento_magerun")

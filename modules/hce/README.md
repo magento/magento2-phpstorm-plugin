@@ -13,6 +13,7 @@ PHP, or JavaScript dependencies into this module unconditionally.
 | `configure_magento_project` | `action=status` (default) reads settings; `action=help` describes supported settings; `action=configure` explicitly persists root, enabled state, and/or CLI wrapper candidates. |
 | `get_magento_root_path` | Reads the configured absolute root. Reports an unconfigured project explicitly. |
 | `describe_magento_cli_environment` | Uses the shared Magento discovery service for wrappers, Compose priority, working directories, and DDEV configuration/overrides. Requires enabled integration and a configured root. |
+| `magento_maintenance` | File evidence and explicitly requested runtime verification for Composer, ECE patches, database setup, and cache types. Returns affected items, reasons, commands and working directories. |
 | `magento_diagnostics` | Explicit file-scoped checks using selected existing XML inspections; reports rules, severity, explanations, and source ranges. |
 | `magento_inspect` | Shared Magento XML analysis: `help`, `detailed_schema`, and `query`; available when the host has XML support. |
 | `magento_intelligence` | Lists the tools actually available in this host. |
@@ -170,6 +171,24 @@ Magerun, start services, probe container state, or install skills. DDEV settings
 are a bounded static view; secret environment entries and hooks are not exported.
 Indexing exclusions are not implemented here: passing `excludeGeneratedFiles`
 returns `unsupported_capability` without changing settings.
+
+## Maintenance checks
+
+After a setup patch edit, pass its path relative to the configured Magento root.
+
+```json
+{"mode":"check","checkIds":["setup_upgrade"],"changedFiles":["app/code/Acme/News/Setup/Patch/Data/AddFeed.php"]}
+```
+
+When runtime verification is requested, repeat with `mode="verify"`. With no `checkIds`,
+verification follows Composer → ECE patches → setup → cache. Resolve an upstream finding
+and verify again to obtain a fresh downstream observation. Use `devMode="no-dev"` to compare
+a production installation. Commands in findings are suggestions and include the selected working directory.
+
+The configured checkout supplies file evidence. Verification supports local tools, DDEV and
+recognized Mark Shust wrappers using `bin/clinotty`. An unavailable runtime or unsupported ECE
+status format produces an incomplete observation. On the first observation of a changed
+`app/etc/config.php`, use `newlyEnabledModules` to supply additions from the deployment diff.
 
 ## XML diagnostics
 

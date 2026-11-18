@@ -34,7 +34,8 @@ host.runtimeClasspath += sourceSets.main.get().output
 
 kotlin.sourceSets.named("host") {
     kotlin.srcDir(shared.resolve("kotlin"))
-    kotlin.include("com/magento/idea/magento2plugin/hce/**")
+    kotlin.include("com/magento/idea/magento2plugin/hce/**", "com/magento/idea/magento2plugin/mcp/Maintenance*.kt")
+    kotlin.exclude("**/MaintenanceDesktop.kt")
     listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
         "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
         "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",
@@ -77,7 +78,7 @@ val hcePluginJar = tasks.register<Jar>("hcePluginJar") {
     archiveClassifier = "hce"
     from(sourceSets.main.get().output)
     from(host.output)
-    from(shared.resolve("resources")) { include("magento2/inspection.properties") }
+    from(shared.resolve("resources")) { include("magento2/inspection.properties", "maintenance/*.php") }
     from("../../skills") { include("magento-inspect/**", "magento-magerun/**", "magento-scaffold/**"); into("skills") }
 }
 tasks.register<Zip>("packageHcePlugin") {
