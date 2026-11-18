@@ -244,6 +244,10 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             for (alias in listOf("modules", "layout", "plugins")) {
                 assertContains(MagentoInspectionCommands.query(project, alias, "{invalid", supported), "unavailable in this host")
             }
+            val json = JSONObject(MagentoInspectionCommands.query(project, "module",
+                "{\"moduleName\":\"Magento_Catalog\",\"format\":\"json\"}", supported))
+            assertEquals("unavailable", json.getString("status"))
+            assertContains(json.getString("message"), "unavailable in this host")
             assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                 MagentoInspectionCommands.query(project, "di", "{\"className\":\"Missing\"}", supported))
         }
