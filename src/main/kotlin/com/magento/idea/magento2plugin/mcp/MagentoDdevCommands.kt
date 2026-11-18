@@ -67,12 +67,12 @@ internal object MagentoDdevCommands {
         fun skip(entry: String) {
             if (skipped.size < MAX_SKIPPED) skipped += entry else truncated = true
         }
-        val base = MagentoCliToolQueries.resolveProjectPath(projectRoot, ddevDirectory.resolve("commands").toString())
+        val base = MagentoCliEnvironment.resolveProjectPath(projectRoot, ddevDirectory.resolve("commands").toString())
             ?.takeIf { Files.isDirectory(it) } ?: return Result(emptyList(), false, emptyList())
         services@ for (serviceDirectory in list(base)) {
             val service = serviceDirectory.fileName.toString()
             if (!Files.isDirectory(serviceDirectory) || service.startsWith(".")) continue
-            if (MagentoCliToolQueries.resolveProjectPath(projectRoot, serviceDirectory.toString()) == null) {
+            if (MagentoCliEnvironment.resolveProjectPath(projectRoot, serviceDirectory.toString()) == null) {
                 skip("$service: outside the project")
                 continue
             }
@@ -85,7 +85,7 @@ internal object MagentoDdevCommands {
                     truncated = true
                     break@services
                 }
-                val checked = MagentoCliToolQueries.resolveProjectPath(projectRoot, file.toString())
+                val checked = MagentoCliEnvironment.resolveProjectPath(projectRoot, file.toString())
                 if (checked == null || !Files.isRegularFile(checked) || !Files.isReadable(checked)) {
                     skip("$service/$name: unreadable or outside the project")
                     continue

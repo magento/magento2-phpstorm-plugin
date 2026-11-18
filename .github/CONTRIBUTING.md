@@ -14,15 +14,60 @@ Repository development skills live in `.agents/skills`; the skills under `skills
 1. In the Gradle tool window, run `Tasks > Intellij platform > runIde`.
 1. The task launches a PhpStorm sandbox with the plugin installed. Make sure that the plugin is enabled and indexing is finished before testing features.
 
+Use `./gradlew runIntellijIdea` to launch the shared plugin in an IntelliJ IDEA
+sandbox. To use an installed IDEA distribution, pass
+`-PideaPlatformLocalPath=/absolute/path/to/idea`. This launches a desktop IDE;
+`coreTest` below runs the separate headless IDEA test application. The same local
+IDEA property is supported by `coreTest` and `verifyPlugin -PverifyIntellijIdea=true`.
+
 To use an extracted IDE distribution, pass `-PplatformLocalPath=/path/to/ide`. Windows CI uses the pinned PhpStorm Windows ZIP through this option.
 
 To run `./gradlew test`, also install PHP CLI and add `php` (`php.exe` on Windows) to `PATH`. The run-configuration tests launch PHP to verify interpreter settings and command arguments. CI installs PHP 8.4 on Linux, Windows, and macOS.
 
 # Optional plugin integrations
 
-Shared, PHP, and shared MCP features are registered in `src/main/resources/META-INF/plugin.xml`, `withPhp.xml`, and `withMcp.xml`, respectively. Integrations that need both PHP and MCP or GraphQL use the optional content-module descriptors in `modules/php-mcp/src/main/resources/` and `modules/php-graphql/src/main/resources/`. Each descriptor declares dependencies on the main plugin and both required plugins. Implementation classes stay in the main plugin JAR; the descriptor modules are packaged separately in `lib/modules/`.
+Shared XML/JSON/project features are registered in `src/main/resources/META-INF/plugin.xml`. JavaScript-backed features (including RequireJS and Knockout integration in XML/HTML/JSON) are registered in optional `withJs.xml`; PHP and shared MCP features use `withPhp.xml` and `withMcp.xml`, respectively. JavaScript support is optional across IDEs; CSS and image plugins are not required by the shared layer. Integrations that need both PHP and MCP or GraphQL use the optional content-module descriptors in `modules/php-mcp/src/main/resources/` and `modules/php-graphql/src/main/resources/`. Each descriptor declares dependencies on the main plugin and both required plugins. Implementation classes stay in the main plugin JAR; the descriptor modules are packaged separately in `lib/modules/`.
 
-Run `./gradlew verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel` after changing these boundaries. This checks the configured PhpStorm and WebStorm versions; also exercise the affected behavior in both IDEs. CI runs the verifier and retains its reports, and publication requires verification to pass.
+Run `./gradlew verifyPlugin -PverifyWebStorm=true -PverifyIntellijIdea=true --max-workers=1 --no-parallel` after changing these boundaries. This checks the configured PhpStorm, WebStorm, and IntelliJ IDEA versions; also exercise the affected behavior in both IDEs. CI runs the verifier and retains its reports, and publication requires verification to pass.
+
+# Shared features without JavaScript or PHP
+
+```sh
+./gradlew coreTest
+```
+
+This separate test task launches an IntelliJ IDEA test application with JavaScript,
+PHP, CSS, and GraphQL disabled. PhpStorm treats its own language plugins as
+essential, so disabling them in a PhpStorm sandbox does not establish this boundary.
+The tests assert actual loaded plugins and classloader isolation, shared XML
+completion registration, active-only reindexing, all eight shared query types, and
+XML diagnostics, and literal UI template navigation (attributes, item values,
+vendor/theme candidates, and live renames). Literal template lookup is shared;
+JavaScript property extraction and dynamic region/component resolution remain in
+`withJs.xml`. Candidate files do not establish Magento's effective theme fallback
+or configuration merge. The tests use the existing repository fixture and require
+no PHP CLI.
+The dedicated `test-intellij-idea` CI job runs this independently of the ordinary
+PhpStorm and WebStorm jobs and uploads its own test reports.
+
+To use an installed IntelliJ IDEA distribution instead of downloading one:
+
+```sh
+./gradlew coreTest -PcorePlatformLocalPath=/absolute/path/to/idea
+```
+
+`magento_diagnostics` is registered by the shared desktop MCP toolset and reuses
+the same file-scoped runner as HCE. Its help lists the two initial rules, scope,
+resource limits, default severities, XML suppression, and incomplete states.
+A focused HTTP contract verifies discovery and diagnostic source evidence.
+
+The `ui_template` inspection query exposes the shared literal template resolver
+to both desktop MCP and HCE. Its required `templatePath` parameter accepts aliases
+such as `Vendor_Module/widget`; results include normalized paths, sorted file
+candidates and explicit truncation at 20. Candidates do not establish effective
+Magento theme fallback. The HTTP/HCE contracts share
+`src/test/resources/mcp/ui-template-query.json`, including missing modules,
+normalization, bounds and live updates.
 
 # MCP HTTP end-to-end tests
 
@@ -82,3 +127,19 @@ If you are a new GitHub user, we recommend that you create your own [free github
 3. Create and test your work.
 4. Fork this repository and create a pull request.
 5. Once your contribution is received the Magento 2 development team will review the contribution and collaborate with you as needed.
+
+The `module_dependencies` query shares native module indexing, XML/JSON PSI, and
+PSI-cached snapshots between desktop IDEs and HCE. Its fixture is
+`src/test/resources/mcp/module-dependencies-query.json`. Focused checks:
+
+```bash
+./gradlew mcpE2eTest --tests '*MagentoMcpHttpTest.testModuleDependenciesOverHttp' --tests '*MagentoMcpHttpTest.testInspectionReportsIndexingAndUnavailableCapabilityOverHttp'
+./gradlew coreTest -PideaPlatformLocalPath='/path/to/IntelliJ IDEA.app/Contents'
+./gradlew uiTest --tests '*MagentoInspectionUiTest'
+```
+
+The first command is the PhpStorm HTTP baseline; the second disables PHP and
+JavaScript in IntelliJ IDEA; the third exercises WebStorm without PHP. Actual HCE
+transport and live filesystem updates are verified separately by the standalone
+[HCE runtime suite](../modules/hce/README.md). These checks do not run Composer or
+validate installed module state, version satisfaction, effective order, or PHP.

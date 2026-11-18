@@ -51,7 +51,7 @@ internal data class MagentoDdevConfiguration(
                 if (files.size > MAX_FILES) return failure("DDEV configuration exceeds the $MAX_FILES file limit.")
                 var total = 0
                 for (file in files) {
-                    val checked = MagentoCliToolQueries.resolveProjectPath(projectRoot, file.toString())
+                    val checked = MagentoCliEnvironment.resolveProjectPath(projectRoot, file.toString())
                     if (checked == null || !Files.isRegularFile(checked) || !Files.isReadable(checked)) {
                         return failure("DDEV configuration is unreadable or outside the project: $file")
                     }

@@ -119,6 +119,17 @@ public final class MagentoSkillInstaller {
             @NotNull final AgentTarget agentTarget,
             final boolean overwrite
     ) throws IOException {
+        return install(project, skill, agentTarget, overwrite, true);
+    }
+
+    /** Hosts with snapshot filesystems observe disk changes without LocalFileSystem refresh. */
+    public static @NotNull String install(
+            @NotNull final Project project,
+            @NotNull final Skill skill,
+            @NotNull final AgentTarget agentTarget,
+            final boolean overwrite,
+            final boolean refreshVfs
+    ) throws IOException {
         final Path targetPath = getTargetPath(project, skill, agentTarget);
         final String skillContent = readBundledSkill(skill);
 
@@ -140,7 +151,9 @@ public final class MagentoSkillInstaller {
                             StandardOpenOption.WRITE,
                             overwrite ? StandardOpenOption.CREATE : StandardOpenOption.CREATE_NEW,
                             StandardOpenOption.TRUNCATE_EXISTING, LinkOption.NOFOLLOW_LINKS);
-                    LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
+                    if (refreshVfs) {
+                        LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
+                    }
                 } catch (final IOException exception) {
                     throw new UncheckedIOException(exception);
                 }
