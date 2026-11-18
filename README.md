@@ -79,6 +79,8 @@
 
 Magento settings exclude generated and runtime outputs by default, including directories named `.cache` anywhere under the configured Magento root. Newly created cache directories are picked up automatically. Source beside these caches remains indexed. You can preview the paths, disable exclusions, or reset plugin-managed exclusions through settings or MCP; existing manual exclusions are preserved.
 
+For Codex or Claude Code on a development server, see the [headless installer pilot](modules/hce/README.md#install-on-a-development-host).
+
 ## MCP tools
 
 Connect your AI assistant to PhpStorm or WebStorm to find Magento modules, DI declarations, observers, layouts, UI components, and ACL/menu entries. PHP method analysis, code generation, and upgrade compatibility checks require the JetBrains PHP plugin.

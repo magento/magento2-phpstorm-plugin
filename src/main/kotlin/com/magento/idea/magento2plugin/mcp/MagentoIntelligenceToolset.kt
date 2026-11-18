@@ -19,6 +19,7 @@ import kotlinx.coroutines.currentCoroutineContext
 
 class MagentoIntelligenceToolset : McpToolset {
     override fun alwaysIncluded() = true
+    override fun isExperimental() = false
 
     @McpTool(name = "magento_intelligence", includeProjectPath = false)
     @McpToolHints(readOnlyHint = TRUE)
@@ -51,7 +52,8 @@ class MagentoIntelligenceToolset : McpToolset {
         }
         val directNames = direct.mapTo(hashSetOf()) { it.descriptor.name }
         val tools = (direct + routed).map { it.descriptor }
-            .filter { it.fullyQualifiedName.startsWith("com.magento.idea.magento2plugin.mcp.") }
+            .filter { it.fullyQualifiedName.startsWith("com.magento.idea.magento2plugin.mcp.") ||
+                it.fullyQualifiedName.startsWith("com.magento.idea.magento2plugin.hce.") }
             .distinctBy { it.name }
             .sortedBy { it.name }
         val selected = tools.firstOrNull { it.name == tool }

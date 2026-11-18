@@ -8,18 +8,7 @@ package com.magento.idea.magento2plugin.indexes;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.ID;
-import com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex;
-import com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex;
-import java.lang.reflect.Field;
+import com.intellij.util.indexing.FileBasedIndexExtension;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,53 +16,12 @@ import java.util.List;
 public class IndexManager {
     private static final Logger LOGGER = Logger.getInstance(IndexManager.class);
 
-    private static final String[] OPTIONAL_INDEX_CLASSES = {
-            "com.magento.idea.magento2plugin.stubs.indexes.PluginIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.VirtualTypeIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.DeclarativeSchemaElementsIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlSectionIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlGroupIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.UIComponentIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.WebApiTypeIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.PhpClassNameIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.AclResourceIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.MenuIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.ActionGroupIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.DataIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.PageIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.TestNameIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.mftf.TestExtendsIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.graphql.GraphQlResolverIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.ProductTypeIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.LayoutBlockTemplateIndex",
-            "com.magento.idea.magento2plugin.stubs.indexes.xml.LayoutTemplateBlockIndex"
-    };
-
     /**
      * Refresh Magento 2 indexes.
      */
     public static void manualReindex() {
         LOGGER.info("Magento manual reindex requested");
-        final List<ID<?, ?>> indexIds = new ArrayList<>(List.of(
-                ModulePackageIndex.KEY,
-                ModuleXmlIndex.KEY,
-                ThemeXmlIndex.KEY,
-                RequireJsIndex.KEY,
-                JsMixinIndex.KEY,
-                KnockoutTemplateIndex.KEY,
-                DisplayAreaIndex.KEY,
-                GetRegionUsageIndex.KEY,
-                UiComponentComponentDeclarationIndex.KEY,
-                UiComponentTemplateDeclarationIndex.KEY,
-                MagentoLibJsIndex.KEY
-        ));
-        indexIds.addAll(getOptionalIndexIds());
+        final List<ID<?, ?>> indexIds = getRegisteredIndexIds();
 
         for (final ID<?, ?> id : indexIds) {
             try {
@@ -88,20 +36,22 @@ public class IndexManager {
         LOGGER.info("Magento manual reindex request completed");
     }
 
-    @SuppressWarnings({"PMD.AvoidCatchingThrowable", "unchecked"})
-    private static List<ID<?, ?>> getOptionalIndexIds() {
-        final List<ID<?, ?>> indexIds = new ArrayList<>();
-
-        for (final String className : OPTIONAL_INDEX_CLASSES) {
+    /** Rebuilds active registrations without static references to optional language implementations. */
+    public static List<ID<?, ?>> getRegisteredIndexIds() {
+        final List<ID<?, ?>> ids = new ArrayList<>();
+        for (final FileBasedIndexExtension<?, ?> extension
+                : FileBasedIndexExtension.EXTENSION_POINT_NAME.getExtensionList()) {
+            final Class<?> indexClass = extension.getClass();
+            if (!indexClass.getName().startsWith("com.magento.idea.magento2plugin.stubs.indexes.")) {
+                continue;
+            }
             try {
-                final Class<?> indexClass = Class.forName(className);
-                final Field keyField = indexClass.getField("KEY");
-                indexIds.add((ID<?, ?>) keyField.get(null));
-            } catch (Throwable ignored) { //NOPMD
-                // Optional IDE/plugin dependencies are absent. Skip their indexes.
+                // KEY is our public constant. The platform's getName() is override-only.
+                ids.add((ID<?, ?>) indexClass.getField("KEY").get(null));
+            } catch (ReflectiveOperationException exception) {
+                LOGGER.warn("Magento index registration has no public KEY: " + indexClass.getName(), exception);
             }
         }
-
-        return indexIds;
+        return ids;
     }
 }

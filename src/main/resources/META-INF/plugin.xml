@@ -5,11 +5,9 @@
  */
 -->
 <idea-plugin require-restart="true">
-    <depends>JavaScript</depends>
-    <depends>com.intellij.css</depends>
+    <depends optional="true" config-file="withJs.xml">JavaScript</depends>
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.xml</depends>
-    <depends>com.intellij.platform.images</depends>
     <depends>com.intellij.modules.json</depends>
     <depends>com.intellij.copyright</depends>
     <depends optional="true" config-file="withMcp.xml">com.intellij.mcpServer</depends>
@@ -132,13 +130,7 @@
                 displayName="Magento"
                 nonDefaultProject="true"/>
 
-        <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
-        <psi.referenceContributor language="JSON" implementation="com.magento.idea.magento2plugin.reference.json.JsonReferenceContributor"/>
-        <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
-        <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
-        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlCoreReferenceContributor"/>
-        <gotoDeclarationHandler implementation="com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCoreCompletionContributor" id="magentoXmlCore"/>
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.SystemConfigurationContributor" id="magentoSystemConfiguration"/>
@@ -151,14 +143,6 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ModulePackageIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ThemeXmlIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.mftf.SectionIndex" />
@@ -177,11 +161,6 @@
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
         <readerModeMatcher implementation="com.magento.idea.magento2plugin.project.indexing.MagentoReaderModeMatcher"/>
-
-        <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.JsMixinLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="HTML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="XML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
 
         <directoryProjectConfigurator implementation="com.magento.idea.magento2plugin.project.ProjectDetector"/>
         <postStartupActivity implementation="com.magento.idea.magento2plugin.project.startup.CheckIfMagentoPathIsValidActivity"/>
@@ -289,6 +268,5 @@
         <internalFileTemplate name="Magento Page Types XML"/>
         <internalFileTemplate name="Magento System XML"/>
         <internalFileTemplate name="Magento Module Readme File MD"/>
-        <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
     </extensions>
 </idea-plugin>

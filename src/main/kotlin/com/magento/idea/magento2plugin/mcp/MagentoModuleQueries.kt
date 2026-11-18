@@ -10,24 +10,25 @@ import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.magento.idea.magento2plugin.indexes.ModuleIndex
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex
 
 internal object MagentoModuleQueries {
     /**
      * Returns module metadata for exact or fuzzy Magento module name matches.
      */
-    fun findMagentoModule(project: Project, moduleName: String): String {
+    fun findMagentoModule(project: Project, moduleName: String, indexKeys: MagentoIndexKeys? = null): String {
         val query = moduleName.trim()
         if (query.isEmpty()) {
             return "Provide a Magento module name, for example Magento_Catalog."
         }
 
         return runWithReadyIndexes(project) {
-            findMagentoModuleWithReadyIndexes(project, query)
+            findMagentoModuleWithReadyIndexes(project, query, indexKeys)
         }
     }
 
-    private fun findMagentoModuleWithReadyIndexes(project: Project, query: String): String {
-        val matches = moduleRecords(project, query)
+    private fun findMagentoModuleWithReadyIndexes(project: Project, query: String, indexKeys: MagentoIndexKeys?): String {
+        val matches = moduleRecords(project, query, indexKeys)
         if (matches.isEmpty()) {
             return "No Magento modules matched \"$query\"."
         }
@@ -56,12 +57,13 @@ internal object MagentoModuleQueries {
      * Every indexed copy of every matching module, in match order. The copy that other features use comes first and
      * is marked preferred. The record path is the module directory, `.` at the project root.
      */
-    fun moduleRecords(project: Project, moduleName: String): List<InspectionRecord> {
+    fun moduleRecords(project: Project, moduleName: String, indexKeys: MagentoIndexKeys? = null): List<InspectionRecord> {
         val query = moduleName.trim()
         val moduleIndex = ModuleIndex(project)
         val candidateNames = linkedSetOf<String>()
-        candidateNames += moduleIndex.moduleNames
-        if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
+        candidateNames += if (indexKeys == null) moduleIndex.moduleNames
+            else moduleIndex.getModuleNames(indexKeys.keys(ModuleXmlIndex.KEY, project))
+        if (indexKeys == null && moduleIndex.getModuleDirectoryByModuleName(query) != null) {
             candidateNames += query
         }
         return MagentoMcpSupport.prioritizeMatches(candidateNames, query).flatMap { name ->
