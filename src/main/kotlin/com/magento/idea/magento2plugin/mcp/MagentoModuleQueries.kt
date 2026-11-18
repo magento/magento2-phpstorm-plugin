@@ -33,8 +33,10 @@ internal object MagentoModuleQueries {
             return "No Magento modules matched \"$query\"."
         }
 
-        val lines = mutableListOf("Found ${matches.size} Magento module match(es) for \"$query\".")
-        for (record in matches.take(MagentoMcpSupport.MAX_MATCHES)) {
+        val names = matches.map { it.key }.distinct()
+        val shown = names.take(MagentoMcpSupport.MAX_MATCHES).toSet()
+        val lines = mutableListOf("Found ${names.size} Magento module match(es) for \"$query\".")
+        for (record in matches.filter { it.key in shown }) {
             lines += ""
             lines += record.key
             lines += "path: ${record.path ?: "<unresolved>"}"
@@ -46,7 +48,7 @@ internal object MagentoModuleQueries {
             lines += "view: ${record.fields["view"] ?: "-"}"
         }
 
-        if (matches.size > MagentoMcpSupport.MAX_MATCHES) {
+        if (names.size > MagentoMcpSupport.MAX_MATCHES) {
             lines += ""
             lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
         }
