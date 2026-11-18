@@ -12,6 +12,7 @@ from engine import Engine, launch_command
 class HceClient:
     def __init__(self, runtime, plugin, license_dir, settings, project, output):
         self.project = project.resolve()
+        self.index_dir = output / "rocksdb"
         output.mkdir(parents=True, exist_ok=False)
         with zipfile.ZipFile(plugin) as archive:
             archive.extractall(output / "plugins")
@@ -29,7 +30,7 @@ class HceClient:
 
     def __enter__(self):
         try:
-            tools = self.engine.start("271.2085.0")
+            tools = self.engine.start("271.2085.0", self.index_dir)
             self.schemas = {t["name"]: t["inputSchema"] for t in tools}
             for name in ("configure_magento_project", "describe_magento_cli_environment", "get_magento_root_path"):
                 assert name in self.schemas, name

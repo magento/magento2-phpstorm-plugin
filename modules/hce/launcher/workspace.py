@@ -46,7 +46,7 @@ def discover_module(project):
             module = ET.parse(file).find("module")
             if module is not None and module.get("name"):
                 return module.get("name")
-    raise ValueError("No Magento module found. Point --project at the Magento root with its Composer dependencies installed.")
+    raise ValueError("No Magento module found. Point --magento-root at the Magento directory with its Composer dependencies installed.")
 
 
 def prepare_import(project):
@@ -105,7 +105,7 @@ def register(project, client, launcher):
     write(dest, updated.encode())
 
 
-def check_index(engine, module):
+def check_index(engine, module, magento_root):
     def call(name, **args):
         reply = engine.tool(name, args)
         if reply["isError"]:
@@ -113,8 +113,8 @@ def check_index(engine, module):
         return json.loads(reply["content"])
 
     settings = call("configure_magento_project")["settings"]
-    if not settings["enabled"] or settings.get("magentoPath") != str(engine.project):
-        result = call("configure_magento_project", action="configure", magentoPath=".", enabled=True)
+    if not settings["enabled"] or settings.get("magentoPath") != str(magento_root):
+        result = call("configure_magento_project", action="configure", magentoPath=str(magento_root.relative_to(engine.project)), enabled=True)
         if not result["successful"]:
             raise RuntimeError("Magento configuration failed: " + str(result))
     result = call("magento_inspect", mode="query", queryType="module_dependencies",

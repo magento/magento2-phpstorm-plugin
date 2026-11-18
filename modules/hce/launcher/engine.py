@@ -86,13 +86,13 @@ class Engine:
     def command(self, name, arguments=()):
         return self.request("workspace/executeCommand", {"command": name, "arguments": list(arguments)})
 
-    def start(self, build):
+    def start(self, build, index_dir):
         uri = self.folder["uri"]
         result = self.request("initialize", {
             "processId": os.getpid(), "clientInfo": {"name": "magento-hce", "version": "1"},
             "rootUri": uri, "workspaceFolders": [self.folder],
             "capabilities": {"workspace": {"workspaceFolders": True, "configuration": True}},
-            "initializationOptions": {"buildTools": {uri: "jps"}, "projects": [{"type": "jps", "path": uri}]}})
+            "initializationOptions": {"indexDir": str(index_dir.resolve()), "buildTools": {uri: "jps"}, "projects": [{"type": "jps", "path": uri}]}})
         if result.get("serverInfo", {}).get("version") != "ILS-" + build:
             raise RuntimeError("Unexpected HCE server build")
         self.send({"jsonrpc": "2.0", "method": "initialized", "params": {}})
@@ -105,6 +105,9 @@ class Engine:
         return self.command("list-mcp-tools")["tools"]
 
     def tool(self, name, arguments):
+        if ((name == "magento_inspect" and arguments.get("mode") == "query")
+                or (name == "magento_diagnostics" and arguments.get("mode") == "check")):
+            self.command("wait-for-highwatermark")
         return self.command("run-mcp-tool", [{"tool": name, "arguments": {
             **arguments, "projectPath": str(self.project)}}])
 

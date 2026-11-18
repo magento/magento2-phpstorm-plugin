@@ -139,7 +139,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertEquals(20, boundedPaths.size)
         assertEquals(boundedPaths.sorted(), boundedPaths)
         assertTrue(bounded, bounded.contains("totalCandidates: 21") && bounded.contains("truncated: true"))
-        for (path in listOf("../outside", "/absolute", "https://example.test/template")) {
+        for (path in listOf("Magento_Ui", "Foo_Bar2/", "text!Foo_Bar2/.html", "../outside", "/absolute", "https://example.test/template")) {
             assertTrue(query(path).contains("Invalid templatePath"))
         }
         assertTrue(inspect("query", "ui_template", "{}").contains("Missing required parameter `templatePath`"))

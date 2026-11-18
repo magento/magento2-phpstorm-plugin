@@ -87,6 +87,11 @@ def install_plugin(home, manifest, provided):
     return plugin
 
 
+def confirm(question):
+    print(question, end=" ", file=sys.stderr, flush=True)
+    return input().strip().lower() == "yes"
+
+
 def consent(home, runtime, accepted):
     agreement = runtime / "EULA.txt"
     fingerprint = digest(agreement)
@@ -95,8 +100,8 @@ def consent(home, runtime, accepted):
         if not accepted:
             if not sys.stdin.isatty():
                 raise ValueError(f"Read {agreement} and run setup with --accept-eula to accept it.")
-            print(agreement.read_text())
-            if input("Accept this JetBrains agreement? [yes/no] ").strip().lower() != "yes":
+            print(agreement.read_text(), file=sys.stderr)
+            if not confirm("Accept this JetBrains agreement? [yes/no]"):
                 raise ValueError("JetBrains agreement declined.")
         write(receipt, (fingerprint + "\n").encode())
     return fingerprint
@@ -104,16 +109,20 @@ def consent(home, runtime, accepted):
 
 def verify_license(runtime, env):
     launcher = str(runtime / "bin/intellij-server")
+
     def active():
         result = subprocess.run([launcher, "license", "status", "--json"], env=env,
-                                stdout=subprocess.PIPE, check=True, timeout=90)
-        return json.loads(result.stdout).get("activeLicense")
+                                stdout=subprocess.PIPE, timeout=90)
+        if result.returncode not in (0, 2):
+            result.check_returncode()
+        state = json.loads(result.stdout)
+        return result.returncode == 0 and state.get("activeLicense")
 
     if active():
         return
     login = [launcher, "license", "login", "--code"]
-    if sys.stdin.isatty() and input("Sign in with JetBrains on this host? [yes/no] ").strip().lower() == "yes":
-        subprocess.run(login, env=env, check=True)
+    if sys.stdin.isatty() and confirm("Sign in with JetBrains on this host? [yes/no]"):
+        subprocess.run(login, env=env, stdout=sys.stderr, check=True)
         if active():
             return
     raise ValueError("Activate the runtime using " + shlex.join(login)
@@ -135,7 +144,7 @@ def open_engine(state, workspace, verify=False):
     with (log / "launcher.log").open("w") as errors:
         engine = Engine(Path(state["project"]), command, env, errors)
         try:
-            engine.catalog = magento_tools(engine.start(state["build"]))
+            engine.catalog = magento_tools(engine.start(state["build"], workspace / "rocksdb"))
             yield engine
         except (OSError, RuntimeError, ValueError) as error:
             raise RuntimeError(f"{error} (HCE logs: {log})") from error
@@ -145,9 +154,10 @@ def open_engine(state, workspace, verify=False):
 
 def setup(args, archive):
     project = args.project.resolve(strict=True)
-    if not (project / "composer.json").is_file():
-        raise ValueError("--project must point to the Magento directory containing composer.json")
-    module = args.check_module or discover_module(project)
+    magento_root = (project / args.magento_root).resolve(strict=True)
+    if not magento_root.is_relative_to(project) or not (magento_root / "composer.json").is_file():
+        raise ValueError("--magento-root must be a directory in --project containing composer.json")
+    module = args.check_module or discover_module(magento_root)
     home = args.data_dir.expanduser().resolve()
     workspace = home / "projects" / hashlib.sha256(os.fsencode(project)).hexdigest()
     with zipfile.ZipFile(archive) as bundle:
@@ -166,7 +176,7 @@ def setup(args, archive):
     with lock(workspace / "session.lock"):
         print(f"Indexing {project} and checking {module}…", file=sys.stderr)
         with open_engine(state, workspace, verify=True) as engine:
-            check_index(engine, module)
+            check_index(engine, module, magento_root)
             state["tools"] = engine.catalog
         write(workspace / (key + ".json"), json.dumps(state).encode())
         stable = workspace / "magento-hce.pyz"
@@ -198,7 +208,8 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     install = commands.add_parser("setup", help="Install the runtime and Magento plugin for this checkout")
     install.add_argument("--client", choices=("codex", "claude", "stdio"), default="codex")
-    install.add_argument("--project", type=Path, default=Path.cwd())
+    install.add_argument("--project", type=Path, default=Path.cwd(), help="Workspace containing client settings and wrappers")
+    install.add_argument("--magento-root", type=Path, default=Path("."), help="Magento root inside --project (default: .)")
     install.add_argument("--runtime", type=Path, help="Reuse an installed, pinned JetBrains runtime")
     install.add_argument("--license-dir", type=Path, help="Use an already provisioned JetBrains license store")
     install.add_argument("--plugin-file", type=Path, help="Use a local copy of the exact release ZIP")

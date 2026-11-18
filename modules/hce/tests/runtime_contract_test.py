@@ -143,6 +143,11 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertEqual("unsupported_wrapper", client.call("magento_magerun", mode="commands")["status"])
             self.assertFalse((project / "unsupported-executed").exists())
             self.assertFalse((project / "unexpected-operation").exists())
+            before = (project / "metadata-calls.jsonl").read_bytes()
+            (project / "src").rename(project / "removed-src")
+            for mode in ("status", "commands"):
+                self.assertEqual("invalid_configuration", client.call("magento_magerun", mode=mode)["status"])
+            self.assertEqual(before, (project / "metadata-calls.jsonl").read_bytes())
 
     def test_xml_diagnostics_rules_locations_limits_and_updates(self):
         project = self.fixture("diagnostics-project")
@@ -298,7 +303,7 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertEqual(sorted(paths), paths)
             self.assertIn("totalCandidates: 21", bounded)
             self.assertIn("truncated: true", bounded)
-            for invalid in ["../outside", "/absolute", "https://example.test/template"]:
+            for invalid in ["Magento_Ui", "Foo_Bar2/", "text!Foo_Bar2/.html", "../outside", "/absolute", "https://example.test/template"]:
                 self.assertIn("Invalid templatePath", query(invalid))
             added = self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/template/live.html", "<div>Live update</div>")
             client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
