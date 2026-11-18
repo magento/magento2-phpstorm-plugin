@@ -477,10 +477,16 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(description, description.contains("--project=commerce-local --dir=/var/www/html/src -- php -v"))
         assertTrue(description, description.contains("8.4") && description.contains("src/pub"))
         assertTrue(description, description.contains(JSONObject.quote(root.resolve(".ddev/config.local.yaml").toString())))
+        assertTrue(description, description.contains("\"commands\": []"))
+        file(".ddev/commands/web/test-integration", "#!/bin/sh\n## Description: Run integration tests\n## Usage: test-integration <path>\n")
+        val withCommands = text("describe_magento_cli_environment")
+        assertTrue(withCommands, withCommands.contains("\"invocation\": \"ddev test-integration\""))
+        assertTrue(withCommands, withCommands.contains("Run integration tests"))
         file(".ddev/config.local.yaml", "working_dir: [invalid")
         val invalid = text("describe_magento_cli_environment")
         assertTrue(invalid, invalid.contains("invalid_configuration"))
         assertFalse(invalid, invalid.contains("execPrefix"))
+        assertFalse(invalid, invalid.contains("projectCommands"))
         assertEquals("invalid_configuration", magerun("commands").getString("status"))
     }
 

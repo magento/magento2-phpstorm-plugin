@@ -59,7 +59,10 @@ class MagentoMcpProjectToolset : McpToolset {
         "name, type, document/Composer roots, runtime versions and container working directories with " +
         "source files.\n" +
         "- The general execPrefix includes the configured project and web working directory; append " +
-        "the intended command as separate arguments and run from cwd. This does not require Magerun.\n\n" +
+        "the intended command as separate arguments and run from cwd. This does not require Magerun.\n" +
+        "- projectCommands lists the project's custom commands from .ddev/commands with their service, " +
+        "description, usage and examples. They are project scripts: run one as its invocation only when " +
+        "the task needs it and the developer agrees.\n\n" +
 
         "Execution guidance:\n" +
         "- The result includes Terminal guidance for interactive permission prompts.\n" +

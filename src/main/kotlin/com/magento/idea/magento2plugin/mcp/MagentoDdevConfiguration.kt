@@ -32,8 +32,8 @@ internal data class MagentoDdevConfiguration(
 
     companion object {
         private const val MAX_FILES = 32
-        private const val MAX_BYTES = 262_144
-        private const val MAX_TOTAL_BYTES = 1_048_576
+        internal const val MAX_BYTES = 262_144
+        internal const val MAX_TOTAL_BYTES = 1_048_576
         private val STRING_KEYS = setOf("name", "type", "docroot", "composer_root", "php_version",
             "nodejs_version", "webserver_type")
         private val MAP_KEYS = mapOf("working_dir" to setOf("web", "db"), "database" to setOf("type", "version"))

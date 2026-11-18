@@ -9,7 +9,7 @@ val shared = file("../../src/main")
 kotlin.sourceSets.main {
     kotlin.srcDir(shared.resolve("kotlin"))
     kotlin.include("com/magento/idea/magento2plugin/hce/**")
-    listOf("MagentoCliEnvironment", "MagentoMagerunNames", "MagentoDdevEnvironment", "MagentoDdevConfiguration").forEach {
+    listOf("MagentoCliEnvironment", "MagentoMagerunNames", "MagentoDdevEnvironment", "MagentoDdevConfiguration", "MagentoDdevCommands").forEach {
         kotlin.include("com/magento/idea/magento2plugin/mcp/$it.kt")
     }
 }
