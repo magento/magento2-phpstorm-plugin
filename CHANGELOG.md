@@ -13,11 +13,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
+- `describe_magento_cli_environment` lists the custom commands of a DDEV project from `.ddev/commands` as `projectCommands`: the `ddev` invocation, which DDEV takes from the first word of `Usage`, service, whether it runs on the host or in a container, description, usage, examples and aliases. Files are read with DDEV's rules and registration order and never run; a command whose `Usage` name is already taken is skipped and a taken alias is dropped, as DDEV does; `ProjectTypes` is applied, while OS, host binary and database conditions are reported as not evaluated [#2807](https://github.com/magento/magento2-phpstorm-plugin/issues/2807).
 
 ### Fixed
 
 - The Upgrade Compatibility Tool report and MCP `analyze` scan a module directory in `vendor` that was requested directly, instead of reporting that no custom components were found. This covers modules installed as symlinks by Composer path repositories and modules from vendors bundled with Magento, such as `PayPal_Braintree` in `vendor/paypal/module-braintree-core`. Bundled modules and symlinks found below a broader requested directory are still skipped. A module reached through both a symlink and its target is scanned once, and excluded paths apply whether they name the symlink or its target. MCP accepts a symlink in the project to a Magento component outside it, while other symlinks still cannot open files outside the project, and a scan whose requested paths are all excluded says so [#1101](https://github.com/magento/magento2-phpstorm-plugin/issues/1101).
-
+- Generated Magento CLI commands return a successful integer exit code on Symfony Console 7.4.
+- Plugin gutter navigation checks the full before, around or after method name.
+- The observer and method-plugin inspections distinguish declarations from area-specific configuration and identify the XML files that disable or replace entries. Method-plugin declarations include inherited interfaces in text and JSON.
 - XML diagnostics can check layout files in Composer packages when the IDE indexes `vendor/` as a library and excludes it from module content.
 
 ## 2026.3.6-p1

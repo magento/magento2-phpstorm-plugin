@@ -31,7 +31,7 @@ internal object MagentoInspectionCommands {
         "module" to "Find modules by exact or partial Magento module name.",
         "module_dependencies" to "Inspect declared sequence ordering and Composer package requirements in either direction.",
         "di_config" to "Find di.xml declarations related to a PHP FQN or virtual type.",
-        "plugins_for_method" to "Find plugins that intercept a target class or interface method.",
+        "plugins_for_method" to "Find declared plugin methods or resolve them for an effective area.",
         "observers_for_event" to "Find observer declarations by full or partial Magento event name.",
         "layout_entities" to "Find layout handles, block names, and container names.",
         "ui_component" to "Find UI component XML definitions by component file name.",
@@ -124,7 +124,18 @@ internal object MagentoInspectionCommands {
     private fun isAvailable(queryType: String): Boolean =
         queryType != "plugins_for_method" || MagentoMethodPluginQueryProvider.isAvailable()
 
-    private fun dispatch(project: Project, queryType: String, parameters: JSONObject, indexKeys: MagentoIndexKeys?): String {
+    private fun dispatch(
+        project: Project,
+        queryType: String,
+        parameters: JSONObject,
+        indexKeys: MagentoIndexKeys?
+    ): String {
+        val json = parameters.optString("format") == "json"
+        val area = parameters.optString("area").trim().takeIf { it.isNotEmpty() }
+        val effectiveArea = parameters.optString("effectiveArea").trim().takeIf { it.isNotEmpty() }
+        if (queryType == "plugins_for_method" && area != null && effectiveArea != null) {
+            return "Choose area for a declaration file filter or effectiveArea for merged configuration."
+        }
         return when (queryType) {
             "module" -> MagentoModuleQueries.findMagentoModule(
                 project = project,
@@ -145,12 +156,12 @@ internal object MagentoInspectionCommands {
             "plugins_for_method" -> MagentoDiQueries.findPluginsForMethod(
                 project = project,
                 className = parameters.requireString("className"),
-                methodName = parameters.requireString("methodName")
+                methodName = parameters.requireString("methodName"), effectiveArea = effectiveArea, json = json, fileArea = area
             )
 
             "observers_for_event" -> MagentoEventQueries.findObserversForEvent(
                 project = project,
-                eventName = parameters.requireString("eventName")
+                eventName = parameters.requireString("eventName"), area = area, json = json
             )
 
             "layout_entities" -> MagentoViewQueries.findLayoutEntities(
@@ -234,7 +245,7 @@ internal object MagentoInspectionCommands {
 
         "plugins_for_method" -> """
             queryType: plugins_for_method
-            Finds Magento plugins that intercept a target class or interface method.
+            Lists declaration-only matches across the PHP hierarchy, including inherited interfaces, by default. Optional: effectiveArea merges global and area configuration in module and PHP inheritance order; area alone filters declaration files. Use format=json for source records.
             Required: className, methodName. methodName must be the bare PHP method name, such as `save` or `getById`, without `before`, `around`, or `after` prefixes.
             Example parametersJson:
             {"className":"Magento\\Catalog\\Api\\ProductRepositoryInterface","methodName":"save"}
@@ -242,7 +253,7 @@ internal object MagentoInspectionCommands {
 
         "observers_for_event" -> """
             queryType: observers_for_event
-            Finds observer declarations for a Magento event.
+            Lists declaration-only matches by default. Optional: area merges global and area observer configuration in enabled module order. Use format=json for source records.
             Required: eventName. Use a full event name such as `catalog_product_save_after` or a partial search such as `product_save`.
             Example parametersJson:
             {"eventName":"catalog_product_save_after"}
