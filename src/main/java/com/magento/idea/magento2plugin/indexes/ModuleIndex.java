@@ -178,24 +178,38 @@ public final class ModuleIndex {
         });
     }
 
-    private @Nullable VirtualFile findIndexedModuleDirectory(final String moduleName) {
-        final Collection<VirtualFile> files;
-        try {
-            files = new ArrayList<>(FileBasedIndex.getInstance().getContainingFiles(
+    /**
+     * Returns every indexed directory of the module, including copies that declare the same name.
+     *
+     * @param moduleName String
+     * @return List
+     * @throws IndexNotReadyException while indexes are being built, so callers can report indexing
+     */
+    public List<VirtualFile> getIndexedModuleDirectories(final String moduleName) {
+        return ApplicationManager.getApplication().runReadAction((Computable<List<VirtualFile>>) () -> {
+            final Collection<VirtualFile> files = new ArrayList<>(FileBasedIndex.getInstance().getContainingFiles(
                     ModuleXmlIndex.KEY,
                     moduleName,
                     GlobalSearchScope.allScope(project)
             ));
+
+            final List<VirtualFile> moduleDirectories = new ArrayList<>();
+            for (final VirtualFile virtualFile : files) {
+                final VirtualFile moduleDirectory = getModuleRoot(virtualFile);
+                if (moduleDirectory != null && moduleDirectory.isValid() && moduleDirectory.isDirectory()) {
+                    moduleDirectories.add(moduleDirectory);
+                }
+            }
+            return moduleDirectories;
+        });
+    }
+
+    private @Nullable VirtualFile findIndexedModuleDirectory(final String moduleName) {
+        final List<VirtualFile> moduleDirectories;
+        try {
+            moduleDirectories = getIndexedModuleDirectories(moduleName);
         } catch (IndexNotReadyException exception) {
             return null;
-        }
-
-        final List<VirtualFile> moduleDirectories = new ArrayList<>();
-        for (final VirtualFile virtualFile : files) {
-            final VirtualFile moduleDirectory = getModuleRoot(virtualFile);
-            if (moduleDirectory != null && moduleDirectory.isValid() && moduleDirectory.isDirectory()) {
-                moduleDirectories.add(moduleDirectory);
-            }
         }
 
         // Generated runtime copies may declare the same module name as the configured Magento source.

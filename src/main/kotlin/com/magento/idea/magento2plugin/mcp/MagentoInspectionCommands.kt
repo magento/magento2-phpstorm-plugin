@@ -42,7 +42,8 @@ internal object MagentoInspectionCommands {
     private val filterHelp = mapOf(
         "module" to "module: exact name of the module that owns the file.",
         "area" to "area: global, frontend, adminhtml or another etc/<area> folder.",
-        "path" to "path: project-relative directory or file prefix."
+        "path" to "path: project-relative directory or file prefix. A module at the project root has path `.`, " +
+            "which no path filter selects; its files, such as `etc/di.xml`, are selected as usual."
     )
 
     private val queryParameters = mapOf(
