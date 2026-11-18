@@ -1,5 +1,6 @@
 <?php
 use Magento\CloudPatches\Environment\Config;
+use Magento\CloudPatches\Patch\Collector\SupportCollector;
 use Magento\CloudPatches\Patch\Pool\OptionalPool;
 use Magento\CloudPatches\Patch\Pool\RequiredPool;
 
@@ -25,28 +26,31 @@ foreach ($container->get(RequiredPool::class)->getList() as $patch) {
 }
 $selection = $container->get(Config::class)->getQualityPatches();
 $optional = $container->get(OptionalPool::class);
-$all = reset($selection) === '*';
-if (!$all) {
-    $expected = array_merge($expected, $selection);
-}
-// Retain selected IDs missing from this release. Expand transitive dependencies even when
-// the installed pool cannot resolve every selected ID.
-$dependencies = [];
-foreach ($optional->getList() as $patch) {
-    $id = $patch->getId();
-    $dependencies[$id] = array_merge($dependencies[$id] ?? [], $patch->getRequire());
-    if ($all && $patch->getType() === 'Optional') {
-        $expected[] = $id;
-    }
-}
-$seen = [];
-while ($expected) {
-    $id = array_pop($expected);
-    if (!isset($seen[$id])) {
-        $seen[$id] = true;
-        foreach ($dependencies[$id] ?? [] as $dependency) {
-            $expected[] = $dependency;
+if (reset($selection) === '*') {
+    // The installed ECE pool expands dependencies before the apply action drops deprecated patches.
+    foreach ($optional->getOptionalListByOrigin([SupportCollector::ORIGIN]) as $patch) {
+        if (!$patch->isDeprecated()) {
+            $expected[] = $patch->getId();
         }
     }
+} else {
+    // Keep explicit IDs missing from the installed pool so their status can be reported as unknown.
+    $dependencies = [];
+    foreach ($optional->getList() as $patch) {
+        $id = $patch->getId();
+        $dependencies[$id] = array_merge($dependencies[$id] ?? [], $patch->getRequire());
+    }
+
+    $seen = [];
+    while ($selection) {
+        $id = array_pop($selection);
+        if (!isset($seen[$id])) {
+            $seen[$id] = true;
+            foreach ($dependencies[$id] ?? [] as $dependency) {
+                $selection[] = $dependency;
+            }
+        }
+    }
+    $expected = array_merge($expected, array_keys($seen));
 }
-echo json_encode(['available' => true, 'environment' => $environment, 'items' => array_keys($seen)], JSON_THROW_ON_ERROR);
+echo json_encode(['available' => true, 'environment' => $environment, 'items' => array_values(array_unique($expected))], JSON_THROW_ON_ERROR);

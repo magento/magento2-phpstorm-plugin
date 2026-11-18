@@ -53,15 +53,17 @@ internal object MaintenanceSources {
     private val translation = Regex("(?:^|/)(?:i18n|app/i18n/[^/]+/[^/]+)/[^/]+\\.csv$")
     private val patch = Regex("(?:^|/)Setup/Patch/(?:Schema|Data)/.+\\.php$")
     private val module = Regex("^app/code/([^/]+)/([^/]+)/")
-    fun cacheType(path: String): String? = when {
-        layout.containsMatchIn(path) -> "layout"
-        path.endsWith("/etc/config.xml") -> "config"
-        translation.containsMatchIn(path) -> "translate"
-        else -> null
+    private val storefrontLayout = Regex("(?:^|/)(?:view/(?:frontend|base)|app/design/frontend)/")
+
+    private fun cacheTypes(path: String): List<String> = when {
+        layout.containsMatchIn(path) -> if (storefrontLayout.containsMatchIn(path)) listOf("layout", "full_page") else listOf("layout")
+        path.endsWith("/etc/config.xml") -> listOf("config")
+        translation.containsMatchIn(path) -> listOf("translate")
+        else -> emptyList()
     }
 
     fun checkId(path: String): String? = when {
-        cacheType(path) != null -> "cache_clean"
+        cacheTypes(path).isNotEmpty() -> "cache_clean"
         path.endsWith("/etc/db_schema.xml") || path.endsWith("/etc/module.xml") || patch.containsMatchIn(path) ||
             path == "app/etc/config.php" -> "setup_upgrade"
         path in listOf("composer.lock", "composer.json") -> "composer_install"
@@ -92,10 +94,11 @@ internal object MaintenanceSources {
                         mod ?: Regex("^vendor/([^/]+/[^/]+)/").find(path)?.groupValues?.get(1) ?: path, "Changed file: $path", if (listChange) "Compare the enabled modules with the previous deployment."
                         else "Verify setup:db:status in the selected runtime.", module = mod)
                 }
-                "cache_clean" -> {
-                    val type = cacheType(path)!!
+                "cache_clean" -> for (type in cacheTypes(path)) {
+                    val action = if (type == "full_page") "If the affected storefront response is cached, clean the full-page cache."
+                        else "If the edited content is stale, clean the $type cache."
                     findings += MaintenanceFinding("source_cache_type", "advisory", type, "Changed file: $path",
-                        "If the edited content is stale, clean the $type cache.", runtime.suggestion("bin/magento", "cache:clean", type))
+                        action, runtime.suggestion("bin/magento", "cache:clean", type))
                 }
                 else -> findings += MaintenanceFinding("maintenance_source_changed", "advisory", path,
                     "Changed file: $path", "Verify $check in the selected environment.")

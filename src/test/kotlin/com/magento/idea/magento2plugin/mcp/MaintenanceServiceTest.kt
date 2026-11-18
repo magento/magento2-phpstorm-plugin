@@ -35,10 +35,10 @@ class MaintenanceServiceTest {
         org.junit.Assume.assumeNotNull(php)
         val root = temporary.root.toPath()
         val vendor = Files.createDirectories(root.resolve("custom vendor"))
-        fun run(script: String): org.json.JSONObject {
+        fun run(script: String, patches: String = """["Q-2","Q-MISSING"]"""): org.json.JSONObject {
             val source = javaClass.getResource("/maintenance/$script.php")!!.readText().substringAfter("<?php")
             val process = ProcessBuilder(php!!.absolutePath, "-r", source, "--", vendor.toString()).directory(root.toFile())
-                .redirectErrorStream(true).apply { environment()["QUALITY_PATCHES"] = """["Q-2","Q-MISSING"]""" }.start()
+                .redirectErrorStream(true).apply { environment()["QUALITY_PATCHES"] = patches }.start()
             val output = process.inputStream.bufferedReader().use { it.readText() }
             assertEquals(output, 0, process.waitFor())
             return org.json.JSONObject(output)
@@ -50,6 +50,8 @@ class MaintenanceServiceTest {
         Files.writeString(bootstrap, javaClass.getResource("/maintenance/cloud-bootstrap.php")!!.readText())
         assertEquals(setOf("CLOUD-1", "Q-2", "Q-DEP", "Q-LEAF", "Q-MISSING", "m2-hotfixes/site.patch"),
             run("patches").getJSONArray("items").toList().toSet())
+        assertEquals(setOf("CLOUD-1", "Q-2", "Q-LEAF", "m2-hotfixes/site.patch"),
+            run("patches", """["*"]""").getJSONArray("items").toList().toSet())
         Files.writeString(root.resolve("composer.lock"), """{"packages":[{"name":"acme/meta","version":"1.0"}]}""")
         assertTrue(run("inventory").getBoolean("missing"))
         Files.writeString(vendor.resolve("autoload.php"), "<?php")
@@ -58,6 +60,39 @@ class MaintenanceServiceTest {
             """{"packages":[{"type":"metapackage","name":"acme/meta","version":"1.0"}]}""")
         val data = run("inventory")
         assertEquals(data.getJSONArray("locked").toString(), data.getJSONArray("installed").toString())
+    }
+
+    @Test fun layoutAdviceRefreshesACachedStorefrontResponseWithoutInvalidations() {
+        val root = temporary.root.toPath().toRealPath()
+        MaintenanceContract.prepare(root, root)
+        val path = "app/code/Acme/News/view/frontend/layout/default.xml"
+        val layout = root.resolve(path)
+        Files.createDirectories(layout.parent)
+        Files.writeString(layout, "<page>old</page>")
+        val cache = mutableMapOf<String, String>()
+        fun storefrontResponse() = cache.getOrPut("full_page") {
+            cache.getOrPut("layout") { Files.readString(layout) }
+        }
+        assertEquals("<page>old</page>", storefrontResponse())
+        Files.writeString(layout, "<page>new</page>")
+
+        val service = MaintenanceService(root, ".", emptyList(), MagerunRunner { argv, _, _ ->
+            assertTrue(argv.toString(), argv.any { it.contains("getInvalidated()") })
+            MagerunProcessResult(0, "[]")
+        })
+        val findings = service.execute("verify", listOf("cache_clean"), listOf(path), emptyList(), "dev") {}
+            .getJSONArray("findings").map { it as org.json.JSONObject }
+        assertEquals(listOf("layout", "full_page"), findings.map { it.getString("item") })
+        assertTrue(findings.all { it.getString("status") == "advisory" })
+        for (finding in findings) {
+            val command = finding.getJSONObject("suggestedCommand").getJSONArray("argv").toList().takeLast(3)
+            assertEquals(listOf("bin/magento", "cache:clean", finding.getString("item")), command)
+            cache.remove(finding.getString("item"))
+            if (finding.getString("item") == "layout") {
+                assertEquals("<page>old</page>", storefrontResponse())
+            }
+        }
+        assertEquals("<page>new</page>", storefrontResponse())
     }
 
     @Test fun composeWithoutAnIdentifiedLauncherNeverProbesHostVendor() {

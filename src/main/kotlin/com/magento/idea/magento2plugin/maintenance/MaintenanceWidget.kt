@@ -7,12 +7,7 @@ package com.magento.idea.magento2plugin.maintenance
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.openapi.vfs.newvfs.BulkFileListener
-import com.intellij.openapi.vfs.newvfs.events.VFileEvent
-import com.intellij.openapi.vfs.newvfs.events.VFileMoveEvent
-import com.intellij.openapi.vfs.newvfs.events.VFilePropertyChangeEvent
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -36,7 +31,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.awt.event.MouseEvent
-import java.io.IOException
 import javax.swing.Action
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -52,11 +46,10 @@ private data class Changes(val root: String, val files: List<String> = emptyList
                            val verify: Boolean = false, val devMode: String = "dev", val revision: Long = 0, val limited: Boolean = false)
 
 private class MaintenanceWidget(private val project: Project, private val scope: CoroutineScope) :
-    StatusBarWidget, StatusBarWidget.TextPresentation, BulkFileListener {
+    StatusBarWidget, StatusBarWidget.TextPresentation {
     private val changes = MutableStateFlow(Changes(""))
     private var result: JSONObject? = null
     private var observed: Changes? = null
-    private var beforeModules: Set<String>? = null
     private var refresh: kotlinx.coroutines.Job? = null
 
     override fun ID() = "MagentoMaintenance"
@@ -71,7 +64,8 @@ private class MaintenanceWidget(private val project: Project, private val scope:
     }
 
     override fun install(statusBar: StatusBar) {
-        project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES, this)
+        project.messageBus.connect(this).subscribe(VirtualFileManager.VFS_CHANGES,
+            MaintenanceChangeListener(::root, ::recordChanges))
         refresh = scope.launch(Dispatchers.IO) {
             changes.collectLatest { snapshot ->
                 delay(200)
@@ -98,41 +92,16 @@ private class MaintenanceWidget(private val project: Project, private val scope:
             .normalize().toString().replace('\\', '/')
     }
 
-    override fun before(events: List<VFileEvent>) {
-        beforeModules = null
-        val root = root() ?: return
-        val old = events.firstOrNull { it.path == "$root/app/etc/config.php" }?.file
-        beforeModules = old?.let(::enabledModules)
-    }
-
-    override fun after(events: List<VFileEvent>) {
-        val root = root() ?: return
-        val paths = events.asSequence().flatMap { event -> when (event) {
-            is VFileMoveEvent -> sequenceOf(event.oldPath, event.newPath)
-            is VFilePropertyChangeEvent -> sequenceOf(event.oldPath, event.newPath)
-            else -> sequenceOf(event.path)
-        } }.filter { it.startsWith("$root/") }.map { it.removePrefix("$root/") }
-            .filter { MaintenanceSources.checkId(it) != null }.toSet()
-        if (paths.isEmpty()) return
-        val currentModules = if ("app/etc/config.php" in paths) events.firstOrNull {
-            it.file?.path == "$root/app/etc/config.php" && it.file?.isValid == true
-        }?.file?.let(::enabledModules) else null
-        val additions = beforeModules?.let { before -> currentModules?.minus(before) }.orEmpty()
+    private fun recordChanges(batch: MaintenanceFileChanges) {
         changes.update { old ->
-            val previous = if (old.root == root) old else Changes(root)
-            val files = (previous.files.filterNot { it in paths } + paths)
-            val enabled = if ("app/etc/config.php" !in paths) previous.enabled
-                else previous.enabled.intersect(currentModules.orEmpty()) + additions
-            Changes(root, files.takeLast(512), enabled, revision = previous.revision + 1,
-                limited = previous.limited || files.size > 512)
+            val previous = if (old.root == batch.root) old else Changes(batch.root)
+            val files = previous.files.filterNot { it in batch.files } + batch.files
+            val enabled = batch.enabledModules?.let {
+                previous.enabled.intersect(it) + batch.newlyEnabledModules
+            } ?: previous.enabled
+            Changes(batch.root, files.takeLast(MAINTENANCE_PATH_LIMIT), enabled, revision = previous.revision + 1,
+                limited = previous.limited || batch.limited || files.size > MAINTENANCE_PATH_LIMIT)
         }
-    }
-
-    private fun enabledModules(file: VirtualFile): Set<String>? {
-        if (file.isDirectory || file.length > 1024 * 1024) return null
-        return try {
-            MaintenanceSources.enabledModules(file.contentsToByteArray().toString(Charsets.UTF_8))
-        } catch (_: IOException) { null }
     }
 
     override fun getClickConsumer() = Consumer<MouseEvent> {
@@ -140,7 +109,7 @@ private class MaintenanceWidget(private val project: Project, private val scope:
         if (snapshot != changes.value || root() != snapshot.root) return@Consumer
         val rows = result?.optJSONArray("findings")?.map { it as JSONObject }.orEmpty()
         val body = buildString {
-            if (snapshot.limited) appendLine("Showing the most recent 512 changed paths.")
+            if (snapshot.limited) appendLine("Showing up to $MAINTENANCE_PATH_LIMIT changed paths.")
             for ((check, group) in rows.groupBy { it.getString("checkId") }) {
                 appendLine(check)
                 for ((item, findings) in group.groupBy { it.getString("item") }) {

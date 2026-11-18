@@ -113,7 +113,7 @@
     ]
   },
   {
-    "name": "layout without invalidation",
+    "name": "cached storefront layout without invalidation",
     "args": {
       "checkIds": [
         "cache_clean"
@@ -121,6 +121,44 @@
       "mode": "verify",
       "changedFiles": [
         "app/code/Acme/News/view/frontend/layout/default.xml"
+      ]
+    },
+    "observation": {
+      "cache": []
+    },
+    "expected": [
+      {
+        "reasonId": "source_cache_type",
+        "status": "advisory",
+        "item": "layout",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "layout"
+        ]
+      },
+      {
+        "reasonId": "source_cache_type",
+        "status": "advisory",
+        "item": "full_page",
+        "nextAction": "If the affected storefront response is cached, clean the full-page cache.",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "full_page"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "adminhtml layout without invalidation",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/design/adminhtml/Acme/admin/Magento_Backend/layout/default.xml"
       ]
     },
     "observation": {
@@ -951,6 +989,11 @@
       {
         "reasonId": "source_cache_type",
         "item": "layout",
+        "status": "advisory"
+      },
+      {
+        "reasonId": "source_cache_type",
+        "item": "full_page",
         "status": "advisory"
       }
     ]
