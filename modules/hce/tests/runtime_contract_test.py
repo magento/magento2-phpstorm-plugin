@@ -42,6 +42,43 @@ class HceRuntimeContracts(unittest.TestCase):
         return HceClient(ARGS.runtime, ARGS.plugin, ARGS.license_dir, self.settings, project,
             ARGS.output / ("session-%d" % self.sequence))
 
+    def test_maintenance_contract(self):
+        project = self.fixture("maintenance-project")
+        resources = Path(__file__).resolve().parents[3] / "src/test/resources/maintenance"
+        self.file(project, "compose.yaml", "services: {}")
+        self.file(project, "bin/magento", '#!/bin/sh\nbin/cli bin/magento "$@"', True)
+        self.file(project, "bin/clinotty", (resources / "launcher.py").read_text(), True)
+        self.file(project, "src/composer.lock", '{"packages":[],"packages-dev":[]}')
+        with self.client(project) as client:
+            client.call("configure_magento_project", action="configure", magentoPath="src", enabled=True)
+            self.assertIn("magento_maintenance", client.schemas)
+            self.assertIn("setup_upgrade", client.call_text("magento_intelligence", tool="magento_maintenance"))
+            for case in json.loads((resources / "cases.json").read_text()):
+                with self.subTest(case=case["name"]):
+                    for path, content in case.get("files", {}).items():
+                        self.file(project / "src", path, content)
+                    self.file(project, "observation.json", json.dumps(case["observation"]))
+                    self.file(project, "probe-log", "")
+                    result = client.call("magento_maintenance", **case["args"])
+                    actual = result["findings"]
+                    self.assertCountEqual([f["reasonId"] for f in case["expected"]], [f["reasonId"] for f in actual])
+                    for expected in case["expected"]:
+                        matches = [f for f in actual if all(f[k] == v for k, v in expected.items() if k != "argvTail")]
+                        self.assertTrue(matches, actual)
+                        if "argvTail" in expected:
+                            tail = expected["argvTail"]
+                            self.assertEqual(tail, matches[0]["suggestedCommand"]["argv"][-len(tail):])
+                    for finding in actual:
+                        for key in ["checkId", "item", "evidence", "nextAction", "environment", "complete"]:
+                            self.assertIn(key, finding)
+                        if finding["status"] == "required":
+                            self.assertTrue(finding["suggestedCommand"]["argv"])
+                            self.assertTrue(finding["suggestedCommand"]["cwd"])
+                        if finding["status"] in ("clear", "unknown"):
+                            self.assertNotIn("suggestedCommand", finding)
+                    if case["args"]["mode"] == "check":
+                        self.assertEqual("", (project / "probe-log").read_text())
+
     def test_settings_wrappers_restart_and_project_isolation(self):
         project = self.fixture("docker-project")
         self.file(project, "compose.yaml", "services: {}")

@@ -59,6 +59,12 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
+    fun testMaintenanceOverHttp() {
+        org.junit.Assume.assumeFalse("The Docker wrapper fixture uses a POSIX shebang.", java.io.File.separatorChar == '\\')
+        MaintenanceContract.prepare(root, root.resolve("src"))
+        MaintenanceContract.run(root) { args -> JSONObject(text("magento_maintenance", args)) }
+    }
+
     fun testModuleDependenciesOverHttp() {
         val fixture = JSONObject(javaClass.getResource("/mcp/module-dependencies-query.json")!!.readText())
         val files = fixture.getJSONObject("files")

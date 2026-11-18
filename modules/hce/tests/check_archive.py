@@ -23,6 +23,10 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                     assert f"skills/{skill}/SKILL.md" in names
                 for inspection in ("CacheableFalseInDefaultLayoutInspection", "ModuleDeclarationInModuleXmlInspection"):
                     assert f"com/magento/idea/magento2plugin/inspections/xml/{inspection}.class" in names
+                for probe in ("cache", "patches", "inventory"):
+                    assert f"maintenance/{probe}.php" in names
+                assert "com/magento/idea/magento2plugin/mcp/MaintenanceService.class" in names
+                assert not any("MaintenanceDesktop" in name or "MaintenanceWidget" in name for name in names)
                 assert "magento2/inspection.properties" in names
                 assert "com/magento/idea/magento2plugin/util/magento/ui/TemplatePathResolver.class" in names
                 assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" not in names

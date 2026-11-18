@@ -17,6 +17,25 @@ import kotlin.io.path.writeText
 /** Runs the production MCP query dispatcher inside WebStorm with no PHP support. */
 class MagentoInspectionUiTest {
     @Test
+    @org.junit.jupiter.api.condition.DisabledOnOs(org.junit.jupiter.api.condition.OS.WINDOWS)
+    fun maintenanceOverHttpWithoutPhpSupport() = runWebStormUiTest(
+        "file-generators", prepareProject = { root -> MaintenanceContract.prepare(root, root) }
+    ) { root ->
+        check(!isPluginLoaded("com.jetbrains.php"))
+        val bridge = utility<DiagnosticsMcpSessionBridge>()
+        val (port, tokenName, token) = bridge.startSession().split(":")
+        try {
+            McpHttpDriverClient(port.toInt(), tokenName, token, root.toString()).use { mcp ->
+                mcp.initialize()
+                check(mcp.tools().any { it.getString("name") == "magento_maintenance" })
+                MaintenanceContract.run(root, root) { org.json.JSONObject(mcp.callText("magento_maintenance", it)) }
+            }
+        } finally {
+            bridge.stopSession()
+        }
+    }
+
+    @Test
     fun sharedConfigurationQueriesRunWithoutPhpSupport() = runWebStormUiTest(
         "file-generators",
         prepareProject = { root ->
