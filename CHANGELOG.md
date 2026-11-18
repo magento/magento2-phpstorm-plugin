@@ -16,6 +16,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
+- Generated Magento CLI commands return a successful integer exit code on Symfony Console 7.4.
+- Plugin gutter navigation checks the full before, around or after method name.
+- The observer and method-plugin inspections distinguish declarations from area-specific configuration and identify the XML files that disable or replace entries. Method-plugin declarations include inherited interfaces in text and JSON.
 - XML diagnostics can check layout files in Composer packages when the IDE indexes `vendor/` as a library and excludes it from module content.
 
 ## 2026.3.6-p1

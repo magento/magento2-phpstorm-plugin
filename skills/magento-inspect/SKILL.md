@@ -46,6 +46,8 @@ Present a `suggestedCommand` using its exact `argv` and `cwd`. Run a remediation
 {"mode":"query","queryType":"module_dependencies","parametersJson":"{\"moduleName\":\"Foo_Bar\",\"direction\":\"both\",\"limit\":20}"}
 ```
 
+For area-specific observer configuration, pass `area` to `observers_for_event`. For merged method-plugin configuration, pass `effectiveArea` to `plugins_for_method`. On a method-plugin query, `area` alone filters declaration files. Both queries return declarations by default. Set `format` to `"json"` inside `parametersJson` for source records. Read `status` and `decidedBy` to distinguish applicable, replaced, and disabled entries. If the module list in `app/etc/config.php` is missing or nonliteral, report the entries as candidates.
+
 For file diagnostics, use `magento_diagnostics` with `mode: "help"` to discover rule IDs, then `mode: "check"` with one **IDE-project-relative** `filePath`. With Magento under `src/`, retain that prefix here. The module-declaration and default-layout cacheability rules report source ranges. Read applicability, readiness, completeness and truncation before interpreting an empty list. After external disk edits on HCE, use the engine's `wait-for-highwatermark` command before an indexed query when the client exposes the LSP command.
 
 ```json

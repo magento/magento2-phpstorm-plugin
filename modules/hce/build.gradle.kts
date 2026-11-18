@@ -42,6 +42,7 @@ kotlin.sourceSets.named("host") {
     kotlin.include("com/magento/idea/magento2plugin/hce/**", "com/magento/idea/magento2plugin/mcp/Maintenance*.kt")
     kotlin.exclude("**/MaintenanceDesktop.kt")
     listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
+        "MagentoEffectiveConfiguration", "MagentoModuleLoadOrder", "MagentoMcpProjectContext",
         "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
         "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",
         "MagentoMagerunQueries", "MagentoMagerunSupport", "MagentoMagerunProcess", "MagentoCliToolQueries",
@@ -60,7 +61,7 @@ listOf("util/magento/ui/TemplatePathResolver", "reference/provider/util/GetModul
     "stubs/indexes/xml/ModuleXmlIndex", "stubs/indexes/xml/ThemeXmlIndex",
     "stubs/indexes/BlockNameIndex", "stubs/indexes/ContainerNameIndex",
     "stubs/indexes/NamedComponentIndex", "stubs/indexes/LayoutDataIndexer", "util/PhpNameUtil",
-    "util/RegExUtil", "util/magento/IsFileInEditableModuleUtil", "util/magento/MagentoPathUrlUtil").forEach {
+    "util/RegExUtil", "util/PluginVersionUtil", "util/magento/IsFileInEditableModuleUtil", "util/magento/MagentoPathUrlUtil").forEach {
     host.java.include("com/magento/idea/magento2plugin/$it.java")
 }
 
