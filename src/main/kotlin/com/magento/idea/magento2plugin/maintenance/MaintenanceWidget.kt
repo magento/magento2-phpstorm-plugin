@@ -46,7 +46,7 @@ private data class Changes(val root: String, val files: List<String> = emptyList
                            val verify: Boolean = false, val devMode: String = "dev", val revision: Long = 0, val limited: Boolean = false)
 
 private class MaintenanceWidget(private val project: Project, private val scope: CoroutineScope) :
-    StatusBarWidget, StatusBarWidget.TextPresentation {
+    MaintenanceStatusBarWidget(), StatusBarWidget.TextPresentation {
     private val changes = MutableStateFlow(Changes(""))
     private var result: JSONObject? = null
     private var observed: Changes? = null
