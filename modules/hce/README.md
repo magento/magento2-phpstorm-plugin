@@ -10,7 +10,7 @@ PHP, or JavaScript dependencies into this module unconditionally.
 
 Run setup as the developer who uses the Magento checkout. The pilot targets Linux x86-64 and Apple Silicon macOS with Python 3.12+ and a JetBrains license valid for the pinned engine. For Adobe Commerce Cloud, use a development VM or workstation with the checkout and its Composer dependencies installed. Run the command from the directory containing Magento’s `composer.json`.
 
-**Release one-liner.** Once a pilot release publishes `magento-hce.pyz` and `magento-hce.zip`, copy its installer asset URL into this command. Choose `--client codex` (default), `--client claude`, or `--client stdio` to print configuration for another MCP client.
+**Release one-liner.** Once a desktop release includes `magento-hce.pyz` and `magento-hce.zip`, copy its installer asset URL into this command. Choose `--client codex` (default), `--client claude`, or `--client stdio` to print configuration for another MCP client.
 
 ```sh
 installer=$(mktemp) && curl -fL 'INSTALLER_ASSET_URL' -o "$installer" && python3 "$installer" setup --client codex
@@ -263,13 +263,13 @@ Engine 2.9 matches the tested engine's bundled version.
 python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
 ```
 
-Package the pilot installer alongside the checked plugin ZIP. The repository argument selects the GitHub release asset at tag `hce-<plugin version>`. Publish both files together when making a release.
+One GitHub release job verifies the desktop plugin, packages HCE with the same version, attaches the desktop ZIP, HCE ZIP and installer to the same tag, and submits the desktop plugin to Marketplace. To reproduce the installer for a particular release, pass its actual tag.
 
 ```sh
-python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --github-repository OWNER/REPO --output modules/hce/build/distributions/magento-hce.pyz
+python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --github-repository OWNER/REPO --release-tag TAG --output modules/hce/build/distributions/magento-hce.pyz
 ```
 
-For an approved HCE Marketplace listing, use `--marketplace` in place of `--github-repository OWNER/REPO` and supply the exact ZIP served by Marketplace. The installer then fetches that version through JetBrains’ download API on a cache miss. The current plugin XML ID is `com.magento.idea.magento2plugin.hce`. The pilot uses GitHub release assets. Attribution to desktop listing 8024 would require a publishing arrangement with JetBrains.
+For an approved HCE Marketplace listing, use `--marketplace` in place of `--github-repository OWNER/REPO --release-tag TAG` and supply the exact ZIP served by Marketplace. The installer then fetches that version through JetBrains’ download API on a cache miss. The current plugin XML ID is `com.magento.idea.magento2plugin.hce`. The pilot uses GitHub release assets. Attribution to desktop listing 8024 would require a publishing arrangement with JetBrains.
 
 Extract `magento-hce.zip` into a dedicated plugins directory and pass that directory
 with `-Didea.plugins.path=...` through `IJ_JAVA_OPTIONS`. The engine's bundled

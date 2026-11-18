@@ -92,7 +92,7 @@ jobs:
         run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon --console=plain
       - name: Verify plugin dependencies and packaging
         run: python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
-      - name: Package the installer for this repository's pilot release
+      - name: Package the installer for this repository's branch preview
         run: >-
           python3 modules/hce/package_launcher.py
           --plugin modules/hce/build/distributions/magento-hce.zip

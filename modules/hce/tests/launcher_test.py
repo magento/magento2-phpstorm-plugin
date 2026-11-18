@@ -11,7 +11,6 @@ import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
-import xml.etree.ElementTree as ET
 
 from launcher_smoke import ROOT, checkout, smoke
 
@@ -96,7 +95,8 @@ class LauncherTest(unittest.TestCase):
         self.plugin = self.root / "magento-hce.zip"
         jar = io.BytesIO()
         with zipfile.ZipFile(jar, "w") as archive:
-            archive.write(HCE / "src/host/resources/META-INF/plugin.xml", "META-INF/plugin.xml")
+            descriptor = (HCE / "src/host/resources/META-INF/plugin.xml").read_text()
+            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42"))
         with zipfile.ZipFile(self.plugin, "w") as archive:
             archive.writestr("magento-hce/lib/test.jar", jar.getvalue())
         self.launcher = self.root / "magento-hce.pyz"
@@ -159,10 +159,18 @@ class LauncherTest(unittest.TestCase):
                     installer.install_runtime(home, manifest, None)
                 self.assertFalse((home / ("runtime-" + "0" * 64)).exists())
 
+    def test_installer_pins_shared_release_tag(self):
+        subprocess.run([sys.executable, str(HCE / "package_launcher.py"), "--plugin", str(self.plugin),
+                        "--github-repository", "example/plugin", "--release-tag", "2026.3.7-preview",
+                        "--output", str(self.launcher)], check=True, stdout=subprocess.DEVNULL)
+        with zipfile.ZipFile(self.launcher) as archive:
+            url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
+        self.assertEqual("https://github.com/example/plugin/releases/download/2026.3.7-preview/magento-hce.zip", url)
+
     def test_pinned_marketplace_url(self):
         with zipfile.ZipFile(self.launcher) as archive:
             url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
-        version = ET.parse(HCE / "src/host/resources/META-INF/plugin.xml").findtext("version")
+        version = "2026.3.7-alpha.42"
         self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin.hce&version=" + version, url)
 
 

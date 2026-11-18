@@ -6,7 +6,7 @@ import io
 import re
 import json
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -20,10 +20,12 @@ def main():
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--github-url", help="HTTPS URL of the magento-hce.zip release asset")
     source.add_argument("--marketplace", action="store_true", help="Download this plugin ID and version from Marketplace")
-    source.add_argument("--github-repository", help="Generate the pilot URL for OWNER/REPO and tag hce-<plugin version>")
+    source.add_argument("--github-repository", help="GitHub repository hosting the shared release assets")
+    parser.add_argument("--release-tag", help="Exact GitHub release tag (defaults to the packaged version for previews)")
     args = parser.parse_args()
+    if args.release_tag and not args.github_repository:
+        parser.error("--release-tag requires --github-repository")
     descriptor = ET.parse(ROOT / "src/host/resources/META-INF/plugin.xml")
-    expected = (descriptor.findtext("id"), descriptor.findtext("version"))
     identities = []
     with zipfile.ZipFile(args.plugin) as plugin:
         for member in plugin.namelist():
@@ -32,16 +34,18 @@ def main():
                     if "META-INF/plugin.xml" in jar.namelist():
                         xml = ET.fromstring(jar.read("META-INF/plugin.xml"))
                         identities.append((xml.findtext("id"), xml.findtext("version")))
-    if identities != [expected]:
+    if (len(identities) != 1 or identities[0][0] != descriptor.findtext("id")
+            or not re.fullmatch(r"[0-9][A-Za-z0-9.+_-]*", identities[0][1] or "")):
         parser.error("Plugin ZIP identity/version differs from the HCE descriptor")
     url = args.github_url
     if args.github_repository:
         if not re.fullmatch(r"[\w.-]+/[\w.-]+", args.github_repository):
             parser.error("Expected --github-repository OWNER/REPO")
-        url = f"https://github.com/{args.github_repository}/releases/download/hce-{expected[1]}/magento-hce.zip"
+        tag = quote(args.release_tag or identities[0][1], safe="")
+        url = f"https://github.com/{args.github_repository}/releases/download/{tag}/magento-hce.zip"
     if args.marketplace:
         url = "https://plugins.jetbrains.com/plugin/download?" + urlencode({
-            "pluginId": descriptor.findtext("id"), "version": descriptor.findtext("version")})
+            "pluginId": descriptor.findtext("id"), "version": identities[0][1]})
     if not url.startswith("https://"):
         parser.error("A release plugin URL must use HTTPS")
     manifest = {"plugin": {"url": url, "sha256": hashlib.sha256(args.plugin.read_bytes()).hexdigest()},
