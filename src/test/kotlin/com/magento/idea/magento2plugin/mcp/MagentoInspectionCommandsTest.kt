@@ -216,6 +216,15 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
         assertContains(MagentoInspectionCommands.query(project, "module",
             """{"moduleName":"Foo_Bar2"}""", indexKeys = MagentoIndexKeys { _, _ -> emptyList() }),
             "No Magento modules matched")
+        // Structured replies use the same host keys.
+        for ((type, parameters) in listOf(
+            "module" to """{"moduleName":"Foo_Bar2","format":"json"}"""
+        )) {
+            assertEquals(MagentoInspectionCommands.query(project, type, parameters),
+                MagentoInspectionCommands.query(project, type, parameters, indexKeys = hostKeys))
+            assertEquals(0, JSONObject(MagentoInspectionCommands.query(project, type, parameters,
+                indexKeys = MagentoIndexKeys { _, _ -> emptyList() })).getInt("total"))
+        }
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
             for ((type, parameters) in listOf("module" to """{"moduleName":"Foo_Bar2"}""",
                 "layout_entities" to """{"name":"test_index_index_block2"}""")) {
