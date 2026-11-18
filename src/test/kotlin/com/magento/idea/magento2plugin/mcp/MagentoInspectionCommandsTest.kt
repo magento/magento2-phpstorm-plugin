@@ -236,6 +236,22 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
     }
 
     @Test
+    fun testQueriesWithoutStructuredResultsKeepTheirParameters() {
+        // module_dependencies has its own limit and replies in JSON without format.
+        val dependencies = MagentoInspectionCommands.query(project, "module_dependencies",
+            """{"moduleName":"Foo_Bar","direction":"dependents","limit":20}""")
+        assertEquals(dependencies, "Foo_Bar", JSONObject(dependencies).getString("moduleName"))
+        for ((type, parameters) in listOf(
+            "module_dependencies" to """{"moduleName":"Foo_Bar","format":"json"}""",
+            "ui_template" to """{"templatePath":"Magento_Ui/form/field","format":"json"}"""
+        )) {
+            val json = JSONObject(MagentoInspectionCommands.query(project, type, parameters))
+            assertEquals(json.toString(), "invalid_request", json.getString("status"))
+            assertContains(json.getString("message"), "format `json` is not available for queryType `$type`")
+        }
+    }
+
+    @Test
     fun testHostCapabilitiesFilterCatalogSchemaAndDispatchBeforeIndexAccess() {
         val supported = setOf("di_config", "observers_for_event", "ui_component", "acl_or_menu")
         val help = MagentoInspectionCommands.help(supported)
