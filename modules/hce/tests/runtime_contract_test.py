@@ -124,11 +124,15 @@ class HceRuntimeContracts(unittest.TestCase):
             status = client.call_text("magento_skills", agentTarget="agents")
             self.assertIn("missing", status)
             self.assertFalse((project / ".agents").exists())
-            installed = client.call_text("magento_skills", mode="install",
-                skills=["magento-inspect", "magento-magerun"], agentTarget="agents")
+            bundle = Path(__file__).resolve().parents[3] / "skills"
+            names = ["magento-inspect", "magento-magerun", "magento-scaffold"]
+            installed = client.call_text("magento_skills", mode="install", skills=names, agentTarget="agents")
             self.assertIn("success", installed)
+            for name in names:
+                relative = Path(name) / "SKILL.md"
+                copy = project / ".agents/skills" / relative
+                self.assertEqual((bundle / relative).read_bytes(), copy.read_bytes(), name)
             skill = project / ".agents/skills/magento-inspect/SKILL.md"
-            self.assertTrue(skill.is_file())
             skill.write_text("My customized skill\n")
             blocked = client.call_text("magento_skills", mode="install", skills=["magento-inspect"], agentTarget="agents")
             self.assertIn("Customized skill preserved", blocked)

@@ -208,7 +208,7 @@
             </constraints>
             <properties>
               <text value="Agent skills:"/>
-              <toolTipText value="Install bundled Magento AI skills into the selected agent target. These skills are starter playbooks for Magento scaffolding and inspection workflows. After installation you can fine-tune them for your team by editing the skill files and adding project-specific instructions, commands, and workflows."/>
+              <toolTipText value="Choose where to install the selected Magento agent skill."/>
             </properties>
           </component>
           <grid id="4119d" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="4">
@@ -230,7 +230,7 @@
                   <toolTipText value="Select where the bundled Magento skills should be installed. Use this to target the agent workspace you want to extend. Installed skills are meant to be customized later with your own prompts, commands, and workflow steps."/>
                 </properties>
               </component>
-              <grid id="55ec1" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="6" vgap="-1">
+              <grid id="55ec1" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="6" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -245,7 +245,7 @@
                     </constraints>
                     <properties>
                       <text value="Scaffold"/>
-                      <toolTipText value="Install or update the bundled Magento scaffold skill for the selected agent target. Use it as a starting point for Magento code generation flows, then adjust the skill file to match your preferred prompts, commands, and delivery workflow."/>
+                      <toolTipText value="Install the guide to code generation and checking generated files on a PHP-enabled desktop."/>
                     </properties>
                   </component>
                   <component id="a8a4a" class="javax.swing.JButton" binding="installMagentoInspectSkillButton">
@@ -254,7 +254,16 @@
                     </constraints>
                     <properties>
                       <text value="Inspect"/>
-                      <toolTipText value="Install or update the bundled Magento inspect skill for project lookups and backward or upgrade compatibility analysis. Extend the installed skill with your own instructions, commands, and workflow conventions."/>
+                      <toolTipText value="Install the guide to source inspection, maintenance checks, and upgrade compatibility."/>
+                    </properties>
+                  </component>
+                  <component id="b098c" class="javax.swing.JButton" binding="installMagentoMagerunSkillButton">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                    </constraints>
+                    <properties>
+                      <text value="Magerun"/>
+                      <toolTipText value="Install the runtime investigation and command discovery guide for n98-magerun2."/>
                     </properties>
                   </component>
                 </children>
