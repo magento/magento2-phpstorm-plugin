@@ -8,8 +8,11 @@ import com.intellij.codeInspection.InspectionManager
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.util.JDOMUtil
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
 import com.magento.idea.magento2uct.execution.output.ReportBuilder
@@ -269,6 +272,142 @@ class UctAnalysisServiceTest : PhysicalMagentoTestCase() {
         assertEquals(1, result.themes)
         assertFalse(result.findings.any { it.filePath.contains("Magento/Bundled") })
         assertTrue(result.findings.any { it.filePath.endsWith("layout/default.xml") })
+    }
+
+    fun testRequestedVendorModulesAreScannedIncludingBundledVendors() {
+        myFixture.addFileToProject("vendor/acme/module-custom/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Acme_Custom', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/acme/module-custom/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+        myFixture.addFileToProject("vendor/paypal/module-braintree-core/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'PayPal_Braintree', __DIR__);
+        """.trimIndent())
+        myFixture.addFileToProject("vendor/paypal/module-braintree-core/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+
+        val custom = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/acme/module-custom").path)))
+        assertEquals(1, custom.modules)
+        assertTrue(custom.findings.any { it.filePath.endsWith("module-custom/etc/di.xml") })
+        val file = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/paypal/module-braintree-core/etc/di.xml").path)))
+        assertTrue(file.findings.any { it.filePath.endsWith("module-braintree-core/etc/di.xml") })
+
+        val bundled = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor/paypal/module-braintree-core").path)))
+        assertEquals(1, bundled.modules)
+        assertTrue(bundled.findings.any { it.filePath.endsWith("module-braintree-core/etc/di.xml") })
+
+        val all = analyze(request().copy(paths = listOf(myFixture.findFileInTempDir("vendor").path)))
+        assertEquals(1, all.modules)
+        assertFalse(all.findings.any { it.filePath.contains("module-braintree-core") })
+    }
+
+    /** Installs `packages/linked` as `vendor/acme/module-linked`, as a Composer path repository does, and returns the link. */
+    private fun linkedModule(): Path {
+        val target = myFixture.addFileToProject("packages/linked/registration.php", """
+            <?php \Magento\Framework\Component\ComponentRegistrar::register('module', 'Acme_Linked', __DIR__);
+        """.trimIndent()).virtualFile.parent
+        myFixture.addFileToProject("packages/linked/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+        myFixture.addFileToProject("packages/linked/Test/etc/di.xml", "<config><type name=\"Magento\\Test\\Removed\"/></config>")
+        val link = Path.of(target.path).parent.parent.resolve("vendor/acme/module-linked")
+        Files.createDirectories(link.parent)
+        return symlink(link, Path.of(target.path))
+    }
+
+    /** VFS paths use forward slashes on every OS. */
+    private fun vfs(path: Path) = FileUtil.toSystemIndependentName(path.toString())
+
+    private fun symlink(link: Path, target: Path): Path {
+        Files.createSymbolicLink(link, target)
+        LocalFileSystem.getInstance().refreshAndFindFileByNioFile(link)
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        return link
+    }
+
+    fun testRequestedVendorModuleInstalledAsSymlinkIsScanned() {
+        val link = linkedModule()
+
+        val result = analyze(request().copy(paths = listOf(link.toString())))
+        assertEquals(1, result.modules)
+        assertTrue(result.findings.any { it.filePath.endsWith("etc/di.xml") })
+    }
+
+    fun testSymlinkedModuleRequestedWithProjectRootIsScannedOnce() {
+        val link = linkedModule()
+        val root = link.parent.parent.parent
+        val target = root.resolve("packages/linked")
+        // Breadth-first scanning reaches this link before its target; skipping the link must not skip the target.
+        symlink(root.resolve("linked"), target)
+        fun removedType(result: UctAnalysisResult) = result.findings.filter {
+            it.filePath.endsWith("linked/etc/di.xml") && it.issue == SupportedIssue.USED_NON_EXISTENT_TYPE_IN_CONFIG
+        }
+        val single = analyze(request().copy(paths = listOf(root.toString())))
+        assertEquals(2, single.modules)
+        assertEquals(1, removedType(single).size)
+
+        for (paths in listOf(listOf(root, link), listOf(link, root))) {
+            val result = analyze(request().copy(paths = paths.map { it.toString() }))
+            assertEquals(paths.toString(), single.modules, result.modules)
+            assertEquals(paths.toString(), single.processedFiles, result.processedFiles)
+            assertEquals(paths.toString(), single.findings.size, result.findings.size)
+            // The requested module directory is scanned before the broader root reaches its target.
+            assertTrue(paths.toString(), removedType(result).single().filePath.startsWith("${vfs(link)}/"))
+        }
+        // When a symlink and its target are both requested, the first requested path is reported.
+        for (paths in listOf(listOf(link, target), listOf(target, link), listOf(link.resolve("etc/di.xml"), target),
+            listOf(link.resolve("etc/di.xml"), target.resolve("etc/di.xml")))) {
+            val result = analyze(request().copy(paths = paths.map { it.toString() }))
+            assertEquals(paths.toString(), 1, removedType(result).size)
+            val first = paths.first().let { if (it.endsWith("etc/di.xml")) it.parent.parent else it }
+            assertTrue(paths.toString(), removedType(result).single().filePath.startsWith("${vfs(first)}/"))
+        }
+    }
+
+    fun testExcludedPathsMatchSymlinkAndTarget() {
+        val link = linkedModule()
+        val root = link.parent.parent.parent
+        val target = root.resolve("packages/linked")
+        val chained = symlink(root.resolve("vendor/acme/module-chained"), link)
+        val broken = symlink(target.resolve("Broken"), root.resolve("packages/missing"))
+        assertEquals(3, analyze(request().copy(paths = listOf(link.toString()))).processedFiles)
+
+        for ((scanned, excluded) in listOf(link to target, target to link, chained to target, target to chained)) {
+            val result = analyze(request().copy(paths = listOf(scanned.toString()), excludedPaths = listOf("$excluded/Test", broken.toString())))
+            assertEquals("$scanned excluding $excluded", 2, result.processedFiles)
+            assertTrue(result.findings.none { it.filePath.contains("/Test/") })
+        }
+        val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+            analyze(request().copy(paths = listOf(link.toString()), excludedPaths = listOf(target.toString())))
+        }
+        assertTrue(error.message, error.message!!.startsWith("Every requested path is excluded"))
+
+        configure("2.4.2", "2.4.4-beta4")
+        val settings = UctSettingsService.getInstance(project)
+        val linkTest = holder("vendor/acme/module-linked/Test/etc/di.xml")
+        val targetTest = holder("packages/linked/Test/etc/di.xml")
+        settings.excludedPaths = listOf("$target/Test")
+        assertFalse(UctAnalysisContext.isEnabled(linkTest))
+        assertTrue(UctAnalysisContext.isEnabled(holder("vendor/acme/module-linked/etc/di.xml")))
+        settings.excludedPaths = listOf("$link/Test")
+        assertFalse(UctAnalysisContext.isEnabled(targetTest))
+        assertTrue(UctAnalysisContext.isEnabled(holder("packages/linked/etc/di.xml")))
+        // Resolved exclusions are cached for editor inspections and must follow the setting.
+        settings.excludedPaths = emptyList()
+        assertTrue(UctAnalysisContext.isEnabled(targetTest))
+    }
+
+    fun testEditorExclusionsFollowSymlinkRetarget() {
+        val link = linkedModule()
+        val root = link.parent.parent.parent
+        myFixture.addFileToProject("packages/other/Test/etc/di.xml", "<config/>")
+        val later = symlink(root.resolve("vendor/acme/module-later"), root.resolve("packages/other"))
+        configure("2.4.2", "2.4.4-beta4")
+        UctSettingsService.getInstance(project).excludedPaths = listOf("$later/Test")
+        val targetTest = holder("packages/linked/Test/etc/di.xml")
+        assertTrue(UctAnalysisContext.isEnabled(targetTest))
+
+        // The setting is unchanged; only the symlink target moves, so the cached exclusions must be resolved again.
+        Files.delete(later)
+        Files.createSymbolicLink(later, root.resolve("packages/linked"))
+        LocalFileSystem.getInstance().refreshNioFiles(listOf(later), false, true, null)
+        assertFalse(UctAnalysisContext.isEnabled(targetTest))
     }
 
     fun testDetachedFindingsStillProduceTheExistingJsonReport() {

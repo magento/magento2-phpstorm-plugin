@@ -764,6 +764,76 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
         }
     }
 
+    fun testRequestAcceptsWindowsJunctionToPackageOutsideProject() {
+        // Junctions exist only on Windows, and Files.isSymbolicLink does not report them.
+        if (!com.intellij.openapi.util.SystemInfo.isWindows) return
+        Settings.getInstance(project).pluginEnabled = true
+        val outside = Files.createTempDirectory("uct-junction-")
+        Disposer.register(testRootDisposable) { com.intellij.openapi.util.io.FileUtil.delete(outside) }
+        Files.writeString(outside.resolve("registration.php"),
+            "<?php \\Magento\\Framework\\Component\\ComponentRegistrar::register('module', 'Acme_Junction', __DIR__);")
+        val root = java.nio.file.Path.of(project.basePath!!).toRealPath()
+        val link = root.resolve("vendor/acme/module-junction")
+        Files.createDirectories(link.parent)
+        val mklink = ProcessBuilder("cmd", "/c", "mklink", "/J", link.toString(), outside.toString()).redirectErrorStream(true).start()
+        val output = mklink.inputStream.bufferedReader().readText()
+        assertEquals(output, 0, mklink.waitFor())
+        // Registered after the target, so it runs first and removes only the junction.
+        Disposer.register(testRootDisposable) { Files.deleteIfExists(link) }
+        assertFalse(Files.isSymbolicLink(link))
+        com.intellij.openapi.vfs.LocalFileSystem.getInstance().refreshAndFindFileByNioFile(link.parent)
+
+        val request = MagentoCompatibilityCommands.request(project,
+            JSONObject("""{"path":"vendor/acme/module-junction","targetVersion":"2.4.3"}"""))
+        assertEquals(listOf(link.toString()), request.paths)
+    }
+
+    fun testAnalysisScansPathRepositoryLinkToPackageOutsideProject() {
+        Settings.getInstance(project).pluginEnabled = true
+        val outside = Files.createTempDirectory("uct-path-repository-")
+        Disposer.register(testRootDisposable) { com.intellij.openapi.util.io.FileUtil.delete(outside) }
+        Files.writeString(outside.resolve("registration.php"),
+            "<?php \\Magento\\Framework\\Component\\ComponentRegistrar::register('module', 'Acme_Outside', __DIR__);")
+        Files.writeString(outside.resolve("Keep.php"), "<?php class OutsideKeep {}")
+        Files.createDirectories(outside.resolve("Test"))
+        Files.writeString(outside.resolve("Test/Skip.php"), "<?php class OutsideSkip {}")
+        val root = java.nio.file.Path.of(project.basePath!!).toRealPath()
+        val link = root.resolve("vendor/acme/module-outside")
+        Files.createDirectories(link.parent)
+        Files.createSymbolicLink(link, outside)
+        // Links that do not point at a Magento component must not open files outside the project.
+        val plain = Files.createTempDirectory("uct-plain-directory-")
+        Disposer.register(testRootDisposable) { com.intellij.openapi.util.io.FileUtil.delete(plain) }
+        Files.writeString(plain.resolve("Secret.php"), "<?php class Secret {}")
+        Files.createSymbolicLink(root.resolve("vendor/acme/not-a-module"), plain)
+        Files.createSymbolicLink(outside.resolve("escape"), plain)
+        com.intellij.openapi.vfs.LocalFileSystem.getInstance().refreshAndFindFileByNioFile(link.parent)
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val arguments = """{"path":"vendor/acme/module-outside","targetVersion":"2.4.3","excludedPaths":["vendor/acme/module-outside/Test"]}"""
+        val request = MagentoCompatibilityCommands.request(project, JSONObject(arguments))
+        assertEquals(listOf(link.toString()), request.paths)
+        assertEquals(listOf(link.resolve("Test").toString().replace('\\', '/')), request.excludedPaths)
+        // The path is normalized before it is checked, as the scan opens the normalized path.
+        val dotted = JSONObject(arguments).put("path", "vendor/acme/module-outside/../module-outside")
+        assertEquals(listOf(link.toString()), MagentoCompatibilityCommands.request(project, dotted).paths)
+        for (rejected in listOf("vendor/acme/not-a-module", "vendor/acme/not-a-module/Secret.php", "vendor/acme/module-outside/escape")) {
+            val error = org.junit.Assert.assertThrows(IllegalArgumentException::class.java) {
+                MagentoCompatibilityCommands.request(project, JSONObject(arguments).put("path", rejected))
+            }
+            assertTrue("$rejected: ${error.message}", error.message!!.contains("must stay inside the current project"))
+        }
+
+        val started = call("analyze", arguments)
+        assertTrue(started.toString(), started.has("runId"))
+        val runId = started.getString("runId")
+        PlatformTestUtil.waitWithEventsDispatching("path repository analysis", { runs().results(runId).state != "running" }, 20)
+        val result = call("results", """{"runId":"$runId"}""")
+        assertEquals(result.toString(), "completed", result.getString("state"))
+        assertEquals(2, result.getInt("processedFiles"))
+        assertEquals(listOf("vendor/acme/module-outside"), result.getJSONArray("paths").toList())
+    }
+
     fun testModuleNameAnalysisPrefersConfiguredRootOverIndexedRuntimeDuplicate() {
         Settings.getInstance(project).pluginEnabled = true
         for (directory in listOf(".runtime", "src")) {
