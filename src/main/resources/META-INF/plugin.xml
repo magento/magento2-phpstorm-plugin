@@ -118,6 +118,8 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <statusBarWidgetFactory id="MagentoMaintenance"
+                                implementation="com.magento.idea.magento2plugin.maintenance.MaintenanceWidgetFactory"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.Settings"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.startup.DeferredProjectOpenActions"/>
         <projectService serviceImplementation="com.magento.idea.magento2plugin.project.indexing.MagentoIndexingExclusionService"/>

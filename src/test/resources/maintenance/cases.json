@@ -1,0 +1,1001 @@
+[
+  {
+    "name": "pending data patch",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: false\nData patches are not up to date\nDetails: {\n    \"unapplied_patches\": [\n        {\n            \"module\": \"Acme_News\",\n            \"patch\": \"Acme\\\\News\\\\Setup\\\\Patch\\\\Data\\\\AddFeed\"\n        }\n    ]\n}\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "pending_data_patch",
+        "status": "required",
+        "item": "Acme\\News\\Setup\\Patch\\Data\\AddFeed",
+        "module": "Acme_News",
+        "argvTail": [
+          "bin/magento",
+          "setup:upgrade"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "already applied",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nAll modules are up to date.",
+      "exit": 0
+    },
+    "expected": [
+      {
+        "reasonId": "validators_current",
+        "status": "clear"
+      }
+    ]
+  },
+  {
+    "name": "validator threw",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData failed with error: SQLSTATE[HY000] [2002] connection refused\nTreating as upgrade required due to validation error.\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "validator_failed",
+        "status": "unknown",
+        "item": "Magento\\Framework\\Setup\\Patch\\UpToDateData"
+      }
+    ]
+  },
+  {
+    "name": "database ahead",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: false\n\nDetails: {\n    \"version_errors\": [\n        {\n            \"module\": \"Acme_News\",\n            \"type\": \"schema\",\n            \"current\": \"1.10\",\n            \"required\": \"1.2\"\n        }\n    ]\n}\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "database_ahead",
+        "status": "advisory",
+        "item": "Acme_News"
+      }
+    ]
+  },
+  {
+    "name": "new module outside validator scope",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "newlyEnabledModules": [
+        "Acme_News"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nAll modules are up to date.",
+      "exit": 0
+    },
+    "expected": [
+      {
+        "reasonId": "module_enabled",
+        "status": "advisory",
+        "item": "Acme_News"
+      }
+    ]
+  },
+  {
+    "name": "cached storefront layout without invalidation",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/view/frontend/layout/default.xml"
+      ]
+    },
+    "observation": {
+      "cache": []
+    },
+    "expected": [
+      {
+        "reasonId": "source_cache_type",
+        "status": "advisory",
+        "item": "layout",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "layout"
+        ]
+      },
+      {
+        "reasonId": "source_cache_type",
+        "status": "advisory",
+        "item": "full_page",
+        "nextAction": "If the affected storefront response is cached, clean the full-page cache.",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "full_page"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "adminhtml layout without invalidation",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/design/adminhtml/Acme/admin/Magento_Backend/layout/default.xml"
+      ]
+    },
+    "observation": {
+      "cache": []
+    },
+    "expected": [
+      {
+        "reasonId": "source_cache_type",
+        "status": "advisory",
+        "item": "layout",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "layout"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "enabled custom cache",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "cache": [
+        "acme_feed"
+      ]
+    },
+    "expected": [
+      {
+        "reasonId": "cache_invalidated",
+        "status": "required",
+        "item": "acme_feed",
+        "argvTail": [
+          "bin/magento",
+          "cache:clean",
+          "acme_feed"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cache now clear",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "cache": []
+    },
+    "expected": [
+      {
+        "reasonId": "no_invalidations",
+        "status": "clear"
+      }
+    ]
+  },
+  {
+    "name": "no-dev metapackage in container-only vendor",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify",
+      "devMode": "no-dev"
+    },
+    "observation": {
+      "inventory": {
+        "locked": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ],
+        "lockedDev": [
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ],
+        "installed": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ]
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "packages_match",
+        "status": "clear"
+      }
+    ]
+  },
+  {
+    "name": "missing dev package",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "inventory": {
+        "locked": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ],
+        "lockedDev": [
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ],
+        "installed": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ]
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "package_missing",
+        "status": "required",
+        "item": "acme/dev"
+      }
+    ]
+  },
+  {
+    "name": "different revision",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "inventory": {
+        "locked": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ],
+        "lockedDev": [
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ],
+        "installed": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          },
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "def"
+            }
+          }
+        ]
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "package_mismatch",
+        "status": "required",
+        "item": "acme/dev"
+      }
+    ]
+  },
+  {
+    "name": "stale lock",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "validation": "The lock file is not up to date with the latest changes in composer.json",
+      "validationExit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "lock_stale",
+        "status": "advisory"
+      }
+    ]
+  },
+  {
+    "name": "applicable cloud patches",
+    "args": {
+      "checkIds": [
+        "ece_patches"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "expected": {
+        "items": [
+          "CLOUD-1",
+          "Q-2",
+          "Q-DEP",
+          "Q-ABSENT",
+          "m2-hotfixes/local.patch"
+        ],
+        "available": true
+      },
+      "rows": [
+        {
+          "Id": "CLOUD-1",
+          "Status": "Applied",
+          "Title": ""
+        },
+        {
+          "Id": "Q-2",
+          "Status": "Not applied",
+          "Title": ""
+        },
+        {
+          "Id": "Q-DEP",
+          "Status": "N/A",
+          "Title": ""
+        },
+        {
+          "Id": "N/A",
+          "Status": "Not applied",
+          "Title": "../m2-hotfixes/local.patch\n"
+        },
+        {
+          "Id": "OPTIONAL",
+          "Status": "Not applied",
+          "Title": ""
+        }
+      ]
+    },
+    "expected": [
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "CLOUD-1"
+      },
+      {
+        "reasonId": "patch_pending",
+        "status": "required",
+        "item": "Q-2"
+      },
+      {
+        "reasonId": "patch_unknown",
+        "status": "unknown",
+        "item": "Q-DEP"
+      },
+      {
+        "reasonId": "patch_unknown",
+        "status": "unknown",
+        "item": "Q-ABSENT"
+      },
+      {
+        "reasonId": "patch_pending",
+        "status": "required",
+        "item": "m2-hotfixes/local.patch"
+      }
+    ]
+  },
+  {
+    "name": "missing vendor blocks downstream",
+    "args": {
+      "mode": "verify"
+    },
+    "observation": {
+      "inventory": {
+        "missing": true
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "vendor_missing",
+        "status": "required"
+      },
+      {
+        "reasonId": "blocked_by_composer",
+        "status": "unknown"
+      },
+      {
+        "reasonId": "blocked_by_composer",
+        "status": "unknown"
+      },
+      {
+        "reasonId": "blocked_by_composer",
+        "status": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "file check never runs CLI",
+    "args": {
+      "mode": "check",
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {},
+    "expected": [
+      {
+        "reasonId": "setup_source_changed",
+        "status": "advisory"
+      }
+    ]
+  },
+  {
+    "name": "generic PHP edit",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "check",
+      "changedFiles": [
+        "app/code/Acme/News/Model/Feed.php"
+      ]
+    },
+    "observation": {},
+    "expected": [
+      {
+        "reasonId": "no_file_signal",
+        "status": "not_applicable"
+      }
+    ]
+  },
+  {
+    "name": "unrecognized exit 2",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "setup": "Run 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "db_status_unknown",
+        "status": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "schema patch",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: false\nSchema patches are not up to date\nDetails: {\n    \"unapplied_patches\": [\n        {\n            \"module\": \"Acme_News\",\n            \"patch\": \"Acme\\\\News\\\\Setup\\\\Patch\\\\Schema\\\\AddTable\"\n        }\n    ]\n}\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "pending_schema_patch",
+        "status": "required",
+        "item": "Acme\\News\\Setup\\Patch\\Schema\\AddTable",
+        "module": "Acme_News",
+        "argvTail": [
+          "bin/magento",
+          "setup:upgrade"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "database behind",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: false\n\nDetails: {\n    \"version_errors\": [\n        {\n            \"module\": \"Acme_News\",\n            \"type\": \"schema\",\n            \"current\": \"1.0\",\n            \"required\": \"1.2\"\n        }\n    ]\n}\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "database_behind",
+        "status": "required",
+        "item": "Acme_News"
+      }
+    ]
+  },
+  {
+    "name": "empty cache observation",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "cache": []
+    },
+    "expected": [
+      {
+        "reasonId": "no_invalidations",
+        "status": "clear"
+      }
+    ]
+  },
+  {
+    "name": "remove dev inventory under no-dev",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify",
+      "devMode": "no-dev"
+    },
+    "observation": {
+      "inventory": {
+        "locked": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ],
+        "lockedDev": [
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ],
+        "installed": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          },
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ]
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "package_extra",
+        "status": "required",
+        "item": "acme/dev",
+        "argvTail": [
+          "composer",
+          "install",
+          "--no-dev"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "version mismatch",
+    "args": {
+      "checkIds": [
+        "composer_install"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "inventory": {
+        "locked": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          }
+        ],
+        "lockedDev": [
+          {
+            "name": "acme/dev",
+            "version": "1.1",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ],
+        "installed": [
+          {
+            "name": "acme/meta",
+            "version": "1.0.0",
+            "type": "metapackage"
+          },
+          {
+            "name": "acme/dev",
+            "version": "1.2",
+            "source": {
+              "reference": "abc"
+            }
+          }
+        ]
+      }
+    },
+    "expected": [
+      {
+        "reasonId": "package_mismatch",
+        "status": "required",
+        "item": "acme/dev"
+      }
+    ]
+  },
+  {
+    "name": "ambiguous status rows",
+    "args": {
+      "checkIds": [
+        "ece_patches"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "expected": {
+        "items": [
+          "CLOUD-1"
+        ],
+        "available": true
+      },
+      "rows": [
+        {
+          "Id": "CLOUD-1",
+          "Title": "Cloud",
+          "Status": "Applied"
+        },
+        {
+          "Id": "CLOUD-1",
+          "Title": "Cloud",
+          "Status": "Not applied"
+        }
+      ]
+    },
+    "expected": [
+      {
+        "reasonId": "patch_unknown",
+        "status": "unknown",
+        "item": "CLOUD-1"
+      }
+    ]
+  },
+  {
+    "name": "every expected patch already applied",
+    "args": {
+      "checkIds": [
+        "ece_patches"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "expected": {
+        "items": [
+          "CLOUD-1",
+          "Q-2",
+          "Q-DEP",
+          "Q-ABSENT",
+          "m2-hotfixes/local.patch"
+        ],
+        "available": true
+      },
+      "rows": [
+        {
+          "Id": "CLOUD-1",
+          "Status": "Applied",
+          "Title": ""
+        },
+        {
+          "Id": "Q-2",
+          "Status": "Applied",
+          "Title": ""
+        },
+        {
+          "Id": "Q-DEP",
+          "Status": "Applied",
+          "Title": ""
+        },
+        {
+          "Id": "N/A",
+          "Status": "Applied",
+          "Title": "../m2-hotfixes/local.patch\n"
+        },
+        {
+          "Id": "OPTIONAL",
+          "Status": "Applied",
+          "Title": ""
+        },
+        {
+          "Id": "Q-ABSENT",
+          "Title": "now installed",
+          "Status": "Applied"
+        }
+      ]
+    },
+    "expected": [
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "CLOUD-1"
+      },
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "Q-2"
+      },
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "Q-DEP"
+      },
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "Q-ABSENT"
+      },
+      {
+        "reasonId": "patch_applied",
+        "status": "clear",
+        "item": "m2-hotfixes/local.patch"
+      }
+    ]
+  },
+  {
+    "name": "defer cache until after setup",
+    "args": {
+      "checkIds": [
+        "cache_clean",
+        "setup_upgrade"
+      ],
+      "mode": "verify"
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: false\nData patches are not up to date\nDetails: {\n    \"unapplied_patches\": [\n        {\n            \"module\": \"Acme_News\",\n            \"patch\": \"Acme\\\\News\\\\Setup\\\\Patch\\\\Data\\\\AddFeed\"\n        }\n    ]\n}\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "pending_data_patch",
+        "status": "required"
+      },
+      {
+        "reasonId": "blocked_by_setup",
+        "status": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "declarative schema with table",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: false\nDeclarative Schema is not up to date\nDetails: {\n    \"affected_tables\": {\n        \"acme_news\": {\n            \"add_table\": 1\n        }\n    }\n}\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "schema_difference",
+        "status": "required",
+        "item": "acme_news"
+      }
+    ]
+  },
+  {
+    "name": "remember enabled module baseline",
+    "args": {
+      "mode": "check",
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "changedFiles": []
+    },
+    "files": {
+      "app/etc/config.php": "<?php return ['modules' => ['Acme_News' => 0]];"
+    },
+    "observation": {},
+    "expected": [
+      {
+        "reasonId": "no_file_signal",
+        "status": "not_applicable"
+      }
+    ]
+  },
+  {
+    "name": "recognize module enabled since baseline",
+    "args": {
+      "mode": "check",
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "changedFiles": [
+        "app/etc/config.php"
+      ]
+    },
+    "files": {
+      "app/etc/config.php": "<?php return ['modules' => ['Acme_News' => 1]];"
+    },
+    "observation": {},
+    "expected": [
+      {
+        "reasonId": "module_enabled",
+        "status": "advisory",
+        "item": "Acme_News"
+      }
+    ]
+  },
+  {
+    "name": "keep enablement separate on verify",
+    "args": {
+      "mode": "verify",
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "changedFiles": [
+        "app/etc/config.php"
+      ]
+    },
+    "files": {},
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: true\nValidator Magento\\Framework\\Setup\\OldDbValidator isUpToDate: true\nAll modules are up to date.",
+      "exit": 0
+    },
+    "expected": [
+      {
+        "reasonId": "module_enabled",
+        "status": "advisory",
+        "item": "Acme_News"
+      }
+    ]
+  },
+  {
+    "name": "independent validator failure preserves pending patch evidence",
+    "args": {
+      "checkIds": [
+        "setup_upgrade"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/Setup/Patch/Data/AddFeed.php"
+      ]
+    },
+    "observation": {
+      "setup": "Validator Magento\\Framework\\Setup\\Declaration\\Schema\\UpToDateDeclarativeSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateSchema isUpToDate: true\nValidator Magento\\Framework\\Setup\\Patch\\UpToDateData isUpToDate: false\nData patches are not up to date\nDetails: {\n    \"unapplied_patches\": [\n        {\n            \"module\": \"Acme_News\",\n            \"patch\": \"Acme\\\\News\\\\Setup\\\\Patch\\\\Data\\\\AddFeed\"\n        }\n    ]\n}\nValidator Magento\\Framework\\Setup\\OldDbValidator failed with error: SQLSTATE[HY000]\nRun 'setup:upgrade' to update your DB schema and data.",
+      "exit": 2
+    },
+    "expected": [
+      {
+        "reasonId": "pending_data_patch",
+        "status": "advisory",
+        "item": "Acme\\News\\Setup\\Patch\\Data\\AddFeed",
+        "module": "Acme_News"
+      },
+      {
+        "reasonId": "validator_failed",
+        "status": "unknown"
+      }
+    ]
+  },
+  {
+    "name": "failed cache probe retains layout evidence",
+    "args": {
+      "checkIds": [
+        "cache_clean"
+      ],
+      "mode": "verify",
+      "changedFiles": [
+        "app/code/Acme/News/view/frontend/layout/default.xml"
+      ]
+    },
+    "observation": {
+      "cacheExit": 1
+    },
+    "expected": [
+      {
+        "reasonId": "probe_failed",
+        "status": "unknown"
+      },
+      {
+        "reasonId": "source_cache_type",
+        "item": "layout",
+        "status": "advisory"
+      },
+      {
+        "reasonId": "source_cache_type",
+        "item": "full_page",
+        "status": "advisory"
+      }
+    ]
+  }
+]

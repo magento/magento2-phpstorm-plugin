@@ -290,10 +290,7 @@ internal object MagentoCliEnvironment {
         val roots = linkedSetOf<String>()
         var directory = magentoRoot
         while (directory.startsWith(normalizedProjectRoot)) {
-            if (DOCKER_COMPOSE_FILES.any { name ->
-                    resolveProjectPath(normalizedProjectRoot, directory.resolve(name).toString())
-                        ?.let { Files.isRegularFile(it) } == true
-                }) {
+            if (hasComposeConfiguration(normalizedProjectRoot, directory)) {
                 roots += relativeProjectPath(normalizedProjectRoot, directory).ifEmpty { "." }
                 break
             }
@@ -305,6 +302,11 @@ internal object MagentoCliEnvironment {
         roots += relativeProjectPath(normalizedProjectRoot, magentoRoot).ifEmpty { "." }
         return roots.toList()
     }
+
+    internal fun hasComposeConfiguration(projectRoot: Path, directory: Path): Boolean =
+        DOCKER_COMPOSE_FILES.any { name ->
+            resolveProjectPath(projectRoot, directory.resolve(name).toString())?.let(Files::isRegularFile) == true
+        }
 
     private fun buildDetectedTool(
         relativePath: String,
