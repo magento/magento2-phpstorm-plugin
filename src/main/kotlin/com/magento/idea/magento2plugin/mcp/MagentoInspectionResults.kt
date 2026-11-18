@@ -5,8 +5,13 @@
 package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.Base64
@@ -27,14 +32,18 @@ internal data class InspectionOptions(
         .put("area", area ?: JSONObject.NULL).put("path", path ?: JSONObject.NULL)
 }
 
-/** One declaration. [key] is the matched value, such as an event name, shared by nested records. */
+/**
+ * One declaration. [key] is the matched value, such as an event name, shared by nested records. [module] is set
+ * when the record knows its module itself, such as a module record; otherwise the owner of [path] is used.
+ */
 internal data class InspectionRecord(
     val kind: String,
     val key: String,
     val path: String?,
     val line: Int?,
     val area: String?,
-    val fields: Map<String, Any?>
+    val fields: Map<String, Any?>,
+    val module: String? = null
 )
 
 internal object MagentoInspectionResults {
@@ -82,7 +91,10 @@ internal object MagentoInspectionResults {
         options: InspectionOptions
     ): String {
         val owners = if (records.isEmpty()) emptyMap() else MagentoMcpSnapshots.moduleOwners(project)
-        val owned = records.map { it to ownerOf(it.path, owners) }
+        // Records of a module at the project root are filtered out anyway when another module is requested.
+        val rootModule = owners[""]?.takeIf { options.module == null || options.module == it }
+            ?.let { RootModuleFiles(project, it) }
+        val owned = records.map { it to (it.module ?: ownerOf(it.path, owners, rootModule)) }
         val matching = owned.filter { (record, module) ->
             (options.module == null || module == options.module) &&
                 (options.area == null || record.area == options.area) &&
@@ -120,11 +132,55 @@ internal object MagentoInspectionResults {
         .apply { record.fields.forEach { (name, value) -> put(name, value ?: JSONObject.NULL) } }
 
     /** The nearest enclosing module directory, so a nested module owns its own files. */
-    private fun ownerOf(path: String?, owners: Map<String, String>): String? {
-        var directory = path ?: return null
-        while (true) {
+    private fun ownerOf(path: String?, owners: Map<String, String>, rootModule: RootModuleFiles?): String? {
+        val file = path ?: return null
+        var directory = file
+        while (directory.isNotEmpty()) {
             owners[directory]?.let { return it }
-            directory = directory.substringBeforeLast('/', "").ifEmpty { return null }
+            directory = directory.substringBeforeLast('/', "")
+        }
+        // A module at the project root has the empty relative path.
+        return rootModule?.owner(file)
+    }
+
+    /**
+     * Files of a module at the project root, decided once per directory for one reply. Installed packages in the
+     * Composer vendor directory, the application configuration in `app/etc/` and any directory that is a package of
+     * its own are not part of it. A path must name a file under the project root: [MagentoMcpSupport.relativePath]
+     * falls back to the project base path, and such a path does not resolve under the root.
+     */
+    private class RootModuleFiles(project: Project, private val module: String) {
+        private val root = MagentoMcpSupport.projectRoot(project)
+        private val excluded = listOf(vendorDirectory(root), "app/etc")
+        private val directories = hashMapOf<VirtualFile, Boolean>()
+
+        fun owner(path: String): String? {
+            val root = root ?: return null
+            val ignoreCase = !SystemInfo.isFileSystemCaseSensitive
+            if (path.startsWith("/") || DRIVE.containsMatchIn(path) || path.substringBefore('/') == ".." ||
+                excluded.any { path.startsWith("$it/", ignoreCase) }) {
+                return null
+            }
+            val directory = root.findFileByRelativePath(path)?.parent ?: return null
+            return module.takeIf { inside(directory, root) }
+        }
+
+        private fun inside(directory: VirtualFile, root: VirtualFile): Boolean = directories.getOrPut(directory) {
+            directory == root || directory.findChild("composer.json") == null &&
+                directory.findChild("registration.php") == null && directory.parent?.let { inside(it, root) } == true
+        }
+
+        /** The `config.vendor-dir` of the root composer.json, `vendor` by default. */
+        private fun vendorDirectory(root: VirtualFile?): String {
+            val composer = root?.findChild("composer.json") ?: return "vendor"
+            val configured = try {
+                JSONObject(VfsUtilCore.loadText(composer)).optJSONObject("config")?.optString("vendor-dir")
+            } catch (_: IOException) {
+                null
+            } catch (_: JSONException) {
+                null
+            }
+            return configured?.replace('\\', '/')?.trim()?.removePrefix("./")?.trim('/')?.ifEmpty { null } ?: "vendor"
         }
     }
 
@@ -159,11 +215,13 @@ internal object MagentoInspectionResults {
     private fun normalizePath(value: String): String {
         val raw = value.replace('\\', '/').trim()
         val segments = raw.split('/').filter { it.isNotEmpty() && it != "." }
-        if (raw.startsWith("/") || Regex("^[A-Za-z]:").containsMatchIn(raw) || segments.isEmpty() || ".." in segments) {
+        if (raw.startsWith("/") || DRIVE.containsMatchIn(raw) || segments.isEmpty() || ".." in segments) {
             invalid("path must be a project-relative directory or file, such as `app/code/Vendor/Module`.")
         }
         return segments.joinToString("/")
     }
+
+    private val DRIVE = Regex("^[A-Za-z]:")
 
     private fun text(parameters: JSONObject, name: String): String? =
         parameters.optString(name).trim().takeIf { it.isNotEmpty() }

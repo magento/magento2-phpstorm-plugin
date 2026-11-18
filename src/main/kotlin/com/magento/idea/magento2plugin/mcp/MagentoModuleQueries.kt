@@ -37,6 +37,9 @@ internal object MagentoModuleQueries {
             lines += ""
             lines += record.key
             lines += "path: ${record.path ?: "<unresolved>"}"
+            if (matches.count { it.key == record.key } > 1) {
+                lines += "preferred: ${if (record.fields["preferred"] == true) "yes" else "no"}"
+            }
             lines += "editable: ${if (record.fields["editable"] == true) "yes" else "no"}"
             lines += "etc: ${record.fields["etc"] ?: "-"}"
             lines += "view: ${record.fields["view"] ?: "-"}"
@@ -49,7 +52,10 @@ internal object MagentoModuleQueries {
         return lines.joinToString("\n")
     }
 
-    /** Every matching module, in match order; the record path is the module directory. */
+    /**
+     * Every indexed copy of every matching module, in match order. The copy that other features use comes first and
+     * is marked preferred. The record path is the module directory, `.` at the project root.
+     */
     fun moduleRecords(project: Project, moduleName: String): List<InspectionRecord> {
         val query = moduleName.trim()
         val moduleIndex = ModuleIndex(project)
@@ -58,15 +64,24 @@ internal object MagentoModuleQueries {
         if (moduleIndex.getModuleDirectoryByModuleName(query) != null) {
             candidateNames += query
         }
-        return MagentoMcpSupport.prioritizeMatches(candidateNames, query).map { name ->
-            val directory = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
-            InspectionRecord("module", name, directory?.let { MagentoMcpSupport.relativePath(project, it) }, null, null, linkedMapOf(
-                "name" to name,
-                "editable" to (directory?.let(::isEditableModuleDirectory) ?: false),
-                "etc" to directory?.findChild("etc")?.let { MagentoMcpSupport.relativePath(project, it) },
-                "view" to directory?.findChild("view")?.let { MagentoMcpSupport.relativePath(project, it) }
-            ))
+        return MagentoMcpSupport.prioritizeMatches(candidateNames, query).flatMap { name ->
+            val preferred = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
+            val copies = moduleIndex.getIndexedModuleDirectories(name).filter { it != preferred }
+                .sortedBy { MagentoMcpSupport.relativePath(project, it) }
+            (listOf(preferred) + copies).map { moduleRecord(project, name, it, it == preferred) }
         }
+    }
+
+    private fun moduleRecord(project: Project, name: String, directory: VirtualFile?, preferred: Boolean): InspectionRecord {
+        val relative = directory?.let { MagentoMcpSupport.relativePath(project, it) }
+        return InspectionRecord("module", name, relative?.ifEmpty { "." }, null, null, linkedMapOf(
+            "name" to name,
+            // A module at the project root is the project being edited.
+            "editable" to (relative == "" || directory?.let(::isEditableModuleDirectory) == true),
+            "etc" to directory?.findChild("etc")?.let { MagentoMcpSupport.relativePath(project, it) },
+            "view" to directory?.findChild("view")?.let { MagentoMcpSupport.relativePath(project, it) },
+            "preferred" to preferred
+        ), module = name)
     }
 
     private fun runWithReadyIndexes(project: Project, action: () -> String): String {

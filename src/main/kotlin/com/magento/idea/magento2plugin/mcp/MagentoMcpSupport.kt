@@ -142,7 +142,8 @@ internal object MagentoMcpSupport {
     }
 
     fun determineConfigScope(filePath: String, fileName: String): String {
-        val normalized = filePath.replace('\\', '/')
+        // The leading slash lets a module at the project root match: its files start with `etc/`.
+        val normalized = "/" + filePath.replace('\\', '/')
         val suffix = "/$fileName"
         val etcIndex = normalized.lastIndexOf("/etc/")
         if (etcIndex == -1) {

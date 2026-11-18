@@ -37,12 +37,20 @@ internal object MagentoMcpSnapshots {
         buildAclMenuSnapshot(project)
     }
 
-    /** Project-relative module directories mapped to module names, from the module index. */
+    /**
+     * Project-relative module directories mapped to module names, from the module index. Every indexed copy of a
+     * module is included, because the snapshots read the files of every copy. A directory that declares several
+     * modules keeps the first name in sorted order.
+     */
     fun moduleOwners(project: Project): Map<String, String> = getCachedValue(project, MODULE_OWNERS_KEY) {
         val index = ModuleIndex(project)
-        index.moduleNames.mapNotNull { name ->
-            index.getModuleDirectoryVirtualFileByModuleName(name)?.let { MagentoMcpSupport.relativePath(project, it) to name }
-        }.toMap()
+        val owners = linkedMapOf<String, String>()
+        for (name in index.moduleNames) {
+            for (directory in index.getIndexedModuleDirectories(name)) {
+                owners.putIfAbsent(MagentoMcpSupport.relativePath(project, directory), name)
+            }
+        }
+        owners
     }
 
     private fun <T> getCachedValue(
