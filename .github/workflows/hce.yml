@@ -54,6 +54,11 @@ jobs:
           java-version: 25
           distribution: temurin
           cache: gradle
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Test packaged installer and stdio bridge
+        run: python3 modules/hce/tests/launcher_test.py
       - name: Test without an IDE or HCE runtime
         run: ./gradlew -p modules/hce test --no-daemon --console=plain
       - uses: actions/upload-artifact@v7.0.2
@@ -87,6 +92,16 @@ jobs:
         run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon --console=plain
       - name: Verify plugin dependencies and packaging
         run: python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
+      - name: Package the installer for this repository's pilot release
+        run: >-
+          python3 modules/hce/package_launcher.py
+          --plugin modules/hce/build/distributions/magento-hce.zip
+          --github-repository "$GITHUB_REPOSITORY"
+          --output modules/hce/build/distributions/magento-hce.pyz
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: magento-hce-installer
+          path: modules/hce/build/distributions/magento-hce.pyz
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: magento-hce-plugin
@@ -107,12 +122,19 @@ jobs:
           java-version: 25
           distribution: temurin
           cache: gradle
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
       - name: Require the provisioned runtime and licensed store
         run: |
           test -x "$HCE_RUNTIME/bin/intellij-server"
           test -d "$HCE_LICENSE_DIR"
       - name: Build against the installed runtime
         run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$HCE_RUNTIME" --no-daemon --console=plain
+      - name: Verify setup, Codex and Claude registration, MCP calls and a warm restart
+        run: |
+          python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --github-repository "$GITHUB_REPOSITORY" --output modules/hce/build/distributions/magento-hce.pyz
+          python3 modules/hce/tests/launcher_smoke.py --launcher modules/hce/build/distributions/magento-hce.pyz --plugin modules/hce/build/distributions/magento-hce.zip --runtime "$HCE_RUNTIME" --license-dir "$HCE_LICENSE_DIR" --accept-eula
       - name: Exercise the actual HCE transport and restart behavior
         run: >-
           python3 modules/hce/tests/runtime_contract_test.py
