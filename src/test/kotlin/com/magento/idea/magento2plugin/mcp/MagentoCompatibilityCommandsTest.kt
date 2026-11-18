@@ -764,6 +764,30 @@ class MagentoCompatibilityCommandsTest : McpHttpTestCase() {
         }
     }
 
+    fun testRequestAcceptsWindowsJunctionToPackageOutsideProject() {
+        // Junctions exist only on Windows, and Files.isSymbolicLink does not report them.
+        if (!com.intellij.openapi.util.SystemInfo.isWindows) return
+        Settings.getInstance(project).pluginEnabled = true
+        val outside = Files.createTempDirectory("uct-junction-")
+        Disposer.register(testRootDisposable) { com.intellij.openapi.util.io.FileUtil.delete(outside) }
+        Files.writeString(outside.resolve("registration.php"),
+            "<?php \\Magento\\Framework\\Component\\ComponentRegistrar::register('module', 'Acme_Junction', __DIR__);")
+        val root = java.nio.file.Path.of(project.basePath!!).toRealPath()
+        val link = root.resolve("vendor/acme/module-junction")
+        Files.createDirectories(link.parent)
+        val mklink = ProcessBuilder("cmd", "/c", "mklink", "/J", link.toString(), outside.toString()).redirectErrorStream(true).start()
+        val output = mklink.inputStream.bufferedReader().readText()
+        assertEquals(output, 0, mklink.waitFor())
+        // Registered after the target, so it runs first and removes only the junction.
+        Disposer.register(testRootDisposable) { Files.deleteIfExists(link) }
+        assertFalse(Files.isSymbolicLink(link))
+        com.intellij.openapi.vfs.LocalFileSystem.getInstance().refreshAndFindFileByNioFile(link.parent)
+
+        val request = MagentoCompatibilityCommands.request(project,
+            JSONObject("""{"path":"vendor/acme/module-junction","targetVersion":"2.4.3"}"""))
+        assertEquals(listOf(link.toString()), request.paths)
+    }
+
     fun testAnalysisScansPathRepositoryLinkToPackageOutsideProject() {
         Settings.getInstance(project).pluginEnabled = true
         val outside = Files.createTempDirectory("uct-path-repository-")
