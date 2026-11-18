@@ -39,7 +39,7 @@ internal object MagentoDiQueries {
         }
         val pluginDeclarations = snapshot.pluginDeclarations[query].orEmpty().map { record ->
             "${record.filePath} -> plugin name=${record.pluginName} type=${record.pluginType ?: "-"} " +
-                "sortOrder=${record.sortOrder} disabled=${record.disabled} scope=${record.scope}"
+                "sortOrder=${record.sortOrder ?: 0} disabled=${record.disabled ?: false} scope=${record.scope}"
         }
 
         val lines = mutableListOf<String>()
@@ -57,9 +57,10 @@ internal object MagentoDiQueries {
     }
 
     /** Retains the existing query API while dispatching PHP semantics through the optional provider. */
-    fun findPluginsForMethod(project: Project, className: String, methodName: String): String {
+    fun findPluginsForMethod(project: Project, className: String, methodName: String, effectiveArea: String? = null,
+                             json: Boolean = false, fileArea: String? = null): String {
         val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
             ?: return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
-        return provider.findPluginsForMethod(project, className, methodName)
+        return provider.findPluginsForMethod(project, className, methodName, effectiveArea, json, fileArea)
     }
 }

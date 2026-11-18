@@ -89,18 +89,8 @@ internal object MagentoMcpSnapshots {
                 )
 
                 for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
-                    pluginDeclarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
-                        filePath = filePath,
-                        targetFqn = typeName,
-                        pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
-                        pluginType = MagentoMcpSupport.presentableFqn(
-                            pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
-                        ),
-                        sortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull() ?: 0,
-                        disabled = pluginTag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)
-                            .equals("true", ignoreCase = true),
-                        scope = scope
-                    )
+                    pluginDeclarations.getOrPut(typeName, ::mutableListOf) +=
+                        PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope)
                 }
             }
 
@@ -147,7 +137,7 @@ internal object MagentoMcpSnapshots {
                         observerInstance = MagentoMcpSupport.presentableFqn(
                             observerTag.getAttributeValue("instance")
                         ) ?: "-",
-                        disabled = observerTag.getAttributeValue("disabled").equals("true", ignoreCase = true)
+                        disabled = observerTag.getAttributeValue("disabled")?.let { it == "true" }
                     )
                 }
             }
@@ -276,16 +266,28 @@ internal data class PluginDeclarationRecord(
     val targetFqn: String,
     val pluginName: String,
     val pluginType: String?,
-    val sortOrder: Int,
-    val disabled: Boolean,
+    val sortOrder: Int?,
+    val disabled: Boolean?,
     val scope: String
-) : HasFilePath
+) : HasFilePath {
+    companion object {
+        fun fromTag(tag: XmlTag, target: String, path: String, scope: String) = PluginDeclarationRecord(
+            filePath = path,
+            targetFqn = target,
+            pluginName = tag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
+            pluginType = MagentoMcpSupport.presentableFqn(tag.getAttributeValue(ModuleDiXml.TYPE_ATTR)),
+            sortOrder = tag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull(),
+            disabled = tag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)?.let { it == "1" || it.equals("true", true) },
+            scope = scope
+        )
+    }
+}
 
 internal data class EventObserverRecord(
     override val filePath: String,
     val observerName: String,
     val observerInstance: String,
-    val disabled: Boolean
+    val disabled: Boolean?
 ) : HasFilePath
 
 internal data class LayoutHandleRecord(

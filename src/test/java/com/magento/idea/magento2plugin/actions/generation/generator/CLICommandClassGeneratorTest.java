@@ -10,6 +10,10 @@ import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.magento.idea.magento2plugin.actions.generation.data.CLICommandClassData;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
     private static final String CLASS_NAME = "TestCLICommandPHPClass";
@@ -22,7 +26,7 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
     /**
      * Test generation of the new CLI command class.
      */
-    public void testGenerateCLICommandClass() {
+    public void testGenerateCLICommandClass() throws Exception {
         final Project project = myFixture.getProject();
         final CLICommandClassData classData = new CLICommandClassData(
                 CLASS_NAME,
@@ -43,6 +47,28 @@ public class CLICommandClassGeneratorTest extends BaseGeneratorTestCase {
                 "src/app/code/Foo/Bar/Console/Command",
                 cliCommandClass
         );
+        // Linux CI supplies Symfony 7.4. Local runs can use an installed Magento vendor autoloader.
+        final String autoload = System.getenv("SYMFONY_CONSOLE_AUTOLOAD");
+        if (autoload != null) {
+            final Path generated = Files.createTempFile("magento-generated-command", ".php");
+            try {
+                Files.writeString(generated, cliCommandClass.getText());
+                final Process process = new ProcessBuilder("php", "-r",
+                        "require $argv[1]; require $argv[2];"
+                        + " $command = new Foo\\Bar\\Console\\Command\\TestCLICommandPHPClass();"
+                        + " exit($command->run(new Symfony\\Component\\Console\\Input\\ArrayInput([]),"
+                        + " new Symfony\\Component\\Console\\Output\\NullOutput()));",
+                        autoload, generated.toString()).redirectErrorStream(true).start();
+                try {
+                    assertTrue("Generated command timed out", process.waitFor(15, TimeUnit.SECONDS));
+                    assertEquals(new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8), 0, process.exitValue());
+                } finally {
+                    process.destroyForcibly();
+                }
+            } finally {
+                Files.deleteIfExists(generated);
+            }
+        }
     }
 
     public void testGenerateCLICommandClassEscapesSingleQuotes() {
