@@ -431,7 +431,8 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
             assertEquals(listOf(path), modules(JSONObject().put("path", path)).map { it.getString("path") })
         }
         val text = MagentoInspectionCommands.query(project, "module", """{"moduleName":"Acme_Twin"}""")
-        assertTrue(text, text.startsWith("Found 2 Magento module match(es)"))
+        // One module with two copies: the header counts modules, the body lists both copies.
+        assertTrue(text, text.startsWith("Found 1 Magento module match(es)"))
         assertEquals(text, 1, text.split("preferred: yes").size - 1)
         assertEquals(text, 1, text.split("preferred: no").size - 1)
     }
