@@ -1,0 +1,63 @@
+{
+  "files": {
+    "src/app/code/Foo/Bar2/etc/module.xml": "<config><module name=\"Foo_Bar2\"/></config>",
+    "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html": "<div>Frontend widget</div>",
+    "src/app/code/Foo/Bar2/view/adminhtml/web/templates/widget.html": "<div>Admin widget</div>",
+    "src/vendor/custom/nonstandard/etc/module.xml": "<config><module name=\"Custom_Literal\"/></config>",
+    "src/vendor/custom/nonstandard/view/adminhtml/web/templates/admin.html": "<div>Vendor template</div>",
+    "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/theme-only.html": "<div>Theme candidate</div>",
+    "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html": "<div>Theme override</div>",
+    "src/lib/web/libwidget.html": "<div>Library template</div>"
+  },
+  "cases": [
+    {
+      "templatePath": "Foo_Bar2/widget",
+      "normalizedPath": "Foo_Bar2/widget",
+      "paths": [
+        "src/app/code/Foo/Bar2/view/adminhtml/web/templates/widget.html",
+        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html",
+        "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html"
+      ]
+    },
+    {
+      "templatePath": "text!Foo_Bar2/template/widget.html",
+      "normalizedPath": "Foo_Bar2/template/widget",
+      "paths": [
+        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html",
+        "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html"
+      ]
+    },
+    {
+      "templatePath": "Custom_Literal/admin",
+      "normalizedPath": "Custom_Literal/admin",
+      "paths": [
+        "src/vendor/custom/nonstandard/view/adminhtml/web/templates/admin.html"
+      ]
+    },
+    {
+      "templatePath": "Foo_Bar2/theme-only",
+      "normalizedPath": "Foo_Bar2/theme-only",
+      "paths": [
+        "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/theme-only.html"
+      ]
+    },
+    {
+      "templatePath": "libwidget",
+      "normalizedPath": "libwidget",
+      "paths": [
+        "src/lib/web/libwidget.html"
+      ]
+    },
+    {
+      "templatePath": "Foo_Bar2/missing",
+      "normalizedPath": "Foo_Bar2/missing",
+      "paths": []
+    },
+    {
+      "templatePath": "NoSuch_Module/missing",
+      "normalizedPath": "NoSuch_Module/missing",
+      "paths": []
+    }
+  ],
+  "boundedCount": 21
+}

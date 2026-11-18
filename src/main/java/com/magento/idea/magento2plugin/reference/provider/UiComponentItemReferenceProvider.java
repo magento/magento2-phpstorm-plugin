@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class UiComponentItemReferenceProvider extends PsiReferenceProvider {
     private final RequireJsPathReferenceProvider requireJsProvider = new RequireJsPathReferenceProvider();
-    private final KnockoutTemplatePathReferenceProvider templateProvider = new KnockoutTemplatePathReferenceProvider();
     private final KnockoutRegionReferenceProvider regionProvider = new KnockoutRegionReferenceProvider();
 
     @Override
@@ -37,9 +36,6 @@ public class UiComponentItemReferenceProvider extends PsiReferenceProvider {
         if (UiComponentXml.XML_ATTRIBUTE_COMPONENT.equals(itemName)) {
             return requireJsProvider.getReferencesByElement(element, context);
         }
-        if (isTemplateItem(tag, itemName)) {
-            return templateProvider.getReferencesByElement(element, context);
-        }
         if ("displayArea".equals(itemName)) {
             return regionProvider.getReferencesByElement(element, context);
         }
@@ -47,18 +43,4 @@ public class UiComponentItemReferenceProvider extends PsiReferenceProvider {
         return PsiReference.EMPTY_ARRAY;
     }
 
-    private boolean isTemplateItem(
-            final @NotNull XmlTag tag,
-            final String itemName
-    ) {
-        if (UiComponentXml.XML_ATTRIBUTE_TEMPLATE.equals(itemName)
-                || "childTemplate".equals(itemName)
-                || "elementTmpl".equals(itemName)) {
-            return true;
-        }
-        final XmlTag parentTag = tag.getParentTag();
-
-        return parentTag != null
-                && "templates".equals(parentTag.getAttributeValue(UiComponentXml.XML_ATTRIBUTE_NAME));
-    }
 }
