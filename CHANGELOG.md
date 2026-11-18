@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- The Upgrade Compatibility Tool report and MCP `analyze` scan a module directory in `vendor` that was requested directly, instead of reporting that no custom components were found. This covers modules installed as symlinks by Composer path repositories and modules from vendors bundled with Magento, such as `PayPal_Braintree` in `vendor/paypal/module-braintree-core`. Bundled modules and symlinks found below a broader requested directory are still skipped [#1101](https://github.com/magento/magento2-phpstorm-plugin/issues/1101).
+- The Upgrade Compatibility Tool report and MCP `analyze` scan a module directory in `vendor` that was requested directly, instead of reporting that no custom components were found. This covers modules installed as symlinks by Composer path repositories and modules from vendors bundled with Magento, such as `PayPal_Braintree` in `vendor/paypal/module-braintree-core`. Bundled modules and symlinks found below a broader requested directory are still skipped. A module reached through both a symlink and its target is scanned once, and excluded paths apply whether they name the symlink or its target. MCP accepts a symlink in the project to a Magento component outside it, while other symlinks still cannot open files outside the project, and a scan whose requested paths are all excluded says so [#1101](https://github.com/magento/magento2-phpstorm-plugin/issues/1101).
 
 
 ## 2026.3.6-p1
