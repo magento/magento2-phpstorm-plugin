@@ -25,23 +25,9 @@ plugins {
 
 group = providers.gradleProperty("pluginGroup").get()
 val basePluginVersion = providers.gradleProperty("pluginVersion")
-val isGithubPrerelease = providers.environmentVariable("GITHUB_RELEASE_PRERELEASE")
-    .map(String::toBoolean)
-    .orElse(false)
-val effectivePluginVersion = providers.provider {
-    val pluginVersion = basePluginVersion.get()
-
-    if (!isGithubPrerelease.get()) {
-        pluginVersion
-    } else {
-        val releaseId = providers.environmentVariable("GITHUB_RELEASE_ID").orNull
-            ?: throw GradleException("GITHUB_RELEASE_ID is required when publishing a GitHub prerelease.")
-
-        "$pluginVersion-alpha.$releaseId"
-    }
-}
-
-version = effectivePluginVersion.get()
+apply(from = "gradle/release-version.gradle.kts")
+val releaseVersion = version.toString()
+val effectivePluginVersion = providers.provider { releaseVersion }
 
 kotlin {
     jvmToolchain(25)

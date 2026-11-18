@@ -4,12 +4,15 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.DumbModeTestUtils
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.JUnit38AssumeSupportRunner
 import com.intellij.util.EnvironmentUtil
 import com.magento.idea.magento2plugin.project.Settings
+import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider
 import org.json.JSONObject
 import org.junit.runner.RunWith
 import java.nio.file.Files
@@ -145,7 +148,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertEquals(20, boundedPaths.size)
         assertEquals(boundedPaths.sorted(), boundedPaths)
         assertTrue(bounded, bounded.contains("totalCandidates: 21") && bounded.contains("truncated: true"))
-        for (path in listOf("../outside", "/absolute", "https://example.test/template")) {
+        for (path in listOf("Magento_Ui", "Foo_Bar2/", "text!Foo_Bar2/.html", "../outside", "/absolute", "https://example.test/template")) {
             assertTrue(query(path).contains("Invalid templatePath"))
         }
         assertTrue(inspect("query", "ui_template", "{}").contains("Missing required parameter `templatePath`"))
@@ -159,6 +162,25 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) { live.virtualFile.delete(this) }
         IndexingTestUtil.waitUntilIndexesAreReady(project)
         assertTrue(query("Foo_Bar2/renamed").contains("No UI template files matched"))
+    }
+
+    fun testXmlDiagnosticsForLibraryOnlyVendorFileOverHttp() {
+        val path = "src/vendor/acme/module/view/frontend/layout/default.xml"
+        val layout = myFixture.addFileToProject(path, """<page><body><block cacheable="false"/></body></page>""").virtualFile
+        val vendor = myFixture.findFileInTempDir("src/vendor")!!
+        ModuleRootModificationUtil.updateModel(module) { model ->
+            model.contentEntries.single().addExcludeFolder(vendor)
+        }
+        MagentoAdditionalLibraryRootsProvider.refreshRoots(project)
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertFalse(GlobalSearchScope.projectScope(project).contains(layout))
+        assertTrue(GlobalSearchScope.allScope(project).contains(layout))
+
+        val result = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)))
+        assertEquals("ok", result.getString("status"))
+        val finding = result.getJSONArray("diagnostics").getJSONObject(0)
+        assertEquals("CacheableFalseInDefaultLayoutInspection", finding.getString("ruleId"))
+        assertEquals(path, finding.getString("path"))
     }
 
     fun testSharedXmlDiagnosticsOverHttp() {

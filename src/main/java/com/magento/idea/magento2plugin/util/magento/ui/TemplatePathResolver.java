@@ -71,7 +71,10 @@ public class TemplatePathResolver {
             path = path.substring(0, path.length() - ".html".length());
         }
 
-        return path.isBlank() ? null : path;
+        if (path.isBlank() || path.endsWith("/") || path.equals(GetModuleNameUtil.getInstance().execute(path))) {
+            return null;
+        }
+        return path;
     }
 
     public @NotNull List<PsiElement> resolveTemplateFiles(
@@ -104,7 +107,7 @@ public class TemplatePathResolver {
         }
         final String moduleName = GetModuleNameUtil.getInstance().execute(templatePath);
 
-        if (moduleName == null) {
+        if (moduleName == null || !templatePath.startsWith(moduleName + "/")) {
             addNonModuleTemplateCandidates(project, result, templatePath);
             return result;
         }
@@ -122,6 +125,7 @@ public class TemplatePathResolver {
         if (result.isEmpty()) {
             addModuleTemplateCandidatesByPath(project, result, moduleName, relativePath);
         }
+        addThemeFilenameMatches(project, result, moduleName, relativePath);
 
         return result;
     }
@@ -139,7 +143,6 @@ public class TemplatePathResolver {
             addFilenameMatchesByModulePath(project, result, appCodeModulePath, area, relativePath);
             addFilenameMatchesByModulePath(project, result, vendorModulePath, area, relativePath);
         }
-        addThemeFilenameMatches(project, result, moduleName, relativePath);
     }
 
     private void addFilenameMatchesByModulePath(

@@ -19,6 +19,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.IOException
+import java.nio.file.Files
 import java.nio.file.Path
 
 /** Lifecycle adapters; skill installation and metadata parsing/execution remain shared. */
@@ -60,7 +62,16 @@ class RuntimeToolset : McpToolset {
             val state = settingsStore().load(root)
             if (!state.enabled || state.magentoPath == null) return@withContext JSONObject()
                 .put("status", "invalid_configuration").put("message", "Configure and enable Magento integration first.").toString()
-            val relative = root.relativize(Path.of(state.magentoPath)).toString().replace('\\', '/').ifEmpty { null }
+            val magentoRoot = try {
+                Path.of(state.magentoPath).toRealPath()
+            } catch (_: IOException) {
+                null
+            }
+            if (magentoRoot == null || !magentoRoot.startsWith(root) || !Files.isDirectory(magentoRoot)) {
+                return@withContext JSONObject().put("status", "invalid_configuration")
+                    .put("message", "The configured Magento root must be an existing directory inside the workspace.").toString()
+            }
+            val relative = root.relativize(magentoRoot).toString().replace('\\', '/').ifEmpty { null }
             val environment = MagentoMagerunSupport.discover(root, relative, state.cliToolCandidates)
             val service = synchronized(services) {
                 services[root] ?: MagentoMagerunService(terminalName = "your terminal").also {

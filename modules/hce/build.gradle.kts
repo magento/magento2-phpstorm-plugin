@@ -1,7 +1,7 @@
 plugins { alias(libs.plugins.kotlin) }
 
 group = "com.magento.idea"
-version = "0.1.0"
+apply(from = "../../gradle/release-version.gradle.kts")
 repositories { mavenCentral() }
 kotlin { jvmToolchain(25) }
 
@@ -21,6 +21,11 @@ sourceSets.main {
 // The core and its tests need no IDE or HCE distribution. Only this host adapter
 // compiles against the pinned engine API and is included in the plugin archive.
 val host = sourceSets.create("host")
+val releaseVersion = version.toString()
+tasks.named<org.gradle.language.jvm.tasks.ProcessResources>(host.processResourcesTaskName) {
+    inputs.property("pluginVersion", releaseVersion)
+    filesMatching("META-INF/plugin.xml") { expand(mapOf("pluginVersion" to releaseVersion)) }
+}
 kotlin.target.compilations.getByName("host").associateWith(kotlin.target.compilations.getByName("main"))
 val hceRuntime = providers.gradleProperty("hceRuntime")
 val engineJars = files(providers.provider {

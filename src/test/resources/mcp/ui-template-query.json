@@ -6,6 +6,7 @@
     "src/vendor/custom/nonstandard/etc/module.xml": "<config><module name=\"Custom_Literal\"/></config>",
     "src/vendor/custom/nonstandard/view/adminhtml/web/templates/admin.html": "<div>Vendor template</div>",
     "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/theme-only.html": "<div>Theme candidate</div>",
+    "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html": "<div>Theme override</div>",
     "src/lib/web/libwidget.html": "<div>Library template</div>"
   },
   "cases": [
@@ -14,14 +15,16 @@
       "normalizedPath": "Foo_Bar2/widget",
       "paths": [
         "src/app/code/Foo/Bar2/view/adminhtml/web/templates/widget.html",
-        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html"
+        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html",
+        "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html"
       ]
     },
     {
       "templatePath": "text!Foo_Bar2/template/widget.html",
       "normalizedPath": "Foo_Bar2/template/widget",
       "paths": [
-        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html"
+        "src/app/code/Foo/Bar2/view/frontend/web/template/widget.html",
+        "src/app/design/frontend/Custom/theme/Foo_Bar2/web/template/widget.html"
       ]
     },
     {
