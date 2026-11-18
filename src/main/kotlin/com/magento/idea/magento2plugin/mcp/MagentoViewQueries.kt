@@ -16,21 +16,22 @@ import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
 import com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex
+import com.magento.idea.magento2plugin.util.magento.ui.TemplatePathResolver
 import org.json.JSONObject
 
 internal object MagentoViewQueries {
     /**
      * Searches across layout handles, block declarations, and container declarations for the supplied name.
      */
-    fun findLayoutEntities(project: Project, name: String): String {
+    fun findLayoutEntities(project: Project, name: String, indexKeys: MagentoIndexKeys? = null): String {
         val query = name.trim()
         if (query.isEmpty()) {
             return "Provide a layout handle, block name, or container name."
         }
 
         val handleMatches = findLayoutHandles(project, query)
-        val blockMatches = findBlockMatches(project, query)
-        val containerMatches = findContainerMatches(project, query)
+        val blockMatches = findBlockMatches(project, query, indexKeys)
+        val containerMatches = findContainerMatches(project, query, indexKeys)
 
         val lines = mutableListOf<String>()
         if (handleMatches.isNotEmpty()) {
@@ -75,6 +76,36 @@ internal object MagentoViewQueries {
             }
         val hint = if (truncated) "\n\n${MagentoInspectionResults.TEXT_TRUNCATED_HINT}" else ""
         return "Layout entities for \"$query\"\n\n${lines.joinToString("\n")}$hint"
+    }
+
+    /** Literal template aliases resolve to static file candidates, independent of JS/PHP semantics. */
+    fun findUiTemplate(project: Project, templatePath: String): String {
+        val raw = templatePath.trim()
+        if (raw.length > 4096) return "Invalid templatePath: maximum length is 4096 characters."
+        val resolver = TemplatePathResolver.getInstance()
+        val normalized = resolver.normalizeTemplatePath(raw)
+        if (normalized.isNullOrBlank() || normalized.startsWith('/') || normalized.contains('\\')
+            || normalized.contains(':') || normalized.any { it.isISOControl() }
+            || normalized.split('/').any { it == "." || it == ".." }) {
+            return "Invalid templatePath: provide a non-empty literal forward-slash UI template path inside the project; absolute paths, URLs and parent traversal are unsupported."
+        }
+        ProgressManager.checkCanceled()
+        val candidates = resolver.findTemplateFiles(project, raw).map { file ->
+            ProgressManager.checkCanceled()
+            MagentoMcpSupport.relativePath(project, file)
+        }.distinct().sorted()
+        val shown = candidates.take(MagentoMcpSupport.MAX_MATCHES)
+        val lines = mutableListOf(
+            if (candidates.isEmpty()) "No UI template files matched \"$raw\"."
+            else "UI template candidates for \"$raw\"",
+            "normalizedPath: $normalized",
+            "totalCandidates: ${candidates.size}",
+            "returnedCandidates: ${shown.size}",
+            "truncated: ${candidates.size > shown.size}",
+            "coverage: Static HTML file candidates in indexed scope; no effective theme fallback, active area, RequireJS map resolution, PHP semantics or runtime validation."
+        )
+        lines += shown.map { "file: $it" }
+        return lines.joinToString("\n")
     }
 
     /**
@@ -187,7 +218,7 @@ internal object MagentoViewQueries {
     }
 
     /** Layout handles, then every block and container declaration, each in a fixed order. */
-    fun layoutRecords(project: Project, name: String): List<InspectionRecord> {
+    fun layoutRecords(project: Project, name: String, indexKeys: MagentoIndexKeys? = null): List<InspectionRecord> {
         val query = name.trim()
         val lineIndexes = hashMapOf<String, MagentoMcpSupport.LineIndex>()
         fun declaration(kind: String, key: String, tag: XmlTag, fields: Map<String, Any?>): InspectionRecord? {
@@ -204,12 +235,12 @@ internal object MagentoViewQueries {
             InspectionRecord("layout_handle", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
                 linkedMapOf("name" to it.name), MagentoMcpSupport.themeOverrideModule(it.filePath))
         }
-        val blocks = matchedBlocks(project, query).flatMap { (blockName, tags) ->
+        val blocks = matchedBlocks(project, query, indexKeys).flatMap { (blockName, tags) ->
             declarations("block", blockName, tags) {
                 linkedMapOf("name" to blockName, "class" to it.getAttributeValue("class"), "template" to it.getAttributeValue("template"))
             }
         }
-        val containers = matchedContainers(project, query).flatMap { (containerName, tags) ->
+        val containers = matchedContainers(project, query, indexKeys).flatMap { (containerName, tags) ->
             declarations("container", containerName, tags) {
                 linkedMapOf("name" to containerName, "htmlTag" to it.getAttributeValue("htmlTag"), "htmlClass" to it.getAttributeValue("htmlClass"))
             }
@@ -271,16 +302,16 @@ internal object MagentoViewQueries {
             .toList()
     }
 
-    private fun findBlockMatches(project: Project, query: String): List<Pair<String, List<BlockRecord>>> =
-        matchedBlocks(project, query).map { (blockName, tags) ->
+    private fun findBlockMatches(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, List<BlockRecord>>> =
+        matchedBlocks(project, query, indexKeys).map { (blockName, tags) ->
             blockName to tags
                 .mapNotNull { tag -> tag.toBlockRecord(project) }
                 .distinct()
                 .sortedWith(compareBy<BlockRecord>({ it.filePath }, { it.blockClass ?: "" }, { it.template ?: "" }))
         }
 
-    private fun findContainerMatches(project: Project, query: String): List<Pair<String, List<ContainerRecord>>> =
-        matchedContainers(project, query).map { (containerName, tags) ->
+    private fun findContainerMatches(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, List<ContainerRecord>>> =
+        matchedContainers(project, query, indexKeys).map { (containerName, tags) ->
             containerName to tags
                 .mapNotNull { tag -> tag.toContainerRecord(project) }
                 .distinct()
@@ -288,12 +319,14 @@ internal object MagentoViewQueries {
         }
 
     /** Block names matching the query with their declaration tags; text and structured replies share them. */
-    private fun matchedBlocks(project: Project, query: String): List<Pair<String, Collection<XmlTag>>> =
-        MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(BlockNameIndex.KEY, project), query)
+    private fun matchedBlocks(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, Collection<XmlTag>>> =
+        MagentoMcpSupport.prioritizeMatches(
+            indexKeys?.keys(BlockNameIndex.KEY, project) ?: LayoutIndex.getAllKeys(BlockNameIndex.KEY, project), query)
             .map { it to LayoutIndex.getBlockDeclarations(it, project) }
 
-    private fun matchedContainers(project: Project, query: String): List<Pair<String, Collection<XmlTag>>> =
-        MagentoMcpSupport.prioritizeMatches(LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project), query)
+    private fun matchedContainers(project: Project, query: String, indexKeys: MagentoIndexKeys?): List<Pair<String, Collection<XmlTag>>> =
+        MagentoMcpSupport.prioritizeMatches(
+            indexKeys?.keys(ContainerNameIndex.KEY, project) ?: LayoutIndex.getAllKeys(ContainerNameIndex.KEY, project), query)
             .map { it to LayoutIndex.getContainerDeclarations(it, project) }
 
     private fun XmlTag.toBlockRecord(project: Project): BlockRecord? {

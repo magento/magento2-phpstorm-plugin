@@ -24,7 +24,7 @@ internal object MagentoMagerunQueries {
         .put("command_help", "Return structured arguments/options for one exact command or alias from the installed catalogue. Requires command.")
         .put("mcp_config", "Generate native stdio MCP configuration if supported. Optional include/exclude command filters. Does not start a server or write client settings."))
         .put("cache", "Per project and selected invocation; expires after five minutes. refresh=true forces a new probe. Local launcher/config/Composer changes invalidate cached metadata.")
-        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in PhpStorm's Terminal.")
+        .put("runtime", "Uses project-local candidates first, then DDEV detected by .ddev/config.yaml with ddev on the IDE's PATH. Magerun reuses the general DDEV execution prefix, including the project name and container working directory parsed from project YAML and overrides, with the Magento root as host cwd. Never installs, updates, starts services, executes an application command, or retries through another runtime. For interactive permissions, use the returned terminalGuidance in your terminal.")
         .toString(2)
 
     fun execute(project: Project, request: MagerunRequest, checkCancelled: () -> Unit): String {
@@ -52,6 +52,7 @@ internal data class MagerunRequest(
 /** Holds only metadata for this IDE project; the last successful runtime snapshot is bounded and expires. */
 internal class MagentoMagerunService(
     private val runner: MagerunRunner = MagentoMagerunProcess(),
+    private val terminalName: String = "PhpStorm's Terminal (IDE console)",
     private val nanoTime: () -> Long = System::nanoTime
 ) {
     private val skillSuggestion = "Optional bundled magento-magerun skill: use magento_skills mode=status, then install it when requested. Installation returns a suggested AGENTS.md link. Verify the runtime before use."
@@ -61,7 +62,7 @@ internal class MagentoMagerunService(
 
     fun execute(environment: MagentoMagerunSupport.Environment, request: MagerunRequest,
                 checkCancelled: () -> Unit = {}): JSONObject {
-        val base = environment.json()
+        val base = environment.json(terminalName)
         while (!lock.tryLock(50, TimeUnit.MILLISECONDS)) checkCancelled()
         try {
             checkCancelled()

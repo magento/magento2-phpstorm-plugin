@@ -1,0 +1,15 @@
+{
+  "build": "271.2085.0",
+  "productVersion": "2027.1",
+  "source": "https://github.com/JetBrains/intellij-lsp.nvim/blob/0409b0a229b145525d724c08a541ac0f0d2d4433/lua/intellij-lsp/server_bundles.lua",
+  "platforms": {
+    "Linux-x86_64": {
+      "url": "https://download.jetbrains.com/language-server/intellij-server/271.2085.0/intellij-server-271.2085.0.tar.gz",
+      "sha256": "fb4fbac78a5043ce568e8b93ec57a1c40c4ba8136db68139d8813d7de3a4f7e4"
+    },
+    "Darwin-arm64": {
+      "url": "https://download.jetbrains.com/language-server/intellij-server/271.2085.0/intellij-server-271.2085.0-aarch64.sit",
+      "sha256": "0b8022627f20cdbe52508afbd5dcb3a6e18afc170fb84d8f70d92ad87b815a78"
+    }
+  }
+}

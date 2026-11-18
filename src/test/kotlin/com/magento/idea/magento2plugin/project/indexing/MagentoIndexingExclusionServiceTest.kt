@@ -219,8 +219,11 @@ class MagentoIndexingExclusionServiceTest : PhysicalMagentoProjectTestCase() {
         getService().applyExclusions()
         assertTrue(ProjectFileIndex.getInstance(project).isExcluded(cache))
         WriteAction.runAndWait<Throwable> { cache.rename(this, "source") }
-        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
-        assertFalse(ProjectFileIndex.getInstance(project).isExcluded(cache))
+        PlatformTestUtil.waitWithEventsDispatching(
+            "Renamed cache directory should return to the project index",
+            { !ProjectFileIndex.getInstance(project).isExcluded(cache) },
+            10
+        )
         assertFalse(settings.getManagedExclusionOwners().any { it.excludedUrl.contains("/tools/") })
     }
 
