@@ -4,9 +4,14 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.application.WriteAction
+import com.intellij.openapi.project.IndexNotReadyException
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.testFramework.DumbModeTestUtils
 import com.magento.idea.magento2plugin.BaseProjectTestCase
+import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.project.Settings
 import org.json.JSONObject
 
@@ -106,6 +111,7 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         assertEquals("invalid_request", plugins.getString("status"))
         val schema = MagentoInspectionCommands.detailedSchema("module")
         assertTrue(schema, schema.contains("filters path") && schema.contains("path: project-relative"))
+        assertTrue(schema, schema.contains("A module at the project root has path `.`, which no path filter selects"))
         assertFalse(schema, schema.contains("area: global"))
     }
 
@@ -276,6 +282,186 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         val aclJson = query("acl_or_menu", JSONObject().put("identifier", "acme_cut").put("format", "json").put("limit", 100))
         assertEquals(21, aclJson.getInt("total"))
         assertEquals(21, records(aclJson).map { it.getString("key") }.toSet().size)
+    }
+
+    private fun addFiles(vararg files: Pair<String, String>) {
+        for ((path, text) in files) myFixture.addFileToProject(path, text)
+        PsiDocumentManager.getInstance(project).commitAllDocuments()
+    }
+
+    fun testModuleAtProjectRootOwnsItsRecordsAndAreas() {
+        val observer = { name: String -> "<config><event name=\"acme_root_event\"><observer name=\"$name\" instance=\"Acme\\Root\\Observer\"/></event></config>" }
+        addFiles(
+            "etc/module.xml" to "<config><module name=\"Acme_Root\"/></config>",
+            "etc/events.xml" to observer("root_global"),
+            "etc/frontend/events.xml" to observer("root_frontend"),
+            "etc/adminhtml/events.xml" to observer("root_adminhtml"),
+            "etc/di.xml" to "<config><preference for=\"Acme\\Root\\Api\\Service\" type=\"Acme\\Root\\Model\\Service\"/></config>",
+            "etc/frontend/di.xml" to "<config><type name=\"Acme\\Root\\Api\\Service\"><plugin name=\"root_plugin\" type=\"Acme\\Root\\Plugin\"/></type></config>"
+        )
+        fun rootEvents(parameters: JSONObject = JSONObject()) =
+            query("observers_for_event", parameters.put("eventName", "acme_root_event").put("format", "json"))
+        val observers = records(rootEvents())
+        assertEquals(mapOf("etc/events.xml" to "global", "etc/frontend/events.xml" to "frontend",
+            "etc/adminhtml/events.xml" to "adminhtml"), observers.associate { it.getString("path") to it.getString("area") })
+        assertTrue(observers.toString(), observers.all { it.optString("module") == "Acme_Root" })
+        assertEquals(3, rootEvents(JSONObject().put("module", "Acme_Root")).getInt("total"))
+        assertEquals(listOf("root_frontend"), records(rootEvents(JSONObject().put("area", "frontend"))).map { it.getString("observerName") })
+        assertEquals(listOf("root_adminhtml"), records(rootEvents(JSONObject().put("area", "adminhtml"))).map { it.getString("observerName") })
+        assertEquals(listOf("root_adminhtml"), records(rootEvents(JSONObject().put("module", "Acme_Root")
+            .put("path", "etc/adminhtml"))).map { it.getString("observerName") })
+
+        fun di(parameters: JSONObject = JSONObject()) =
+            query("di_config", parameters.put("className", "Acme\\Root\\Api\\Service").put("format", "json"))
+        val declarations = records(di())
+        assertEquals(listOf("preference@etc/di.xml/global", "plugin@etc/frontend/di.xml/frontend", "type@etc/frontend/di.xml/frontend"),
+            declarations.map { "${it.getString("kind")}@${it.getString("path")}/${it.getString("area")}" })
+        assertTrue(declarations.toString(), declarations.all { it.optString("module") == "Acme_Root" })
+        assertEquals(3, di(JSONObject().put("module", "Acme_Root")).getInt("total"))
+        assertEquals(setOf("type", "plugin"), records(di(JSONObject().put("module", "Acme_Root").put("area", "frontend")))
+            .map { it.getString("kind") }.toSet())
+
+        val module = records(query("module", JSONObject().put("moduleName", "Acme_Root").put("format", "json"))).single()
+        assertEquals(".", module.getString("path"))
+        assertEquals("Acme_Root", module.getString("module"))
+        assertEquals("etc", module.getString("etc"))
+        assertTrue(module.toString(), module.getBoolean("editable"))
+        assertTrue(module.toString(), module.getBoolean("preferred"))
+        val text = MagentoInspectionCommands.query(project, "module", """{"moduleName":"Acme_Root"}""")
+        assertTrue(text, text.contains("\npath: .\neditable: yes\n"))
+    }
+
+    fun testRootModuleDoesNotClaimOtherPackages() {
+        val declaration = "<config><preference for=\"Acme\\Root\\Shared\" type=\"Acme\\Root\\SharedImpl\"/></config>"
+        addFiles(
+            "etc/module.xml" to "<config><module name=\"Acme_Root\"/></config>",
+            "etc/di.xml" to declaration,
+            "vendor/x/y/app/etc/di.xml" to declaration,
+            "app/etc/di.xml" to declaration,
+            "packages/acme/composer-package/composer.json" to "{}",
+            "packages/acme/composer-package/etc/di.xml" to declaration,
+            "packages/acme/registered/registration.php" to "<?php",
+            "packages/acme/registered/etc/di.xml" to declaration,
+            "VENDOR/x/y/etc/di.xml" to declaration
+        )
+        val result = query("di_config", JSONObject().put("className", "Acme\\Root\\Shared").put("format", "json").put("limit", 100))
+        assertEquals(mapOf(
+            "etc/di.xml" to "Acme_Root",
+            "vendor/x/y/app/etc/di.xml" to null,
+            "app/etc/di.xml" to null,
+            "packages/acme/composer-package/etc/di.xml" to null,
+            "packages/acme/registered/etc/di.xml" to null,
+            "VENDOR/x/y/etc/di.xml" to if (SystemInfo.isFileSystemCaseSensitive) "Acme_Root" else null
+        ), modulesByPath(result))
+
+        // A path built from the project base path names a file outside the project root: it does not resolve under
+        // the root, or it starts with `../` even when it leads back into the root.
+        val root = MagentoMcpSupport.projectRoot(project)!!
+        val options = MagentoInspectionResults.options(JSONObject().put("format", "json"), setOf("module", "area", "path"))
+        val outside = JSONObject(MagentoInspectionResults.respond(project, "di_config", "x", listOf(
+            InspectionRecord("type", "x", "outside/a/etc/di.xml", 1, "global", emptyMap()),
+            InspectionRecord("type", "x", "../${root.name}/etc/di.xml", 1, "global", emptyMap())
+        ), options))
+        assertEquals(mapOf("outside/a/etc/di.xml" to null, "../${root.name}/etc/di.xml" to null), modulesByPath(outside))
+    }
+
+    private fun modulesByPath(result: JSONObject): Map<String, String?> =
+        records(result).associate { it.getString("path") to (if (it.isNull("module")) null else it.getString("module")) }
+
+    fun testRootModuleHonoursTheComposerVendorDirectory() {
+        val declaration = "<config><preference for=\"Acme\\Root\\Shared\" type=\"Acme\\Root\\SharedImpl\"/></config>"
+        val composer = MagentoMcpSupport.projectRoot(project)!!.findChild("composer.json")!!
+        WriteAction.runAndWait<java.io.IOException> {
+            VfsUtil.saveText(composer, "{\"name\": \"acme/root\", \"config\": {\"vendor-dir\": \"./lib/deps/\"}}")
+        }
+        addFiles(
+            "etc/module.xml" to "<config><module name=\"Acme_Root\"/></config>",
+            "etc/di.xml" to declaration,
+            "lib/deps/x/y/etc/di.xml" to declaration
+        )
+        val result = query("di_config", JSONObject().put("className", "Acme\\Root\\Shared").put("format", "json"))
+        assertEquals(mapOf("etc/di.xml" to "Acme_Root", "lib/deps/x/y/etc/di.xml" to null), modulesByPath(result))
+    }
+
+    /**
+     * The contract that lets owner lookups report `indexing`. The reply path checks dumb mode before it reads the
+     * module index, so a race between that check and the lookup cannot be reproduced end to end.
+     */
+    fun testIndexedModuleDirectoriesThrowWhileIndexing() {
+        DumbModeTestUtils.runInDumbModeSynchronously(project) {
+            try {
+                ModuleIndex(project).getIndexedModuleDirectories("Foo_Bar2")
+                fail("expected IndexNotReadyException")
+            } catch (_: IndexNotReadyException) {
+                // The caller reports `indexing` instead of caching an incomplete owner map.
+            }
+        }
+    }
+
+    fun testDiConfigOrdersDeclarationsOnOneLineByName() {
+        addFiles("app/code/Acme/Order/etc/di.xml" to "<config><type name=\"Acme\\Order\\Same\">" +
+            "<plugin name=\"zeta\" type=\"Acme\\Order\\Zeta\"/><plugin name=\"alpha\" type=\"Acme\\Order\\Alpha\"/></type></config>")
+        val result = query("di_config", JSONObject().put("className", "Acme\\Order\\Same").put("format", "json"))
+        assertEquals(listOf("plugin/alpha", "plugin/zeta", "type/Acme\\Order\\Same"),
+            records(result).map { "${it.getString("kind")}/${it.getString("name")}" })
+    }
+
+    fun testEveryIndexedCopyOfAModuleOwnsItsFiles() {
+        val observer = { name: String -> "<config><event name=\"acme_twin_event\"><observer name=\"$name\" instance=\"Acme\\Twin\\Observer\"/></event></config>" }
+        addFiles(
+            "app/code/Acme/Twin/etc/module.xml" to "<config><module name=\"Acme_Twin\"/></config>",
+            "app/code/Acme/Twin/etc/events.xml" to observer("code_copy"),
+            "vendor/acme/module-twin/etc/module.xml" to "<config><module name=\"Acme_Twin\"/></config>",
+            "vendor/acme/module-twin/etc/events.xml" to observer("vendor_copy")
+        )
+        fun names(parameters: JSONObject) = records(query("observers_for_event",
+            parameters.put("eventName", "acme_twin_event").put("format", "json").put("module", "Acme_Twin"))).map { it.getString("observerName") }
+        assertEquals(listOf("code_copy", "vendor_copy"), names(JSONObject()))
+        assertEquals(listOf("code_copy"), names(JSONObject().put("path", "app/code/Acme/Twin")))
+        assertEquals(listOf("vendor_copy"), names(JSONObject().put("path", "vendor/acme/module-twin")))
+
+        fun modules(parameters: JSONObject = JSONObject()) =
+            records(query("module", parameters.put("moduleName", "Acme_Twin").put("format", "json")))
+        val copies = modules()
+        assertEquals(setOf("app/code/Acme/Twin", "vendor/acme/module-twin"), copies.map { it.getString("path") }.toSet())
+        assertEquals(2, copies.size)
+        assertTrue(copies.toString(), copies.all { it.getString("module") == "Acme_Twin" })
+        assertEquals(listOf(true, false), copies.map { it.getBoolean("preferred") })
+        for (path in listOf("app/code/Acme/Twin", "vendor/acme/module-twin")) {
+            assertEquals(listOf(path), modules(JSONObject().put("path", path)).map { it.getString("path") })
+        }
+        val text = MagentoInspectionCommands.query(project, "module", """{"moduleName":"Acme_Twin"}""")
+        assertTrue(text, text.startsWith("Found 2 Magento module match(es)"))
+        assertEquals(text, 1, text.split("preferred: yes").size - 1)
+        assertEquals(text, 1, text.split("preferred: no").size - 1)
+    }
+
+    fun testDiConfigOrdersEveryDeclarationKindTogether() {
+        addFiles(
+            "app/code/Acme/Order/etc/adminhtml/di.xml" to """
+                <config>
+                    <type name="Acme\Order\Target">
+                        <plugin name="admin_plugin" type="Acme\Order\AdminPlugin"/>
+                    </type>
+                    <preference for="Acme\Order\Target" type="Acme\Order\AdminTarget"/>
+                </config>
+            """.trimIndent(),
+            "app/code/Acme/Order/etc/di.xml" to """
+                <config>
+                    <virtualType name="Acme\Order\Virtual" type="Acme\Order\Target"/>
+                    <preference for="Acme\Order\TargetInterface" type="Acme\Order\Target"/>
+                    <type name="Acme\Order\Target">
+                        <plugin name="global_plugin" type="Acme\Order\GlobalPlugin"/>
+                    </type>
+                </config>
+            """.trimIndent()
+        )
+        val result = query("di_config", JSONObject().put("className", "Acme\\Order\\Target").put("format", "json").put("limit", 100))
+        val admin = "app/code/Acme/Order/etc/adminhtml/di.xml"
+        val global = "app/code/Acme/Order/etc/di.xml"
+        assertEquals(listOf("type@$admin:2", "plugin@$admin:3", "preference@$admin:5",
+            "virtualType@$global:2", "preference@$global:3", "type@$global:4", "plugin@$global:5"),
+            records(result).map { "${it.getString("kind")}@${it.getString("path")}:${it.getInt("line")}" })
     }
 
     fun testIndexingAndDisabledSupportAreStatuses() {

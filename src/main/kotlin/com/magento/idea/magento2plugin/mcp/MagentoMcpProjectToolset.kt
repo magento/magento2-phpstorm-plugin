@@ -146,8 +146,7 @@ class MagentoMcpProjectToolset : McpToolset {
         "- For every query type except `plugins_for_method`, add \"format\":\"json\" to parametersJson " +
         "for flat records with path, line, module and area, a status (ok, no_matches, indexing, unavailable, " +
         "invalid_request, stale_cursor), total and nextCursor. Optional limit (1-100, default 20), cursor, " +
-        "and the module, area and path filters that `detailed_schema` lists. Text output is unchanged and " +
-        "says when it was cut.\n\n" +
+        "and the module, area and path filters that `detailed_schema` lists. Text output says when it was cut.\n\n" +
 
         "Coverage:\n" +
         "- XML results describe declarations, not resolved PHP semantics."
