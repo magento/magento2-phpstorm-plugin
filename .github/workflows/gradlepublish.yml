@@ -1,13 +1,14 @@
-# This workflow will build a package using Gradle and then publish it to JetBrains repository when a release is created
-
-name: Publish Plugin
+name: Release desktop and headless plugins
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 jobs:
   build:
+    if: ${{ !startsWith(github.event.release.tag_name, 'hce-') }}
+    permissions:
+      contents: write
 
     runs-on: ubuntu-latest
     env:
@@ -25,7 +26,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Verify PhpStorm and WebStorm compatibility
-        run: ./gradlew verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel --no-daemon --no-configuration-cache
+        run: ./gradlew buildPlugin verifyPlugin -PverifyWebStorm=true --max-workers=1 --no-parallel --no-daemon --no-configuration-cache
       - name: Upload Plugin Verifier reports
         if: always()
         uses: actions/upload-artifact@v7.0.2
@@ -34,7 +35,29 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
           path: build/reports/pluginVerifier/**
-      - name: Run publish plugin
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Package headless plugin and installer for this release
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
+          ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon
+          dist=modules/hce/build/distributions
+          python3 modules/hce/tests/check_archive.py "$dist/magento-hce.zip"
+          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --github-repository "$GITHUB_REPOSITORY" --release-tag "$RELEASE_TAG" --output "$dist/magento-hce.pyz"
+      - name: Upload desktop ZIP, headless ZIP and installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          shopt -s nullglob
+          desktop=(build/distributions/*.zip)
+          [[ ${#desktop[@]} == 1 ]]
+          dist=modules/hce/build/distributions
+          gh release upload "$RELEASE_TAG" "${desktop[0]}" "$dist/magento-hce.zip" "$dist/magento-hce.pyz" --repo "$GITHUB_REPOSITORY" --clobber
+      - name: Publish desktop plugin to JetBrains Marketplace
         run: ./gradlew publishPlugin -i --no-daemon
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}

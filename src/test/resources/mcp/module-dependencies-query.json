@@ -1,0 +1,15 @@
+{
+  "files": {
+    "src/app/code/Graph/Core/etc/module.xml": "<config>\n  <module name=\"Graph_Core\"><sequence></sequence></module>\n</config>",
+    "src/app/code/Graph/Core/composer.json": "{\n  \"name\": \"graph/co\\u0072e\"\n}",
+    "src/app/code/Graph/Feature/etc/module.xml": "<config>\n  <module name=\"Graph_Feature\"><sequence><module name=\"Graph_Core\"/><module name=\"Graph_Missing\"/></sequence></module>\n</config>",
+    "src/app/code/Graph/Feature/composer.json": "{\n  \"name\": \"graph/feature\",\n  \"require\": {\n    \"graph/core\": \"^1.0\",\n    \"php\": \">=8.2\"\n  },\n  \"require-dev\": {\n    \"graph/dev\": \"*\"\n  }\n}",
+    "src/app/code/Graph/Dev/etc/module.xml": "<config>\n  <module name=\"Graph_Dev\"><sequence></sequence></module>\n</config>",
+    "src/app/code/Graph/Dev/composer.json": "{\n  \"name\": \"graph/dev\"\n}",
+    "src/app/code/Graph/Loose/etc/module.xml": "<config>\n  <module name=\"Graph_Loose\"><sequence><module name=\"Graph_Core\"/></sequence></module>\n</config>",
+    "src/app/code/Graph/Duplicate/etc/module.xml": "<config>\n  <module name=\"Graph_Core\"><sequence></sequence></module>\n</config>",
+    "src/app/code/Graph/Duplicate/composer.json": "{\n  \"name\": \"graph/core-alternative\"\n}"
+  },
+  "featureModule": "src/app/code/Graph/Feature/etc/module.xml",
+  "featureComposer": "src/app/code/Graph/Feature/composer.json"
+}
