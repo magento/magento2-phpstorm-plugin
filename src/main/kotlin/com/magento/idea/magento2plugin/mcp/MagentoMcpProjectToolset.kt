@@ -156,7 +156,7 @@ class MagentoMcpProjectToolset : McpToolset {
         "capabilities available in this IDE.\n\n" +
 
         "Structured results:\n" +
-        "- For every query type, add \"format\":\"json\" to parametersJson " +
+        "- For every query type except `module_dependencies` and `ui_template`, add \"format\":\"json\" to parametersJson " +
         "for flat records with path, line, module and area, a status (ok, no_matches, indexing, unavailable, " +
         "invalid_request, stale_cursor), total and nextCursor. Optional limit (1-100, default 20), cursor, " +
         "and the module, area and path filters that `detailed_schema` lists. Text output says when it was cut.\n\n" +
