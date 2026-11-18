@@ -48,7 +48,7 @@ internal object MagentoSkillCommands {
     """.trimIndent()
 
     fun execute(project: Project, mode: String, skills: List<String>, agentTarget: String,
-                overwrite: Boolean, projectPath: String): String {
+                overwrite: Boolean, projectPath: String, refreshVfs: Boolean = true): String {
         if (mode == "help") return help()
         return try {
             require(mode in setOf("status", "install")) { "Unknown mode '$mode'. Use help, status, or install." }
@@ -65,7 +65,7 @@ internal object MagentoSkillCommands {
                     guidance(project, catalog.filter { it.previous != "missing" })
             } else {
                 require(skills.isNotEmpty()) { "Provide a non-empty skills array. Use mode=status for the catalog." }
-                install(project, prepare(project, skills, agentTarget, overwrite), overwrite)
+                install(project, prepare(project, skills, agentTarget, overwrite), overwrite, refreshVfs)
             }
         } catch (failure: IllegalArgumentException) {
             "Result: error\nMessage: ${failure.message}\nNo skills were installed."
@@ -95,13 +95,13 @@ internal object MagentoSkillCommands {
         }
     }
 
-    fun install(project: Project, plan: List<Installation>, overwrite: Boolean): String {
+    fun install(project: Project, plan: List<Installation>, overwrite: Boolean, refreshVfs: Boolean = true): String {
         val lines = mutableListOf("Agent skill installation")
         val installed = mutableListOf<Installation>()
         var failed = false
         for (entry in plan) {
             try {
-                MagentoSkillInstaller.install(project, entry.skill, entry.target, overwrite)
+                MagentoSkillInstaller.install(project, entry.skill, entry.target, overwrite, refreshVfs)
                 installed += entry
                 val state = when (entry.previous) {
                     "identical" -> "unchanged"

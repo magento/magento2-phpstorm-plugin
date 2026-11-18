@@ -4,12 +4,15 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.roots.ModuleRootModificationUtil
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.DumbModeTestUtils
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.JUnit38AssumeSupportRunner
 import com.intellij.util.EnvironmentUtil
 import com.magento.idea.magento2plugin.project.Settings
+import com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider
 import org.json.JSONObject
 import org.junit.runner.RunWith
 import java.nio.file.Files
@@ -31,6 +34,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val discoveredTools = mcp().tools()
         assertEquals(1, discoveredTools.count { it.getString("name") == "magento_inspect" })
         val tools = discoveredTools.associateBy { it.getString("name") }
+        assertTrue(tools.getValue("magento_diagnostics").getJSONObject("annotations").getBoolean("readOnlyHint"))
         assertEquals(MAGENTO_TOOLS, tools.keys.filter { it != "execute_tool" }.toSet())
         val properties = tools.getValue("magento_magerun").getJSONObject("inputSchema").getJSONObject("properties")
         for ((name, type) in listOf("mode" to "string", "command" to "string", "search" to "string",
@@ -56,6 +60,138 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val exclusionsStatus = text("get_magento_indexing_exclusions")
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Exclusions cannot be applied: Magento installation path is invalid"))
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
+    }
+
+    fun testModuleDependenciesOverHttp() {
+        val fixture = JSONObject(javaClass.getResource("/mcp/module-dependencies-query.json")!!.readText())
+        val files = fixture.getJSONObject("files")
+        for (path in files.keySet()) myFixture.addFileToProject(path, files.getString(path))
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(inspect("help").contains("- `module_dependencies`:"))
+        assertTrue(inspect("detailed_schema", "module_dependencies").contains("Required: moduleName"))
+        fun query(name: String, direction: String = "both", limit: Any = 20) = JSONObject(inspect("query", "module_dependencies",
+            JSONObject().put("moduleName", name).put("direction", direction).put("limit", limit).toString()))
+        val feature = query("Graph_Feature", "dependencies")
+        assertEquals(feature.toString(), "ok", feature.getString("status"))
+        assertEquals(5, feature.getInt("totalEdges"))
+        val edges = feature.getJSONArray("edges").let { a -> (0 until a.length()).map { a.getJSONObject(it) } }
+        assertEquals(setOf("sequence_after", "composer_require", "composer_require_dev"), edges.map { it.getString("kind") }.toSet())
+        assertEquals("Graph_Core", edges.single { it.optString("toPackage") == "graph/core" }.getJSONArray("targetModules").getString(0))
+        assertEquals(0, edges.single { it.optString("toPackage") == "php" }.getJSONArray("targetModules").length())
+        for (edge in edges) {
+            val source = edge.getJSONObject("source")
+            val body = files.getString(source.getString("path"))
+            val expected = edge.optString("toPackage", edge.optString("toModule"))
+            assertEquals("\"$expected\"", body.substring(source.getInt("startOffset"), source.getInt("endOffset")))
+            assertEquals(body.take(source.getInt("startOffset")).count { it == '\n' } + 1, source.getInt("line"))
+        }
+        val core = query("Graph_Core", "dependents")
+        assertEquals(2, core.getInt("declarationCount"))
+        assertEquals(3, core.getInt("totalEdges"))
+        assertEquals("module_not_found", query("Graph_Missing").getString("status"))
+        assertEquals(1, query("Graph_Missing").getInt("totalEdges"))
+        assertEquals(0, query("Graph_Nothing").getInt("totalEdges"))
+        assertEquals("absent", query("Graph_Loose").getJSONArray("declarations").getJSONObject(0).getString("composerStatus"))
+        assertEquals("partial", query("Graph_Feature", limit = 1).getString("status"))
+        for (limit in listOf(0, 101, 1.5, "2")) assertEquals("invalid_request", query("Graph_Core", limit = limit).getString("status"))
+        assertEquals("invalid_request", query("Graph_Core", "sideways").getString("status"))
+        // Committed, unsaved editor changes must invalidate the same native PSI cache used by MCP.
+        val path = fixture.getString("featureModule")
+        val psi = myFixture.findFileInTempDir(path).let { com.intellij.psi.PsiManager.getInstance(project).findFile(it)!! }
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) {
+            val manager = com.intellij.psi.PsiDocumentManager.getInstance(project)
+            val document = manager.getDocument(psi)!!
+            document.setText(files.getString(path).replace("Graph_Missing", "Graph_New"))
+            manager.commitDocument(document)
+        }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertEquals(0, query("Graph_Missing").getInt("totalEdges"))
+        assertEquals(1, query("Graph_New").getInt("totalEdges"))
+        myFixture.addFileToProject(fixture.getString("featureComposer"), "{broken")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val partial = query("Graph_Feature")
+        assertEquals("partial", partial.getString("status"))
+        assertFalse(partial.getBoolean("complete"))
+        assertEquals(2, partial.getInt("totalEdges"))
+        assertTrue(partial.getJSONArray("problems").toString().contains("invalid_json"))
+    }
+
+    fun testSharedUiTemplateCandidatesOverHttp() {
+        val fixture = JSONObject(javaClass.getResource("/mcp/ui-template-query.json")!!.readText())
+        val files = fixture.getJSONObject("files")
+        for (path in files.keySet()) myFixture.addFileToProject(path, files.getString(path))
+        for (index in 0 until fixture.getInt("boundedCount")) myFixture.addFileToProject(
+            "src/app/code/Foo/Bar2/view/frontend/web/template/bounds/$index/wire-bounded.html", "<div/>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(inspect("help").contains("- `ui_template`:"))
+        assertTrue(inspect("detailed_schema", "ui_template").contains("Required: templatePath"))
+        fun query(path: String) = inspect("query", "ui_template", JSONObject().put("templatePath", path).toString())
+        val cases = fixture.getJSONArray("cases")
+        for (index in 0 until cases.length()) {
+            val case = cases.getJSONObject(index)
+            val result = query(case.getString("templatePath"))
+            val paths = case.getJSONArray("paths").let { values -> (0 until values.length()).map { values.getString(it) } }
+            assertEquals(paths, result.lineSequence().filter { it.startsWith("file: ") }.map { it.removePrefix("file: ") }.toList())
+            assertTrue(result, result.contains("normalizedPath: " + case.getString("normalizedPath")))
+            assertTrue(result, result.contains("truncated: false"))
+            assertTrue(result, result.contains("no effective theme fallback"))
+            if (paths.isEmpty()) assertTrue(result, result.contains("No UI template files matched"))
+        }
+        val bounded = query("wire-bounded")
+        val boundedPaths = bounded.lineSequence().filter { it.startsWith("file: ") }.toList()
+        assertEquals(20, boundedPaths.size)
+        assertEquals(boundedPaths.sorted(), boundedPaths)
+        assertTrue(bounded, bounded.contains("totalCandidates: 21") && bounded.contains("truncated: true"))
+        for (path in listOf("Magento_Ui", "Foo_Bar2/", "text!Foo_Bar2/.html", "../outside", "/absolute", "https://example.test/template")) {
+            assertTrue(query(path).contains("Invalid templatePath"))
+        }
+        assertTrue(inspect("query", "ui_template", "{}").contains("Missing required parameter `templatePath`"))
+        val live = myFixture.addFileToProject("src/app/code/Foo/Bar2/view/frontend/web/template/live.html", "<div>Live update</div>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/live").contains("file: src/app/code/Foo/Bar2/view/frontend/web/template/live.html"))
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) { live.virtualFile.rename(this, "renamed.html") }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/live").contains("No UI template files matched"))
+        assertTrue(query("Foo_Bar2/renamed").contains("file: src/app/code/Foo/Bar2/view/frontend/web/template/renamed.html"))
+        com.intellij.openapi.command.WriteCommandAction.runWriteCommandAction(project) { live.virtualFile.delete(this) }
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertTrue(query("Foo_Bar2/renamed").contains("No UI template files matched"))
+    }
+
+    fun testXmlDiagnosticsForLibraryOnlyVendorFileOverHttp() {
+        val path = "src/vendor/acme/module/view/frontend/layout/default.xml"
+        val layout = myFixture.addFileToProject(path, """<page><body><block cacheable="false"/></body></page>""").virtualFile
+        val vendor = myFixture.findFileInTempDir("src/vendor")!!
+        ModuleRootModificationUtil.updateModel(module) { model ->
+            model.contentEntries.single().addExcludeFolder(vendor)
+        }
+        MagentoAdditionalLibraryRootsProvider.refreshRoots(project)
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        assertFalse(GlobalSearchScope.projectScope(project).contains(layout))
+        assertTrue(GlobalSearchScope.allScope(project).contains(layout))
+
+        val result = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)))
+        assertEquals("ok", result.getString("status"))
+        val finding = result.getJSONArray("diagnostics").getJSONObject(0)
+        assertEquals("CacheableFalseInDefaultLayoutInspection", finding.getString("ruleId"))
+        assertEquals(path, finding.getString("path"))
+    }
+
+    fun testSharedXmlDiagnosticsOverHttp() {
+        val path = "src/app/code/Inspect/Module/view/frontend/layout/default.xml"
+        myFixture.addFileToProject(path, "<page><body><referenceBlock name=\"test\" cacheable=\"false\"/></body></page>")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        val help = JSONObject(text("magento_diagnostics"))
+        assertEquals(2, help.getJSONArray("rules").length())
+        val result = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)))
+        assertEquals("ok", result.getString("status"))
+        val diagnostic = result.getJSONArray("diagnostics").getJSONObject(0)
+        assertEquals("CacheableFalseInDefaultLayoutInspection", diagnostic.getString("ruleId"))
+        assertEquals("warning", diagnostic.getString("severity"))
+        assertEquals(path, diagnostic.getString("path"))
+        val invalid = JSONObject(text("magento_diagnostics", JSONObject().put("mode", "check").put("filePath", path)
+            .put("ruleIds", org.json.JSONArray(listOf("PhpClassExistence")))))
+        assertEquals("invalid_request", invalid.getString("status"))
     }
 
     fun testSharedInspectionQueriesAndUnavailablePhpCapabilityOverHttp() {
@@ -143,7 +279,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, emptyList(), testRootDisposable)
         mcp()
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
-            for (type in listOf("module", "di_config", "observers_for_event", "layout_entities",
+            for (type in listOf("module", "module_dependencies", "ui_template", "di_config", "observers_for_event", "layout_entities",
                 "ui_component", "acl_or_menu")) {
                 assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                     inspect("query", type, "{}"))

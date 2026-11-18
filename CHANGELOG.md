@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
+- Use Magento MCP tools from Codex or Claude Code on a development server with JetBrains Headless Code Engine. Download `magento-hce.pyz` from the same GitHub release as the desktop plugin and run setup from your checkout. Setup verifies the runtime and plugin, offers JetBrains sign-in, and indexes the project before registering the client. See the [headless installation guide](modules/hce/README.md#install-on-a-development-host).
+
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
 
@@ -16,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - `magento_magerun` no longer starts a DDEV project that is not running. `ddev exec` starts a stopped, paused or unhealthy project, so the tool now checks `ddev describe --skip-hooks` first, without running describe hooks (DDEV v1.23.3 or newer), and answers `environment_not_running` with the project status and `ddev start` for the developer, instead of reporting a probe timeout while the project starts [#2806](https://github.com/magento/magento2-phpstorm-plugin/issues/2806).
 
+- XML diagnostics can check layout files in Composer packages when the IDE indexes `vendor/` as a library and excludes it from module content.
 
 ## 2026.3.6-p1
 

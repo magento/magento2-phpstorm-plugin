@@ -4,8 +4,6 @@
  */
 package com.magento.idea.magento2plugin.mcp
 
-import com.intellij.openapi.util.SystemInfoRt
-import com.intellij.util.EnvironmentUtil
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -15,10 +13,11 @@ import java.nio.file.Path
 
 /** Shared DDEV discovery and command planning; never launches a process. */
 internal object MagentoDdevEnvironment {
+    private val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
     fun discover(projectRoot: Path, magentoRoot: Path?, findExecutable: () -> Path? = ::findExecutable): Runtime? {
         var directory = magentoRoot ?: return null
         while (directory.startsWith(projectRoot)) {
-            val config = MagentoCliToolQueries.resolveProjectPath(projectRoot,
+            val config = MagentoCliEnvironment.resolveProjectPath(projectRoot,
                 directory.resolve(".ddev/config.yaml").toString())
             if (config != null && Files.isRegularFile(config) && Files.isReadable(config)) {
                 val executable = findExecutable()?.takeIf { it.isAbsolute && Files.isRegularFile(it) && Files.isExecutable(it) }
@@ -30,12 +29,12 @@ internal object MagentoDdevEnvironment {
         return null
     }
 
-    fun findExecutable(): Path? = findExecutable(EnvironmentUtil.getValue("PATH"))
+    fun findExecutable(): Path? = findExecutable(System.getenv("PATH"))
 
     internal fun findExecutable(path: String?): Path? {
-        val name = if (SystemInfoRt.isWindows) "ddev.exe" else "ddev"
+        val name = if (isWindows) "ddev.exe" else "ddev"
         for (entry in path.orEmpty().split(File.pathSeparatorChar)) {
-            val directory = if (SystemInfoRt.isWindows) entry.removeSurrounding("\"") else entry
+            val directory = if (isWindows) entry.removeSurrounding("\"") else entry
             if (directory.isEmpty()) continue
             val candidate = try {
                 Path.of(directory).resolve(name)
@@ -70,13 +69,14 @@ internal object MagentoDdevEnvironment {
             listOfNotNull(configuration.string("name"))
 
         fun example(command: List<String>): String = (listOf("ddev") + execArguments(command))
-            .joinToString(" ", transform = MagentoCliToolQueries::shellQuote)
+            .joinToString(" ", transform = MagentoCliEnvironment::shellQuote)
 
-        fun terminalGuidance(command: List<String> = listOf("php", "-v")): JSONObject = JSONObject()
+        fun terminalGuidance(command: List<String> = listOf("php", "-v"),
+                             terminalName: String = "PhpStorm's Terminal (IDE console)"): JSONObject = JSONObject()
             .put("command", example(command)).put("cwd", cwd.toString())
-            .put("message", "If execution needs interactive permissions, suggest running this command in PhpStorm's Terminal (IDE console) from the reported working directory and handling permission prompts there. The IDE process must also have access to DDEV and Docker. Retry the intended operation after resolving access.")
+            .put("message", "If execution needs interactive permissions, suggest running this command in $terminalName from the reported working directory and handling permission prompts there. The IDE process must also have access to DDEV and Docker. Retry the intended operation after resolving access.")
 
-        fun json(): JSONObject = JSONObject().put("runtime", "ddev")
+        fun json(terminalName: String = "PhpStorm's Terminal (IDE console)"): JSONObject = JSONObject().put("runtime", "ddev")
             .put("status", when {
                 configuration.error != null -> "invalid_configuration"
                 executable == null -> "missing_launcher"
@@ -89,7 +89,7 @@ internal object MagentoDdevEnvironment {
             .apply {
                 if (configuration.error == null) {
                     put("execPrefix", JSONArray(listOf(executable?.toString() ?: "ddev") + execArguments(emptyList())))
-                    put("terminalGuidance", terminalGuidance())
+                    put("terminalGuidance", terminalGuidance(terminalName = terminalName))
                     put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed. ddev exec starts a project that is not running, so check `ddev describe --skip-hooks` first and ask the developer before starting it.")
                 }
             }

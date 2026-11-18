@@ -6,10 +6,10 @@
 package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
@@ -58,7 +58,12 @@ public final class MagentoVfsUtil {
     public static @Nullable VirtualFile findByPath(final @NotNull String path) {
         final VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file://" + path);
 
-        return file != null ? file : LocalFileSystem.getInstance().findFileByPath(path);
+        if (file != null) {
+            return file;
+        }
+        // HCE supplies a snapshot VFS for the file protocol, rather than LocalFileSystem.
+        final VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem("file");
+        return fileSystem == null ? null : fileSystem.findFileByPath(path);
     }
 
     public static @NotNull Collection<VirtualFile> getMagentoScanRoots(final @NotNull Project project) {

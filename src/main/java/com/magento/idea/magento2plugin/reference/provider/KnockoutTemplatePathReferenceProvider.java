@@ -12,7 +12,8 @@ import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
-import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
+import com.magento.idea.magento2plugin.util.magento.ui.TemplatePathResolver;
+import com.magento.idea.magento2plugin.project.Settings;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,12 +24,15 @@ public class KnockoutTemplatePathReferenceProvider extends PsiReferenceProvider 
             final @NotNull PsiElement element,
             final @NotNull ProcessingContext context
     ) {
+        if (!Settings.isEnabled(element.getProject())) {
+            return PsiReference.EMPTY_ARRAY;
+        }
         final String templatePath = getElementValue(element);
 
         if (templatePath == null) {
             return PsiReference.EMPTY_ARRAY;
         }
-        final List<PsiElement> targets = KnockoutTemplatePathResolver.getInstance()
+        final List<PsiElement> targets = TemplatePathResolver.getInstance()
                 .resolveTemplateFiles(element.getProject(), templatePath);
 
         if (targets.isEmpty()) {
