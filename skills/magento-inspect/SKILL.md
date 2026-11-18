@@ -7,7 +7,9 @@ description: Inspect Magento 2 or Adobe Commerce configuration, configure projec
 
 Call `magento_intelligence` to discover the connected IDE's Magento tools and verify the intended project before choosing a workflow. Available tools depend on the installed plugin version and IDE capabilities. Explain missing capabilities rather than presenting them as an empty result.
 
-- For source configuration lookups, use `magento_inspect` with the preferred flow below.
+- If discovery exposes `magento_diagnostics`, use `mode: "help"` for its supported XML rule IDs, then `mode: "check"` with one project-relative `filePath`. Read `complete`, truncation, applicability, and readiness before interpreting an empty diagnostic list. It reports default rule severities and source ranges; it does not apply fixes or provide PHP/schema/runtime validation.
+- If the catalog includes `module_dependencies`, query an exact `moduleName`, optional `direction` (`dependencies`, `dependents`, or `both`), and integer `limit` (1–100). Read the JSON status, completeness, truncation, problems, declarations, and edge source ranges. `sequence_after` is ordering; Composer `require` and `require-dev` are distinct package declarations. Package mappings use only manifests directly at module roots. Missing manifests, external packages, and duplicate declarations must not become guessed hard dependencies. This does not establish installed/enabled state, version satisfaction, effective load order, PHP validity, or runtime behavior.
+- For source configuration lookups, use `magento_inspect` with the preferred flow below. If its catalog includes `ui_template`, use it with a literal `templatePath` such as `Vendor_Module/widget` to find candidate HTML files. Read normalization, counts, truncation and coverage; candidates do not prove effective theme fallback, RequireJS maps or runtime behavior.
 - For project command discovery or n98-magerun2 metadata, use the CLI workflow below. Filesystem discovery alone does not require a running container.
 - For backward compatibility or upgrade analysis, use `magento_compatibility` with the compatibility workflow below.
 

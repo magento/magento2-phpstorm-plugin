@@ -1,0 +1,21 @@
+<idea-plugin>
+    <id>com.magento.idea.magento2plugin.hce</id>
+    <name>Magento 2 and Adobe Commerce for HCE</name>
+    <version>${pluginVersion}</version>
+    <vendor>Magento Inc.</vendor>
+    <description>Magento 2 and Adobe Commerce integration for JetBrains Headless Code Engine.</description>
+    <idea-version since-build="271.2085" until-build="271.*"/>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.ls.plugin.mcp</depends>
+    <depends optional="true" config-file="withXml.xml">com.intellij.modules.xml</depends>
+    <depends optional="true" config-file="withJson.xml">com.intellij.modules.json</depends>
+    <extensionPoints>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.methodPluginQueryProvider"
+                        interface="com.magento.idea.magento2plugin.mcp.MagentoMethodPluginQueryProvider"/>
+    </extensionPoints>
+    <extensions defaultExtensionNs="com.intellij">
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.ProjectToolset"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.RuntimeToolset"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.mcp.MagentoIntelligenceToolset"/>
+    </extensions>
+</idea-plugin>

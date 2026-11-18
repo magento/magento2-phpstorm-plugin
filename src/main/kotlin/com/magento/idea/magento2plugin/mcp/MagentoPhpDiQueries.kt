@@ -37,11 +37,14 @@ internal object MagentoPhpDiQueries {
                 .put("records", emptyList<String>()).toString() else message
         }
 
-        if (effectiveArea != null || json) {
-            return resolve(project, targetClasses, targetMethodName, effectiveArea, json, fileArea)
+        if (effectiveArea != null) {
+            return resolveEffective(project, targetClasses, targetMethodName, effectiveArea, json, fileArea)
         }
         val allTargetFqns = linkedSetOf(targetClassName)
         targetClasses.forEach { MagentoPhpInspectionSupport.collectClassHierarchy(it, allTargetFqns) }
+        if (json) {
+            return renderConfiguration(project, allTargetFqns, targetMethodName, area = null, json = true, fileArea = fileArea)
+        }
         val pluginDeclarations = findPluginDeclarations(project, allTargetFqns)
         val pluginCandidates = mutableListOf<MagentoPhpInspectionSupport.PluginMethodMatch>()
 
@@ -103,10 +106,9 @@ internal object MagentoPhpDiQueries {
         return lines.joinToString("\n")
     }
 
-    private fun resolve(project: Project, targets: List<PhpClass>, method: String, area: String?,
-                        json: Boolean, fileArea: String?): String {
-        val context = MagentoEffectiveConfiguration(project)
-        val snapshot = MagentoMcpSnapshots.diSnapshot(project)
+    private fun resolveEffective(
+        project: Project, targets: List<PhpClass>, method: String, area: String, json: Boolean, fileArea: String?
+    ): String {
         val hierarchy = linkedSetOf<String>()
         val interfaces = linkedSetOf<String>()
         val visitedClasses = mutableSetOf<String>()
@@ -127,6 +129,16 @@ internal object MagentoPhpDiQueries {
             hierarchy += type.presentableFQN
         }
         targets.forEach(::visit)
+        return renderConfiguration(project, hierarchy, method, area, json, fileArea, interfaces)
+    }
+
+    private fun renderConfiguration(
+        project: Project, hierarchy: Set<String>, method: String, area: String?, json: Boolean,
+        fileArea: String?, interfaces: Set<String> = emptySet()
+    ): String {
+        val context = MagentoEffectiveConfiguration(project)
+        val modules = if (area != null) context.modules else null
+        val snapshot = MagentoMcpSnapshots.diSnapshot(project)
         val declarations = hierarchy.flatMap { type ->
             snapshot.pluginDeclarations[type].orEmpty().map { plugin ->
                 val (scope, module) = context.location(plugin.filePath)
@@ -149,7 +161,7 @@ internal object MagentoPhpDiQueries {
 
         val records = declarations.groupBy { it.name }.values.flatMap { group ->
             ProgressManager.checkCanceled()
-            val decisions = MagentoEffectiveConfiguration.resolve(group, area, context.modules, observer = false, interfaces = interfaces)
+            val decisions = MagentoEffectiveConfiguration.resolve(group, area, modules, observer = false, interfaces = interfaces)
             // Keep suppression evidence even when the replacing class has no hook for this method.
             if (group.mapNotNull { it.instance }.all { hooksFor(it)?.isEmpty() == true }) return@flatMap emptyList()
             decisions.map { decision ->
@@ -162,7 +174,7 @@ internal object MagentoPhpDiQueries {
                 row
             }
         }
-        return MagentoEffectiveConfiguration.render(records, area, context.modules != null, json)
+        return MagentoEffectiveConfiguration.render(records, area, modules != null, json)
     }
 
     private fun findPluginDeclarations(

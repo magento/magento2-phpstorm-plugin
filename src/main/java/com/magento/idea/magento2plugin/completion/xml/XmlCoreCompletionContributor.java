@@ -125,10 +125,7 @@ public class XmlCoreCompletionContributor extends CompletionContributor {
                         .inside(XmlPatterns.xmlAttributeValue().withParent(
                                 XmlPatterns.xmlAttribute().withName(
                                         UiComponentXml.XML_ATTRIBUTE_COMPONENT))),
-                new CompositeCompletionProvider(
-                        new RequireJsMappingCompletionProvider(),
-                        new FilePathCompletionProvider()
-                )
+                new FilePathCompletionProvider()
         );
         extend(CompletionType.BASIC, PlatformPatterns.psiElement(XmlTokenType.XML_DATA_CHARACTERS)
                         .withParent(XmlPatterns.xmlText().withParent(
@@ -138,10 +135,7 @@ public class XmlCoreCompletionContributor extends CompletionContributor {
                                                         UiComponentXml.XML_ATTRIBUTE_COMPONENT)))
                                         .withChild(XmlPatterns.xmlAttribute().withName(
                                                 UiComponentXml.XML_ATTRIBUTE_NAME)))),
-                new CompositeCompletionProvider(
-                        new RequireJsMappingCompletionProvider(),
-                        new FilePathCompletionProvider()
-                )
+                new FilePathCompletionProvider()
         );
     }
 
