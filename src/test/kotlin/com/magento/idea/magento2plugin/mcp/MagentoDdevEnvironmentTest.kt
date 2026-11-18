@@ -85,6 +85,222 @@ class MagentoDdevEnvironmentTest {
     }
 
     @Test
+    fun listsProjectCommandsWithDdevFileRulesAndDirectives() = fixture { root ->
+        file(root, ".ddev/config.yaml", "name: shop\ntype: magento2\n")
+        file(root, ".ddev/commands/web/test-integration", """
+            #!/usr/bin/env bash
+            ## Description: Run Magento integration tests
+            ## Usage: test-integration <path> [phpunit options]
+            ## Example: ddev test-integration dev/tests/integration\nddev test-integration app/code
+            ## Aliases: ti, integration
+            ## OSTypes: darwin,linux
+            phpunit "${'$'}@"
+        """.trimIndent())
+        file(root, ".ddev/commands/host/perf-check", "#!/usr/bin/env bash\n## Description: 'Check changed files'\n")
+        file(root, ".ddev/commands/web/plain", "#!/usr/bin/env bash\necho no directives\n")
+        file(root, ".ddev/commands/web/README.txt", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/sample.example", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/.hidden", "## Description: not a command\n")
+        file(root, ".ddev/commands/.hidden-service/tool", "## Description: not a command\n")
+        file(root, ".ddev/commands/web/drupal-only", "## ProjectTypes: drupal10,drupal11\n")
+        file(root, ".ddev/commands/web/windows", "## Description: x\r\n")
+        file(root, ".ddev/commands/worker/test-integration", "## Description: a later service folder does not replace it\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("test-integration", "perf-check", "plain").sorted(), commands.map { it.getString("name") }.sorted())
+        val integration = commands.single { it.getString("name") == "test-integration" }
+        assertEquals("web", integration.getString("service"))
+        assertEquals("container", integration.getString("runsOn"))
+        assertEquals("ddev test-integration", integration.getString("invocation"))
+        assertEquals(".ddev/commands/web/test-integration", integration.getString("path"))
+        assertEquals("Run Magento integration tests", integration.getString("description"))
+        assertEquals("test-integration <path> [phpunit options]", integration.getString("usage"))
+        assertEquals("ddev test-integration dev/tests/integration\nddev test-integration app/code", integration.getString("example"))
+        assertEquals(listOf("ti", "integration"), integration.getJSONArray("aliases").toList())
+        assertEquals("darwin,linux", integration.getJSONObject("unevaluatedConditions").getString("OSTypes"))
+        val host = commands.single { it.getString("name") == "perf-check" }
+        assertEquals("host", host.getString("runsOn"))
+        assertEquals("Check changed files", host.getString("description"))
+        val plain = commands.single { it.getString("name") == "plain" }
+        assertEquals("plain", plain.getString("description"))
+        assertEquals("plain [flags] [args]", plain.getString("usage"))
+        assertEquals(listOf("web/windows: CRLF line endings, which DDEV skips"), json.getJSONArray("skipped").toList())
+        assertFalse(json.getBoolean("truncated"))
+    }
+
+    @Test
+    fun projectCommandsStayInsideTheProjectAndAreBounded() = fixture { directory ->
+        val root = Files.createDirectories(directory.resolve("project"))
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        assertEquals(0, MagentoDdevEnvironment.discover(root, root) { null }!!.json()
+            .getJSONObject("projectCommands").getJSONArray("commands").length())
+        val outside = file(directory, "outside/secret", "## Description: outside\n")
+        Files.createDirectories(root.resolve(".ddev/commands/web"))
+        if (!SystemInfoRt.isWindows) Files.createSymbolicLink(root.resolve(".ddev/commands/web/a-linked"), outside)
+        for (index in 0 until 101) file(root, ".ddev/commands/web/command-%03d".format(index), "#!/bin/sh\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals(100, json.getJSONArray("commands").length())
+        assertTrue(json.getBoolean("truncated"))
+        assertFalse(json.getJSONArray("commands").toList().any { it.toString().contains("a-linked") })
+        if (!SystemInfoRt.isWindows) assertTrue(json.getJSONArray("skipped").toList().contains("web/a-linked: unreadable or outside the project"))
+    }
+
+    @Test
+    fun projectCommandsFollowDdevNamingDirectivesAndLimits() = fixture { directory ->
+        val root = Files.createDirectories(directory.resolve("project"))
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/long-name", "## Usage: ln <path>\n## Description: first\n## Description: 'last'\n## Example:  ddev ln 'a b'  \n")
+        file(root, ".ddev/commands/db/shared", "## ProjectTypes: drupal11\n")
+        file(root, ".ddev/commands/web/shared", "## Description: from web\n")
+        file(root, ".ddev/commands/db/big", "#".repeat(262_145))
+        file(root, ".ddev/commands/web/big", "## Description: a later folder must not replace it\n")
+        val outside = Files.createDirectories(directory.resolve("outside-commands"))
+        file(outside, "planted", "## Description: outside\n")
+        if (!SystemInfoRt.isWindows) Files.createSymbolicLink(root.resolve(".ddev/commands/linked-service"), outside)
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("long-name", "shared"), commands.map { it.getString("name") }.sorted())
+        val long = commands.single { it.getString("name") == "long-name" }
+        assertEquals("ddev ln", long.getString("invocation"))
+        assertEquals("last", long.getString("description"))
+        assertEquals("ddev ln 'a b'", long.getString("example"))
+        assertEquals("from web", commands.single { it.getString("name") == "shared" }.getString("description"))
+        val skipped = json.getJSONArray("skipped").toList().map { it.toString() }
+        assertTrue(skipped.toString(), skipped.contains("db/big: larger than 262144 bytes, not read"))
+        if (!SystemInfoRt.isWindows) assertTrue(skipped.toString(), skipped.contains("linked-service: outside the project"))
+        assertFalse(json.toString().contains("planted"))
+    }
+
+    @Test
+    fun projectCommandsFollowDdevRegistrationOrderForNamesAndAliases() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/a-first", "## Usage: run <path>\n")
+        file(root, ".ddev/commands/web/b-second", "## Usage: run [options]\n")
+        file(root, ".ddev/commands/web/c-tests", "## Aliases: t, tests\n")
+        file(root, ".ddev/commands/web/d-tool", "## Usage: t <path>\n")
+        file(root, ".ddev/commands/web/e-other", "## Aliases: tests, run, eo\n")
+        file(root, ".ddev/commands/web/f-drupal", "## ProjectTypes: drupal11\n## Aliases: t\n")
+        file(root, ".ddev/commands/worker/b-second", "## Description: DDEV did not add the skipped web file\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("a-first", "c-tests", "e-other", "b-second"), commands.map { it.getString("name") })
+        assertEquals("worker", commands.last().getString("service"))
+        assertEquals(listOf("eo"), commands.single { it.getString("name") == "e-other" }.getJSONArray("aliases").toList())
+        assertEquals(listOf(
+            "web/b-second: 'run' is already used by web/a-first, which DDEV skips",
+            "web/d-tool: 't' is already used by web/c-tests, which DDEV skips",
+            "web/e-other: alias 'tests' is already used by web/c-tests, which DDEV drops",
+            "web/e-other: alias 'run' is already used by web/a-first, which DDEV drops",
+        ), json.getJSONArray("skipped").toList())
+    }
+
+    @Test
+    fun oversizedCommandFilesCountTowardsTheReadBudget() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        for (index in 1..4) file(root, ".ddev/commands/web/a-big-$index", "#".repeat(262_145))
+        file(root, ".ddev/commands/web/b-valid", "## Description: after the budget\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals(0, json.getJSONArray("commands").length())
+        assertTrue(json.getBoolean("truncated"))
+        assertEquals((1..3).map { "web/a-big-$it: larger than 262144 bytes, not read" }, json.getJSONArray("skipped").toList())
+    }
+
+    @Test
+    fun oversizedCommandFileKeepsItsNameForLaterUsages() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/a-big", "#".repeat(262_145))
+        file(root, ".ddev/commands/web/b", "## Usage: a-big\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals(0, json.getJSONArray("commands").length())
+        assertEquals(listOf("web/a-big: larger than 262144 bytes, not read", "web/b: 'a-big' is already used by web/a-big, which DDEV skips"),
+            json.getJSONArray("skipped").toList())
+    }
+
+    @Test
+    fun commandFileThatExactlyFillsTheReadBudgetIsComplete() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        for (index in 1..3) file(root, ".ddev/commands/web/a-big-$index", "#".repeat(262_145))
+        val header = "## Description: exact fit\n"
+        val exact = file(root, ".ddev/commands/web/b-exact", header + "\n".repeat(1_048_576 - 3 * 262_145 - header.length))
+        assertEquals(262_141L, Files.size(exact))
+        val fits = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals("exact fit", fits.getJSONArray("commands").getJSONObject(0).getString("description"))
+        assertFalse(fits.getBoolean("truncated"))
+        file(root, ".ddev/commands/web/c-after", "## Description: after the budget\n")
+        val after = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals(listOf("b-exact"), (0 until after.getJSONArray("commands").length())
+            .map { after.getJSONArray("commands").getJSONObject(it).getString("name") })
+        assertTrue(after.getBoolean("truncated"))
+    }
+
+    @Test
+    fun projectCommandsRegisterInDdevFileNameByteOrder() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/a", "## Usage: go\n")
+        file(root, ".ddev/commands/web/Run", "## Usage: go\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        assertEquals("Run", json.getJSONArray("commands").getJSONObject(0).getString("name"))
+        assertEquals(listOf("web/a: 'go' is already used by web/Run, which DDEV skips"), json.getJSONArray("skipped").toList())
+    }
+
+    @Test
+    fun directivesFollowDdevLineScanner() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/long-line", "## Usage: other\n## Aliases: ll\n## ProjectTypes: drupal11\n" +
+            "## Description: hidden\n" + "#".repeat(65_536) + "\n")
+        file(root, ".ddev/commands/web/near-limit", "## Usage: near\n" + "#".repeat(65_535) + "\n")
+        file(root, ".ddev/commands/web/lone-cr", "## Usage: crx\r## Description: hidden\n## Example: tail\r")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        val long = commands.single { it.getString("name") == "long-line" }
+        assertEquals("ddev long-line", long.getString("invocation"))
+        assertEquals("long-line", long.getString("description"))
+        assertFalse(long.has("aliases"))
+        assertEquals("ddev near", commands.single { it.getString("name") == "near-limit" }.getString("invocation"))
+        val cr = commands.single { it.getString("name") == "lone-cr" }
+        assertEquals("crx\r## Description: hidden", cr.getString("usage"))
+        assertEquals("lone-cr", cr.getString("description"))
+        assertEquals("tail", cr.getString("example"))
+    }
+
+    @Test
+    fun emptyUsageIsRejectedAsTheRootCommand() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/blank", "## Usage:\n## Aliases: bl\n")
+        file(root, ".ddev/commands/web/c-next", "## Usage: bl\n")
+        file(root, ".ddev/commands/worker/blank", "## Description: DDEV did not add the web file\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("ddev bl", "ddev blank"), commands.map { it.getString("invocation") })
+        assertEquals("worker", commands.last().getString("service"))
+        assertEquals(listOf("web/blank: '' is already used by ddev, which DDEV skips"), json.getJSONArray("skipped").toList())
+    }
+
+    @Test
+    fun usageAndAliasesFollowCobraFlagParsing() = fixture { root ->
+        file(root, ".ddev/config.yaml", "type: magento2\n")
+        file(root, ".ddev/commands/web/a-tool", "## Usage: tool\n")
+        file(root, ".ddev/commands/web/b-flag", "## Usage: -x tool\n")
+        file(root, ".ddev/commands/web/c-flag", "## Usage: -x value tool\n")
+        file(root, ".ddev/commands/web/d-json", "## Usage: -j tool2 [args]\n")
+        file(root, ".ddev/commands/web/e-tool2", "## Usage: tool2\n")
+        file(root, ".ddev/commands/web/f-alias", "## Aliases: -a, --long, fa\n")
+        file(root, ".ddev/commands/web/g-json", "## Usage: -j tool\n")
+        val json = MagentoDdevEnvironment.discover(root, root) { null }!!.json().getJSONObject("projectCommands")
+        val commands = (0 until json.getJSONArray("commands").length()).map { json.getJSONArray("commands").getJSONObject(it) }
+        assertEquals(listOf("a-tool", "e-tool2", "f-alias"), commands.map { it.getString("name") })
+        assertEquals(listOf("fa"), commands.last().getJSONArray("aliases").toList())
+        assertEquals(listOf(
+            "web/b-flag: '-x tool' is already used by ddev, which DDEV skips",
+            "web/c-flag: 'tool' is already used by web/a-tool, which DDEV skips",
+            "web/d-json: Usage name '-j' starts with '-', so DDEV cannot run it",
+            "web/f-alias: alias '-a' is already used by ddev, which DDEV drops",
+            "web/f-alias: alias '--long' is already used by ddev, which DDEV drops",
+            "web/g-json: 'tool' is already used by web/a-tool, which DDEV skips",
+        ), json.getJSONArray("skipped").toList())
+    }
+
+    @Test
     fun mergesOrderedOverridesAndRetainsFieldEvidence() = fixture { root ->
         file(root, ".ddev/config.yaml", "name: base\ndocroot: pub\nphp_version: '8.3'\nworking_dir: {web: /original, db: /database}\n")
         file(root, ".ddev/config.z.yaml", "name: final\nworking_dir: {web: '/final path'}\n")
