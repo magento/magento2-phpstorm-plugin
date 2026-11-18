@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Fixed
 
-- `magento_magerun` no longer starts a DDEV project that is not running. `ddev exec` starts a stopped, paused or unhealthy project, so the tool now checks `ddev describe` first and answers `environment_not_running` with the project status and `ddev start` for the developer, instead of reporting a probe timeout while the project starts [#2806](https://github.com/magento/magento2-phpstorm-plugin/issues/2806).
+- `magento_magerun` no longer starts a DDEV project that is not running. `ddev exec` starts a stopped, paused or unhealthy project, so the tool now checks `ddev describe --skip-hooks` first, without running describe hooks (DDEV v1.23.3 or newer), and answers `environment_not_running` with the project status and `ddev start` for the developer, instead of reporting a probe timeout while the project starts [#2806](https://github.com/magento/magento2-phpstorm-plugin/issues/2806).
 
 
 ## 2026.3.6-p1

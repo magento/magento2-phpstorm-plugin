@@ -194,6 +194,11 @@ internal class MagentoMagerunService(
                                    checkCancelled: () -> Unit) {
         val result = runner.run(listOf(plan.argv.first()) + ddev.statusArguments(), ddev.projectRoot, checkCancelled)
         if (result.timedOut) fail("timeout", "DDEV did not report the project status within the probe timeout. ddev exec was not run.")
+        // --skip-hooks appeared in DDEV v1.23.3; plain describe would run the hooks, so there is no fallback.
+        if ("unknown flag: --skip-hooks" in result.stderr) {
+            fail("runtime_unavailable", "This DDEV version cannot check the project status without running describe " +
+                "hooks: --skip-hooks needs DDEV v1.23.3 or newer. ddev exec was not run.")
+        }
         val lines = (result.stdout.lines() + result.stderr.lines())
             .mapNotNull { line -> runCatching { JSONObject(line) }.getOrNull() }
         val status = lines.firstNotNullOfOrNull { line ->
@@ -203,7 +208,7 @@ internal class MagentoMagerunService(
         if (status == "running") return
         val name = ddev.configuration.string("name")?.let { " '$it'" }.orEmpty()
         val shown = status.takeIf { it in DDEV_STATUSES } ?: "in an unknown state"
-        val next = if (status == "starting") "Wait until `ddev describe` reports it as running, then retry."
+        val next = if (status == "starting") "Wait until `ddev describe --skip-hooks` reports it as running, then retry."
             else "Ask the developer to run `ddev start` in ${ddev.projectRoot}, then retry."
         fail("environment_not_running", "DDEV project$name is $shown. Magerun was not run, because ddev exec starts " +
             "a project that is not running. $next")

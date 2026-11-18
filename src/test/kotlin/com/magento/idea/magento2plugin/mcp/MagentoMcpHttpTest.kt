@@ -196,7 +196,9 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         file("host tools/ddev", """
             #!/bin/sh
             printf '%s\n' "${'$'}*" >> ddev-calls.txt
-            if [ "${'$'}*" = "describe --json-output commerce-local" ]; then
+            if [ "${'$'}1" = describe ]; then
+              # Emulates a pre-describe exec-host hook, which DDEV runs unless --skip-hooks is passed.
+              case " ${'$'}* " in *" --skip-hooks "*) ;; *) echo pre-describe >> describe-hook-ran ;; esac
               printf '{"level":"info","msg":"","raw":{"status":"%s"}}\n' "${'$'}(cat ddev-status 2>/dev/null || echo running)"; exit 0
             fi
             [ "${'$'}1" = exec ] && [ "${'$'}2" = --raw ] && [ "${'$'}3" = --service=web ] && [ "${'$'}4" = --project=commerce-local ] && [ "${'$'}5" = --dir=/var/www/html/src ] && [ "${'$'}6" = -- ] && [ "${'$'}7" = magerun2 ] || exit 91
@@ -243,10 +245,11 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
             file("ddev-status", "stopped")
             val stopped = magerun("commands", JSONObject().put("refresh", true))
+            assertFalse(Files.exists(root.resolve("describe-hook-ran")))
             assertEquals(stopped.toString(), "environment_not_running", stopped.getString("status"))
             assertTrue(stopped.getString("message").contains("DDEV project 'commerce-local' is stopped"))
             assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
-            assertEquals(List(6) { "describe --json-output commerce-local" }, Files.readAllLines(root.resolve("ddev-calls.txt")))
+            assertEquals(List(6) { "describe --skip-hooks --json-output commerce-local" }, Files.readAllLines(root.resolve("ddev-calls.txt")))
         }
     }
 

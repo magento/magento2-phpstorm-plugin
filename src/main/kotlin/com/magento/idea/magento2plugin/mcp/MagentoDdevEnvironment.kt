@@ -62,8 +62,12 @@ internal object MagentoDdevEnvironment {
 
         val projectRoot: Path get() = config.parent.parent
 
-        /** `ddev describe` reports the status and, unlike `ddev exec`, does not start a stopped project. */
-        fun statusArguments(): List<String> = listOf("describe", "--json-output") + listOfNotNull(configuration.string("name"))
+        /**
+         * `ddev describe` reports the status and, unlike `ddev exec`, does not start a stopped project.
+         * `--skip-hooks` keeps project describe hooks, which may run host commands, out of the probe.
+         */
+        fun statusArguments(): List<String> = listOf("describe", "--skip-hooks", "--json-output") +
+            listOfNotNull(configuration.string("name"))
 
         fun example(command: List<String>): String = (listOf("ddev") + execArguments(command))
             .joinToString(" ", transform = MagentoCliToolQueries::shellQuote)
@@ -86,7 +90,7 @@ internal object MagentoDdevEnvironment {
                 if (configuration.error == null) {
                     put("execPrefix", JSONArray(listOf(executable?.toString() ?: "ddev") + execArguments(emptyList())))
                     put("terminalGuidance", terminalGuidance())
-                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed. ddev exec starts a project that is not running, so check `ddev describe` first and ask the developer before starting it.")
+                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed. ddev exec starts a project that is not running, so check `ddev describe --skip-hooks` first and ask the developer before starting it.")
                 }
             }
     }
