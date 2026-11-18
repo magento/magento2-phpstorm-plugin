@@ -146,6 +146,8 @@ XML lookups locate declarations and source files. Use PHP analysis to validate c
 
 - Prefer `magento_inspect` over any finder-specific tool. Its staged modes exist to avoid loading the whole inspection library into context.
 - Use PHP FQNs with escaped backslashes inside `parametersJson`, for example `Magento\\Catalog\\Api\\ProductRepositoryInterface`.
+- For the observers configured in an area, pass `area` to `observers_for_event`. For method plugins, pass `effectiveArea` to `plugins_for_method`; `area` alone filters declaration files. Omitting the area returns declarations.
+- Pass `format: "json"` for source records. Read `status` and `decidedBy` to distinguish applicable entries, replacements and disables. A missing or nonliteral module list in `app/etc/config.php` yields candidates.
 - Use bare method names for `plugins_for_method`, for example `save`, not `beforeSave`, `aroundSave`, or `afterSave`.
 - Use UI component base names without `.xml`, for example `product_form`.
 

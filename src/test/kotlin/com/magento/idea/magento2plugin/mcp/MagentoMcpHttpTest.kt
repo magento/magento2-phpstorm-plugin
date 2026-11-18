@@ -239,6 +239,81 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
     }
 
+    fun testInheritedInterfacePluginDeclarationsOverHttp() {
+        val module = "src/app/code/Inspect/Module"
+        val diXml = "$module/etc/di.xml"
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Module' => 1]];")
+        myFixture.addFileToProject("$module/etc/module.xml", """<config><module name="Inspect_Module"/></config>""")
+        myFixture.addFileToProject("$module/Models.php", """<?php
+            interface ParentApi { public function save(); }
+            interface ChildApi extends ParentApi {}
+            class SavePlugin { public function beforeSave() {} }
+        """.trimIndent())
+        myFixture.addFileToProject(diXml, """
+            <config><type name="ParentApi"><plugin name="save_plugin" type="SavePlugin"/></type></config>
+        """.trimIndent())
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val args = JSONObject().put("className", "ChildApi").put("methodName", "save")
+        val text = inspect("query", "plugins_for_method", args.toString())
+        assertTrue(text, text.contains("target: ParentApi::save()"))
+        assertTrue(text, text.contains("pluginClass: SavePlugin"))
+        assertTrue(text, text.contains("pluginMethod: beforeSave()"))
+
+        val json = JSONObject(inspect("query", "plugins_for_method", args.put("format", "json").toString()))
+        assertEquals("declarations", json.getString("mode"))
+        val records = json.getJSONArray("records")
+        assertEquals(json.toString(), 1, records.length())
+        val declaration = records.getJSONObject(0)
+        assertEquals("ParentApi", declaration.getString("target"))
+        assertEquals("save_plugin", declaration.getString("name"))
+        assertEquals("declaration", declaration.getString("status"))
+        assertEquals(diXml, declaration.getString("file"))
+        assertEquals(listOf("beforeSave"), declaration.getJSONArray("pluginMethods").toList())
+
+        val effective = JSONObject(inspect("query", "plugins_for_method", args.put("effectiveArea", "frontend").toString()))
+        assertEquals("effective", effective.getString("mode"))
+        assertEquals(effective.toString(), 0, effective.getJSONArray("records").length())
+    }
+
+    fun testAreaResolutionThroughInspectionTool() {
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Base' => 1, 'Inspect_Later' => 1]];")
+        for (name in listOf("Base", "Later")) {
+            myFixture.addFileToProject("src/app/code/Inspect/$name/etc/module.xml", """<config><module name="Inspect_$name"/></config>""")
+        }
+        val base = "src/app/code/Inspect/Base/etc"
+        val local = "src/app/code/Inspect/Later/etc/adminhtml"
+        myFixture.addFileToProject("$base/events.xml", """<config><event name="placed"><observer name="log" instance="Logger"/></event></config>""")
+        myFixture.addFileToProject("$local/events.xml", """<config><event name="placed"><observer name="log" disabled="true"/></event></config>""")
+        myFixture.addFileToProject("$base/di.xml", """<config><type name="SaveInterface"><plugin name="log" type="SavePlugin"/></type></config>""")
+        myFixture.addFileToProject("$local/di.xml", """<config><type name="SaveModel"><plugin name="log" disabled="true"/></type></config>""")
+        myFixture.addFileToProject("src/app/code/Inspect/Base/Models.php", """<?php
+            interface SaveInterface { public function save(); }
+            class SaveModel implements SaveInterface { public function save() {} }
+            class SavePlugin { public function beforeSave() {} public function helperSave() {} }
+        """.trimIndent())
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        for ((query, args, file) in listOf(
+            Triple("observers_for_event", JSONObject().put("eventName", "placed"), "events.xml"),
+            Triple("plugins_for_method", JSONObject().put("className", "SaveModel").put("methodName", "save"), "di.xml")
+        )) {
+            args.put("format", "json")
+            assertEquals("declarations", JSONObject(inspect("query", query, args.toString())).getString("mode"))
+            val areaKey = if (query == "plugins_for_method") "effectiveArea" else "area"
+            val frontend = JSONObject(inspect("query", query, args.put(areaKey, "frontend").toString()))
+            val active = frontend.getJSONArray("records").getJSONObject(0)
+            assertEquals("applies", active.getString("status"))
+            assertEquals("$base/$file", active.getString("file"))
+            if (file == "di.xml") assertEquals(listOf("beforeSave"), active.getJSONArray("pluginMethods").toList())
+            val admin = JSONObject(inspect("query", query, args.put(areaKey, "adminhtml").toString())).getJSONArray("records")
+            assertEquals(2, admin.length())
+            for (i in 0 until admin.length()) {
+                assertEquals("disabled", admin.getJSONObject(i).getString("status"))
+                assertEquals("$local/$file", admin.getJSONObject(i).getString("decidedBy"))
+            }
+        }
+    }
+
     fun testInspectAndScaffoldRequireOnlyModeOverHttp() {
         val client = mcp()
         IndexingTestUtil.waitUntilIndexesAreReady(project)

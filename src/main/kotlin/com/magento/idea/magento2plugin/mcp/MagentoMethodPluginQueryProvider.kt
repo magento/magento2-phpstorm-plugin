@@ -11,6 +11,14 @@ import com.intellij.openapi.project.Project
 interface MagentoMethodPluginQueryProvider {
     fun findPluginsForMethod(project: Project, className: String, methodName: String): String
 
+    fun findPluginsForMethod(
+        project: Project, className: String, methodName: String, effectiveArea: String?, json: Boolean, fileArea: String?
+    ): String = if (effectiveArea == null && !json && fileArea == null) {
+        findPluginsForMethod(project, className, methodName)
+    } else {
+        "This PHP provider supports declaration-only text results."
+    }
+
     companion object {
         val EP_NAME = ExtensionPointName.create<MagentoMethodPluginQueryProvider>(
             "com.magento.idea.magento2plugin.methodPluginQueryProvider"

@@ -21,6 +21,7 @@ class MagentoInspectionUiTest {
         "file-generators",
         prepareProject = { root ->
             val files = mapOf(
+                "app/etc/config.php" to "<?php return ['modules' => ['Acme_Shipping' => 1]];",
                 "app/code/Acme/Shipping/composer.json" to """{"name":"acme/shipping","require":{"php":">=8.2"}}""",
                 "app/code/Acme/Shipping/view/frontend/web/template/shipping.html" to "<div>Shipping template</div>",
                 "app/code/Acme/Shipping/view/frontend/layout/default.xml" to
@@ -77,6 +78,8 @@ class MagentoInspectionUiTest {
             Triple("module", """{"moduleName":"Acme_Shipping"}""", "app/code/Acme/Shipping"),
             Triple("di_config", """{"className":"Acme\\Shipping\\Target"}""", "plugin name=shipping_plugin"),
             Triple("observers_for_event", """{"eventName":"shipping_event"}""", "observer=shipping_observer instance=Acme\\Shipping\\Observer disabled=true"),
+            Triple("observers_for_event", """{"eventName":"shipping_event","area":"frontend"}""", "status=disabled"),
+            Triple("observers_for_event", """{"eventName":"shipping_event","area":"frontend"}""", "decidedBy=app/code/Acme/Shipping/etc/events.xml"),
             Triple("layout_entities", """{"name":"shipping_block"}""", "template=Acme_Shipping::example.phtml"),
             Triple("layout_entities", """{"name":"shipping_mcp"}""", "shipping_mcp -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),
             Triple("layout_entities", """{"name":"shipping_container"}""", "shipping_container -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),

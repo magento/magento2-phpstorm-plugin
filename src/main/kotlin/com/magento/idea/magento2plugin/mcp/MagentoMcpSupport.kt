@@ -83,16 +83,6 @@ internal object MagentoMcpSupport {
             || normalizedCandidate.contains(normalizedQuery)
     }
 
-    fun getPluginKind(pluginMethodName: String, targetMethodName: String): String? {
-        val capitalizedMethod = targetMethodName.replaceFirstChar { it.uppercase() }
-        return when {
-            pluginMethodName == "before$capitalizedMethod" -> "before"
-            pluginMethodName == "around$capitalizedMethod" -> "around"
-            pluginMethodName == "after$capitalizedMethod" -> "after"
-            else -> null
-        }
-    }
-
     fun pluginKindOrder(kind: String): Int = when (kind) {
         "before" -> 0
         "around" -> 1
