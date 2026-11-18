@@ -70,7 +70,7 @@ internal object MagentoXmlDiagnostics {
         val root = Path.of(requireNotNull(project.basePath) { "Project path is unavailable." }).toRealPath()
         val target = root.resolve(relative).normalize()
         require(Files.isRegularFile(target) && target.toRealPath().startsWith(root)) { "File must exist inside the opened project." }
-        val virtual = FilenameIndex.getVirtualFilesByName(target.fileName.toString(), GlobalSearchScope.projectScope(project))
+        val virtual = FilenameIndex.getVirtualFilesByName(target.fileName.toString(), GlobalSearchScope.allScope(project))
             .firstOrNull { Path.of(it.path).normalize() == target }
             ?: return@guarded failure("file_unavailable", "File is outside the indexed project scope; wait for indexing after updates.")
         if (virtual.length > MAX_BYTES) return@guarded failure("file_too_large", "File exceeds the $MAX_BYTES byte diagnostic limit.")
