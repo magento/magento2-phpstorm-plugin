@@ -5,13 +5,14 @@
 
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 
 internal object MagentoEventQueries {
     /**
      * Finds event names via index lookup and expands them to observer declarations from matching events.xml files.
      */
-    fun findObserversForEvent(project: Project, eventName: String): String {
+    fun findObserversForEvent(project: Project, eventName: String, area: String? = null, json: Boolean = false): String {
         val query = eventName.trim()
         if (query.isEmpty()) {
             return "Provide an event name."
@@ -23,11 +24,26 @@ internal object MagentoEventQueries {
             query
         )
 
-        if (matchedEvents.isEmpty()) {
-            return "No Magento events matched \"$query\"."
+        if (area != null || json) {
+            val context = MagentoEffectiveConfiguration(project)
+            val records = matchedEvents.flatMap { event ->
+                ProgressManager.checkCanceled()
+                snapshot.observersByEvent.getValue(event).map { observer ->
+                    val (scope, module) = context.location(observer.filePath)
+                    ConfigDeclaration(event, observer.observerName, observer.filePath, scope, module,
+                        observer.observerInstance.takeUnless { it == "-" }, observer.disabled)
+                }.groupBy { it.name }.values.flatMap {
+                    MagentoEffectiveConfiguration.resolve(it, area, context.modules, observer = true)
+                }.map { it.record() }
+            }
+            return MagentoEffectiveConfiguration.render(records, area, context.modules != null, json)
         }
 
-        val lines = mutableListOf("Found ${matchedEvents.size} event match(es) for \"$query\".")
+        if (matchedEvents.isEmpty()) {
+            return "Declaration-only results. No Magento events matched \"$query\"."
+        }
+
+        val lines = mutableListOf("Declaration-only results. Specify area to resolve overrides.", "Found ${matchedEvents.size} event match(es) for \"$query\".")
         for (matchedEvent in matchedEvents.take(MagentoMcpSupport.MAX_MATCHES)) {
             lines += ""
             lines += matchedEvent
@@ -39,7 +55,7 @@ internal object MagentoEventQueries {
             }
 
             for (observer in observers.take(MagentoMcpSupport.MAX_FILE_MATCHES)) {
-                lines += "file: ${observer.filePath} observer=${observer.observerName} instance=${observer.observerInstance} disabled=${observer.disabled}"
+                lines += "file: ${observer.filePath} observer=${observer.observerName} instance=${observer.observerInstance} disabled=${observer.disabled ?: false}"
             }
         }
 
