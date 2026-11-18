@@ -43,9 +43,7 @@ import org.jetbrains.annotations.Nullable;
 public class Settings implements PersistentStateComponent<Settings.State> {
     private final EventDispatcher<MagentoModuleDataListener> myEventDispatcher
             = EventDispatcher.create(MagentoModuleDataListener.class);
-    public static final String DEFAULT_MCP_CLI_TOOL_CANDIDATES =
-            "bin/magento, bin/n98-magerun2, bin/n98-magerun, bin/magerun, "
-                    + "bin/cli, bin/console, bin/composer, bin/php";
+    public static final String DEFAULT_MCP_CLI_TOOL_CANDIDATES = MagentoCliConfiguration.DEFAULT_CANDIDATES;
     public static final String DEFAULT_PUBLISHED_RELEASES_URL =
             "https://api.github.com/repos/magento/magento2/releases";
     public boolean pluginEnabled;
@@ -357,36 +355,7 @@ public class Settings implements PersistentStateComponent<Settings.State> {
     }
 
     public static @NotNull List<String> parseMcpCliToolCandidates(final @Nullable String value) {
-        final String rawValue = StringUtil.isEmptyOrSpaces(value)
-                ? DEFAULT_MCP_CLI_TOOL_CANDIDATES
-                : value;
-        final Set<String> result = new LinkedHashSet<>();
-
-        for (final String part : rawValue.split("[,;\\n\\r]+")) {
-            final String normalizedPart = normalizeCliToolCandidate(part);
-            if (!normalizedPart.isEmpty()) {
-                result.add(normalizedPart);
-            }
-        }
-
-        if (result.isEmpty()) {
-            return List.of();
-        }
-
-        return List.copyOf(result);
-    }
-
-    private static @NotNull String normalizeCliToolCandidate(final @Nullable String value) {
-        if (StringUtil.isEmptyOrSpaces(value)) {
-            return "";
-        }
-
-        String normalizedValue = value.trim().replace('\\', '/');
-        while (normalizedValue.startsWith("./")) {
-            normalizedValue = normalizedValue.substring(2);
-        }
-
-        return normalizedValue;
+        return MagentoCliConfiguration.parseCandidates(value);
     }
 
     public static boolean isExcludeGeneratedFiles(final @NotNull Project project) {

@@ -8,6 +8,8 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.mcpserver.McpToolset
 import com.intellij.mcpserver.annotations.McpDescription
 import com.intellij.mcpserver.annotations.McpTool
+import com.intellij.mcpserver.annotations.McpToolHints
+import com.intellij.mcpserver.annotations.McpToolHintValue.TRUE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -119,6 +121,17 @@ class MagentoMcpProjectToolset : McpToolset {
         }
     }
 
+    @McpTool(name = "magento_diagnostics")
+    @McpToolHints(readOnlyHint = TRUE)
+    @McpDescription("Read-only Magento XML diagnostics shared with HCE. mode=help discovers supported inspection rule IDs and limits. mode=check requires one project-relative filePath; optional ruleIds selects checks and limit bounds findings (1..100). Returns severity, explanation and exact source ranges, applicability, truncation and incomplete states. Default severities, XML suppression, no quick fixes or PHP/schema/runtime validation.")
+    suspend fun magentoDiagnostics(mode: String = "help", filePath: String = "", ruleIds: List<String> = emptyList(), limit: Int = 25): String {
+        if (mode == "help") return MagentoXmlDiagnostics.help()
+        if (mode != "check") return MagentoXmlDiagnostics.failure("invalid_request", "mode must be help or check.").toString()
+        return MagentoMcpToolsetSupport.withProjectReadAction(requireSmartMode = false) {
+            MagentoXmlDiagnostics.check(it, filePath, ruleIds, limit).toString()
+        }
+    }
+
     /**
      * Provides one low-noise entry point for Magento project inspections.
      */
@@ -137,8 +150,8 @@ class MagentoMcpProjectToolset : McpToolset {
         "small: list, inspect one schema, then query.\n\n" +
 
         "Available inspections:\n" +
-        "- Shared queryType values are `module`, `di_config`, `observers_for_event`, " +
-        "`layout_entities`, `ui_component`, and `acl_or_menu`.\n" +
+        "- Shared queryType values are `module`, `module_dependencies`, `di_config`, `observers_for_event`, " +
+        "`layout_entities`, `ui_component`, `ui_template`, and `acl_or_menu`.\n" +
         "- `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the " +
         "capabilities available in this IDE.\n\n" +
 

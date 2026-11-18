@@ -1,0 +1,9 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectService serviceInterface="com.magento.idea.magento2plugin.project.Settings" serviceImplementation="com.magento.idea.magento2plugin.hce.AnalysisSettings"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex"/>
+        <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.AnalysisToolset"/>
+    </extensions>
+</idea-plugin>
