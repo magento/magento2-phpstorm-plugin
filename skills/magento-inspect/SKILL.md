@@ -46,7 +46,15 @@ Present a `suggestedCommand` using its exact `argv` and `cwd`. Run a remediation
 {"mode":"query","queryType":"module_dependencies","parametersJson":"{\"moduleName\":\"Foo_Bar\",\"direction\":\"both\",\"limit\":20}"}
 ```
 
-For area-specific observer configuration, pass `area` to `observers_for_event`. For merged method-plugin configuration, pass `effectiveArea` to `plugins_for_method`. On a method-plugin query, `area` alone filters declaration files. Both queries return declarations by default. Set `format` to `"json"` inside `parametersJson` for source records. Read `status` and `decidedBy` to distinguish applicable, replaced, and disabled entries. If the module list in `app/etc/config.php` is missing or nonliteral, report the entries as candidates.
+Text is the default. Set `"format":"json"` in `parametersJson` for `module`, `di_config`, `observers_for_event`, or `plugins_for_method`. The shared response includes `status`, `total`, `returned`, `complete`, `nextCursor`, and `records` with project-relative paths and source lines. Use the filters listed by `detailed_schema`. Follow each `nextCursor` with the same query and filters. Restart after `stale_cursor`. Read the response status to distinguish `no_matches` from `indexing`, `unavailable`, and `invalid_request`. If text reports truncation, use JSON pagination.
+
+For both observer and method-plugin queries, omit `effectiveArea` to inspect declarations. Set `effectiveArea` to resolve the merged configuration for a Magento runtime area. Set `area` to filter by a source configuration area, such as `global` or `adminhtml`. You can combine both arguments in text or JSON. Resolution uses the applicable configuration before applying record filters. This example returns global declarations with their decisions in the Admin runtime area.
+
+```json
+{"mode":"query","queryType":"observers_for_event","parametersJson":"{\"eventName\":\"catalog_product_save_after\",\"effectiveArea\":\"adminhtml\",\"area\":\"global\",\"format\":\"json\"}"}
+```
+
+Read each record's `status`, `decidedBy`, `instance`, `instanceFile`, `declaredDisabled`, and applicable `sortOrder` alongside its own `path`, `line`, `module`, and `area`. The response's `mode` and `message` describe resolution coverage. Report `candidates` as uncertain when module order cannot be read from `app/etc/config.php`. `complete` means the response reached the end of the matching records.
 
 For file diagnostics, use `magento_diagnostics` with `mode: "help"` to discover rule IDs, then `mode: "check"` with one **IDE-project-relative** `filePath`. With Magento under `src/`, retain that prefix here. The module-declaration and default-layout cacheability rules report source ranges. Read applicability, readiness, completeness and truncation before interpreting an empty list. After external disk edits on HCE, use the engine's `wait-for-highwatermark` command before an indexed query when the client exposes the LSP command.
 

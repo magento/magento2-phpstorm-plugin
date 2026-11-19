@@ -97,8 +97,8 @@ class MagentoInspectionUiTest {
             Triple("module", """{"moduleName":"Acme_Shipping"}""", "app/code/Acme/Shipping"),
             Triple("di_config", """{"className":"Acme\\Shipping\\Target"}""", "plugin name=shipping_plugin"),
             Triple("observers_for_event", """{"eventName":"shipping_event"}""", "observer=shipping_observer instance=Acme\\Shipping\\Observer disabled=true"),
-            Triple("observers_for_event", """{"eventName":"shipping_event","area":"frontend"}""", "status=disabled"),
-            Triple("observers_for_event", """{"eventName":"shipping_event","area":"frontend"}""", "decidedBy=app/code/Acme/Shipping/etc/events.xml"),
+            Triple("observers_for_event", """{"eventName":"shipping_event","effectiveArea":"frontend","area":"global"}""", "status=disabled"),
+            Triple("observers_for_event", """{"eventName":"shipping_event","effectiveArea":"frontend","area":"global"}""", "decidedBy=app/code/Acme/Shipping/etc/events.xml"),
             Triple("layout_entities", """{"name":"shipping_block"}""", "template=Acme_Shipping::example.phtml"),
             Triple("layout_entities", """{"name":"shipping_mcp"}""", "shipping_mcp -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),
             Triple("layout_entities", """{"name":"shipping_container"}""", "shipping_container -> app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml"),
@@ -117,6 +117,12 @@ class MagentoInspectionUiTest {
         val unavailable = withReadAction { commands.query(project, "plugins_for_method", "{}") }
         check(unavailable.contains("unavailable") && unavailable.contains("requires the JetBrains PHP plugin")) { unavailable }
         check(commands.detailedSchema("plugins_for_method") == unavailable)
+        val unavailableJson = withReadAction { commands.query(project, "plugins_for_method", """{"format":"json"}""") }
+        check(unavailableJson.contains("\"status\": \"unavailable\"")) { unavailableJson }
+        val observers = withReadAction {
+            commands.query(project, "observers_for_event", """{"eventName":"shipping_event","format":"json"}""")
+        }
+        check(observers.contains("\"status\": \"ok\"") && observers.contains("\"observerName\": \"shipping_observer\"")) { observers }
         val empty = withReadAction { commands.query(project, "ui_component", """{"name":"missing_component"}""") }
         check(empty == "No UI components matched \"missing_component\".") { empty }
     }

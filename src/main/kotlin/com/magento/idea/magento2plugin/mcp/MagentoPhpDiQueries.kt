@@ -15,14 +15,13 @@ import com.jetbrains.php.PhpIndex
 import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 import com.magento.idea.magento2plugin.util.PhpNameUtil
-import org.json.JSONObject
 
 internal object MagentoPhpDiQueries {
     /**
      * Resolves the target class hierarchy and reports plugin methods that match the requested method name.
      */
     fun findPluginsForMethod(project: Project, className: String, methodName: String,
-                             effectiveArea: String? = null, json: Boolean = false, fileArea: String? = null): String {
+                             effectiveArea: String? = null, fileArea: String? = null): String {
         val targetClassName = MagentoMcpSupport.normalizeFqn(className)
         val targetMethodName = methodName.trim()
         if (targetClassName.isEmpty() || targetMethodName.isEmpty()) {
@@ -32,19 +31,16 @@ internal object MagentoPhpDiQueries {
         val phpIndex = PhpIndex.getInstance(project)
         val targetClasses = MagentoPhpInspectionSupport.resolveTargetClasses(phpIndex, targetClassName)
         if (targetClasses.isEmpty()) {
-            val message = "Could not resolve target class \"$targetClassName\"."
-            return if (json) JSONObject().put("mode", "unresolved_target").put("message", message)
-                .put("records", emptyList<String>()).toString() else message
+            return unresolvedTarget(targetClassName)
         }
 
         if (effectiveArea != null) {
-            return resolveEffective(project, targetClasses, targetMethodName, effectiveArea, json, fileArea)
+            return MagentoEffectiveConfiguration.renderText(
+                resolveEffective(project, targetClasses, targetMethodName, effectiveArea), fileArea
+            )
         }
         val allTargetFqns = linkedSetOf(targetClassName)
         targetClasses.forEach { MagentoPhpInspectionSupport.collectClassHierarchy(it, allTargetFqns) }
-        if (json) {
-            return renderConfiguration(project, allTargetFqns, targetMethodName, area = null, json = true, fileArea = fileArea)
-        }
         val pluginDeclarations = findPluginDeclarations(project, allTargetFqns)
         val pluginCandidates = mutableListOf<MagentoPhpInspectionSupport.PluginMethodMatch>()
 
@@ -106,9 +102,22 @@ internal object MagentoPhpDiQueries {
         return lines.joinToString("\n")
     }
 
+    fun pluginRecords(project: Project, className: String, methodName: String, effectiveArea: String?): InspectionQueryResult {
+        val target = MagentoMcpSupport.normalizeFqn(className)
+        val targets = MagentoPhpInspectionSupport.resolveTargetClasses(PhpIndex.getInstance(project), target)
+        if (targets.isEmpty()) return InspectionQueryResult(emptyList(), "unresolved_target", unresolvedTarget(target))
+        if (effectiveArea != null) return resolveEffective(project, targets, methodName, effectiveArea)
+
+        val hierarchy = linkedSetOf(target)
+        targets.forEach { MagentoPhpInspectionSupport.collectClassHierarchy(it, hierarchy) }
+        return configurationRecords(project, hierarchy, methodName, area = null)
+    }
+
+    private fun unresolvedTarget(target: String) = "Could not resolve target class \"$target\"."
+
     private fun resolveEffective(
-        project: Project, targets: List<PhpClass>, method: String, area: String, json: Boolean, fileArea: String?
-    ): String {
+        project: Project, targets: List<PhpClass>, method: String, area: String
+    ): InspectionQueryResult {
         val hierarchy = linkedSetOf<String>()
         val interfaces = linkedSetOf<String>()
         val visitedClasses = mutableSetOf<String>()
@@ -129,13 +138,12 @@ internal object MagentoPhpDiQueries {
             hierarchy += type.presentableFQN
         }
         targets.forEach(::visit)
-        return renderConfiguration(project, hierarchy, method, area, json, fileArea, interfaces)
+        return configurationRecords(project, hierarchy, method, area, interfaces)
     }
 
-    private fun renderConfiguration(
-        project: Project, hierarchy: Set<String>, method: String, area: String?, json: Boolean,
-        fileArea: String?, interfaces: Set<String> = emptySet()
-    ): String {
+    private fun configurationRecords(
+        project: Project, hierarchy: Set<String>, method: String, area: String?, interfaces: Set<String> = emptySet()
+    ): InspectionQueryResult {
         val context = MagentoEffectiveConfiguration(project)
         val modules = if (area != null) context.modules else null
         val snapshot = MagentoMcpSnapshots.diSnapshot(project)
@@ -143,9 +151,9 @@ internal object MagentoPhpDiQueries {
             snapshot.pluginDeclarations[type].orEmpty().map { plugin ->
                 val (scope, module) = context.location(plugin.filePath)
                 ConfigDeclaration(type, plugin.pluginName, plugin.filePath, scope, module,
-                    plugin.pluginType, plugin.disabled, plugin.sortOrder)
+                    plugin.pluginType, plugin.disabled, plugin.sortOrder, plugin.line)
             }
-        }.filter { fileArea == null || it.area == fileArea }
+        }
         val phpIndex = PhpIndex.getInstance(project)
         val hooks = mutableMapOf<String, List<String>?>()
         fun hooksFor(instance: String): List<String>? {
@@ -166,15 +174,22 @@ internal object MagentoPhpDiQueries {
             if (group.mapNotNull { it.instance }.all { hooksFor(it)?.isEmpty() == true }) return@flatMap emptyList()
             decisions.map { decision ->
                 val methods = decision.instance?.let(::hooksFor)
-                val row = decision.record().put("method", method).put("pluginMethods", methods)
-                if (decision.status == "applies") {
-                    if (methods == null) row.put("status", "unresolved_class")
-                    else if (methods.isEmpty()) row.put("status", "no_interceptor")
+                val status = when {
+                    decision.status != "applies" -> decision.status
+                    methods == null -> "unresolved_class"
+                    methods.isEmpty() -> "no_interceptor"
+                    else -> decision.status
                 }
-                row
+                val sourceArea = decision.source.area.ifEmpty {
+                    MagentoMcpSupport.determineConfigScope(decision.source.file, ModuleDiXml.FILE_NAME)
+                }
+                decision.copy(status = status).record("plugin", sourceArea, linkedMapOf(
+                    "method" to method,
+                    "pluginMethods" to methods
+                ))
             }
         }
-        return MagentoEffectiveConfiguration.render(records, area, modules != null, json)
+        return MagentoEffectiveConfiguration.result(records, area, modules != null)
     }
 
     private fun findPluginDeclarations(
@@ -225,6 +240,7 @@ internal object MagentoPhpDiQueries {
         declarations: MutableMap<String, MutableList<PluginDeclarationRecord>>
     ) {
         val rootTag = xmlFile.rootTag ?: return
+        val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
         for (typeTag in rootTag.findSubTags(ModuleDiXml.TYPE_TAG)) {
             val typeName = MagentoMcpSupport.presentableFqn(typeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)) ?: continue
             if (typeName != targetFqn) {
@@ -233,7 +249,7 @@ internal object MagentoPhpDiQueries {
 
             for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                 declarations.getOrPut(typeName, ::mutableListOf) +=
-                    PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope)
+                    PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope, lines.lineOf(pluginTag))
             }
         }
     }

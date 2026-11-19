@@ -267,6 +267,8 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(text, text.contains("pluginMethod: beforeSave()"))
 
         val json = JSONObject(inspect("query", "plugins_for_method", args.put("format", "json").toString()))
+        assertEquals(1, json.getInt("schemaVersion"))
+        assertEquals("ok", json.getString("status"))
         assertEquals("declarations", json.getString("mode"))
         val records = json.getJSONArray("records")
         assertEquals(json.toString(), 1, records.length())
@@ -274,12 +276,21 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertEquals("ParentApi", declaration.getString("target"))
         assertEquals("save_plugin", declaration.getString("name"))
         assertEquals("declaration", declaration.getString("status"))
-        assertEquals(diXml, declaration.getString("file"))
+        assertEquals(diXml, declaration.getString("path"))
+        assertEquals(1, declaration.getInt("line"))
+        assertEquals("Inspect_Module", declaration.getString("module"))
+        assertEquals("global", declaration.getString("area"))
+        assertTrue(declaration.isNull("declaredDisabled"))
         assertEquals(listOf("beforeSave"), declaration.getJSONArray("pluginMethods").toList())
 
         val effective = JSONObject(inspect("query", "plugins_for_method", args.put("effectiveArea", "frontend").toString()))
         assertEquals("effective", effective.getString("mode"))
+        assertEquals("no_matches", effective.getString("status"))
         assertEquals(effective.toString(), 0, effective.getJSONArray("records").length())
+
+        val missing = JSONObject(inspect("query", "plugins_for_method", args.put("className", "MissingClass").toString()))
+        assertEquals("unresolved_target", missing.getString("mode"))
+        assertTrue(missing.getString("message").contains("MissingClass"))
     }
 
     fun testAreaResolutionThroughInspectionTool() {
@@ -291,7 +302,7 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         val local = "src/app/code/Inspect/Later/etc/adminhtml"
         myFixture.addFileToProject("$base/events.xml", """<config><event name="placed"><observer name="log" instance="Logger"/></event></config>""")
         myFixture.addFileToProject("$local/events.xml", """<config><event name="placed"><observer name="log" disabled="true"/></event></config>""")
-        myFixture.addFileToProject("$base/di.xml", """<config><type name="SaveInterface"><plugin name="log" type="SavePlugin"/></type></config>""")
+        myFixture.addFileToProject("$base/di.xml", """<config><type name="SaveInterface"><plugin name="log" type="SavePlugin" sortOrder="35"/></type></config>""")
         myFixture.addFileToProject("$local/di.xml", """<config><type name="SaveModel"><plugin name="log" disabled="true"/></type></config>""")
         myFixture.addFileToProject("src/app/code/Inspect/Base/Models.php", """<?php
             interface SaveInterface { public function save(); }
@@ -303,20 +314,118 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             Triple("observers_for_event", JSONObject().put("eventName", "placed"), "events.xml"),
             Triple("plugins_for_method", JSONObject().put("className", "SaveModel").put("methodName", "save"), "di.xml")
         )) {
-            args.put("format", "json")
-            assertEquals("declarations", JSONObject(inspect("query", query, args.toString())).getString("mode"))
-            val areaKey = if (query == "plugins_for_method") "effectiveArea" else "area"
-            val frontend = JSONObject(inspect("query", query, args.put(areaKey, "frontend").toString()))
+            fun query(vararg parameters: Pair<String, Any>): JSONObject =
+                JSONObject(inspect("query", query, JSONObject(args.toMap() + mapOf("format" to "json") + parameters).toString()))
+
+            val declarations = query("area" to "adminhtml")
+            assertEquals("declarations", declarations.getString("mode"))
+            val override = declarations.getJSONArray("records").getJSONObject(0)
+            assertEquals(1, declarations.getInt("total"))
+            assertEquals("declaration", override.getString("status"))
+            assertEquals("$local/$file", override.getString("path"))
+            assertEquals(1, override.getInt("line"))
+            assertEquals("Inspect_Later", override.getString("module"))
+            assertEquals("adminhtml", override.getString("area"))
+            assertTrue(override.getBoolean("declaredDisabled"))
+
+            val frontend = query("effectiveArea" to "frontend", "area" to "global")
+            assertEquals("ok", frontend.getString("status"))
             val active = frontend.getJSONArray("records").getJSONObject(0)
             assertEquals("applies", active.getString("status"))
-            assertEquals("$base/$file", active.getString("file"))
-            if (file == "di.xml") assertEquals(listOf("beforeSave"), active.getJSONArray("pluginMethods").toList())
-            val admin = JSONObject(inspect("query", query, args.put(areaKey, "adminhtml").toString())).getJSONArray("records")
-            assertEquals(2, admin.length())
-            for (i in 0 until admin.length()) {
-                assertEquals("disabled", admin.getJSONObject(i).getString("status"))
-                assertEquals("$local/$file", admin.getJSONObject(i).getString("decidedBy"))
+            assertEquals("$base/$file", active.getString("path"))
+            assertEquals("$base/$file", active.getString("instanceFile"))
+            assertEquals("Inspect_Base", active.getString("module"))
+            assertEquals(if (file == "di.xml") "SavePlugin" else "Logger", active.getString("instance"))
+            if (file == "di.xml") {
+                assertEquals(listOf("beforeSave"), active.getJSONArray("pluginMethods").toList())
+                assertEquals(35, active.getInt("sortOrder"))
             }
+            for (filter in listOf("area" to "global", "module" to "Inspect_Base", "path" to base)) {
+                val admin = query("effectiveArea" to "adminhtml", filter)
+                assertEquals("ok", admin.getString("status"))
+                assertEquals("effective", admin.getString("mode"))
+                assertEquals("adminhtml", admin.getJSONObject("scope").getString("effectiveArea"))
+                assertEquals(1, admin.getInt("total"))
+                val disabled = admin.getJSONArray("records").getJSONObject(0)
+                assertEquals("$base/$file", disabled.getString("path"))
+                assertEquals("disabled", disabled.getString("status"))
+                assertEquals("$local/$file", disabled.getString("decidedBy"))
+                assertTrue(disabled.isNull("declaredDisabled"))
+            }
+
+            val text = inspect("query", query, JSONObject(args.toMap() +
+                mapOf("effectiveArea" to "adminhtml", "area" to "global")).toString())
+            assertTrue(text, text.contains("status=disabled") && text.contains("decidedBy=$local/$file"))
+            for ((key, value) in listOf("area" to " ", "area" to 1, "effectiveArea" to "etc/frontend",
+                "effectiveArea" to JSONObject.NULL, "limit" to 0)) {
+                val invalid = query(key to value)
+                assertEquals(invalid.toString(), "invalid_request", invalid.getString("status"))
+                assertTrue(invalid.toString(), invalid.getString("message").contains(key))
+            }
+        }
+    }
+
+    fun testEffectiveInspectionPagesAllRecordsAndBindsCursorsToScopeOverHttp() {
+        val module = "src/app/code/Inspect/Paged"
+        myFixture.addFileToProject("$module/etc/module.xml", """<config><module name="Inspect_Paged"/></config>""")
+        myFixture.addFileToProject("$module/Models.php", """<?php
+            class PagedTarget { public function save() {} public function delete() {} }
+            class PagedPlugin { public function beforeSave() {} public function beforeDelete() {} }
+        """.trimIndent())
+        val count = 207
+        val names = (1..count).map { "record_$it" }
+        val observers = names.joinToString("\n") { """<observer name="$it" instance="Logger"/>""" }
+        val plugins = names.joinToString("\n") { """<plugin name="$it" type="PagedPlugin"/>""" }
+        myFixture.addFileToProject("$module/etc/events.xml", """<config><event name="paged">$observers</event></config>""")
+        myFixture.addFileToProject("$module/etc/di.xml", """<config><type name="PagedTarget">$plugins</type></config>""")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val requests = mapOf(
+            "observers_for_event" to mapOf("eventName" to "paged"),
+            "plugins_for_method" to mapOf("className" to "PagedTarget", "methodName" to "save")
+        )
+        val cursors = requests.mapValues { (type, args) ->
+            fun query(vararg extra: Pair<String, Any>): JSONObject = JSONObject(inspect("query", type,
+                JSONObject(args + mapOf("format" to "json", "effectiveArea" to "frontend", "limit" to 100) + extra).toString()))
+
+            val first = query()
+            val cursor = first.getString("nextCursor")
+            val second = query("cursor" to cursor)
+            val last = query("cursor" to second.getString("nextCursor"))
+            val seen = listOf(first, second, last).flatMap { page ->
+                assertEquals("ok", page.getString("status"))
+                assertEquals(count, page.getInt("total"))
+                assertEquals("candidates", page.getString("mode"))
+                assertTrue(page.getString("message").contains("config.php"))
+                val records = page.getJSONArray("records")
+                assertEquals(records.length(), page.getInt("returned"))
+                (0 until records.length()).map {
+                    val record = records.getJSONObject(it)
+                    assertEquals("candidate", record.getString("status"))
+                    record.getString("name")
+                }
+            }
+            assertEquals(names, seen)
+            assertEquals(200, last.getInt("offset"))
+            assertTrue(last.getBoolean("complete"))
+            assertTrue(last.isNull("nextCursor"))
+            assertEquals("stale_cursor", query("cursor" to cursor, "effectiveArea" to "adminhtml").getString("status"))
+            assertEquals("stale_cursor", query("cursor" to cursor, "area" to "global").getString("status"))
+            if (type == "plugins_for_method") {
+                assertEquals("stale_cursor", query("cursor" to cursor, "methodName" to "delete").getString("status"))
+            }
+            cursor
+        }
+
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Paged' => 1]];")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        for ((type, args) in requests) {
+            val parameters = JSONObject(args + mapOf("format" to "json", "effectiveArea" to "frontend"))
+            val changed = JSONObject(inspect("query", type, parameters.put("cursor", cursors.getValue(type)).toString()))
+            assertEquals(changed.toString(), "stale_cursor", changed.getString("status"))
+            val fresh = JSONObject(inspect("query", type, parameters.apply { remove("cursor") }.toString()))
+            assertEquals("effective", fresh.getString("mode"))
+            assertEquals("applies", fresh.getJSONArray("records").getJSONObject(0).getString("status"))
         }
     }
 
@@ -367,6 +476,13 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             }
             assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
                 inspect("query", "plugins_for_method", "{}"))
+            val unavailable = JSONObject(inspect("query", "plugins_for_method", """{"format":"json","effectiveArea":"global"}"""))
+            assertEquals("unavailable", unavailable.getString("status"))
+            assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE, unavailable.getString("message"))
+            assertFalse(unavailable.getBoolean("complete"))
+            assertEquals(0, unavailable.getJSONArray("records").length())
+            val indexing = JSONObject(inspect("query", "observers_for_event", """{"format":"json","eventName":"placed"}"""))
+            assertEquals("indexing", indexing.getString("status"))
             assertTrue(inspect("detailed_schema", "layout_entities").contains("queryType: layout_entities"))
             assertTrue(inspect("help").contains("- `layout_entities`:"))
         }
@@ -735,6 +851,23 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
                 .put("parametersJson", """{"moduleName":"HttpIndex_Module"}""")
             )
             assertTrue(moduleResult, moduleResult.replace('\\', '/').contains("src/app/code/HttpIndex/Module"))
+            val structured = JSONObject(text("magento_inspect", JSONObject()
+                .put("mode", "query")
+                .put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module","format":"json","path":"src/app/code/HttpIndex"}""")
+            ))
+            assertEquals(structured.toString(), "ok", structured.getString("status"))
+            assertEquals(1, structured.getInt("total"))
+            val record = structured.getJSONArray("records").getJSONObject(0)
+            assertEquals("HttpIndex_Module", record.getString("module"))
+            assertEquals("src/app/code/HttpIndex/Module", record.getString("path"))
+            Settings.getInstance(project).pluginEnabled = false
+            val disabled = JSONObject(text("magento_inspect", JSONObject().put("mode", "query").put("queryType", "module")
+                .put("parametersJson", """{"moduleName":"HttpIndex_Module","format":"json"}""")))
+            assertEquals(disabled.toString(), "unavailable", disabled.getString("status"))
+            Settings.getInstance(project).pluginEnabled = true
+            val schema = text("magento_inspect", JSONObject().put("mode", "detailed_schema").put("queryType", "module"))
+            assertTrue(schema, schema.contains("filters path") && schema.contains("stale_cursor"))
         } finally {
             Settings.getInstance(project).magentoPath = originalPath
             Settings.getInstance(project).pluginEnabled = originalEnabled

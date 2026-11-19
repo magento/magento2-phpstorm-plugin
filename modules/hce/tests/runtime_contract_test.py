@@ -416,6 +416,10 @@ class HceRuntimeContracts(unittest.TestCase):
         project = self.fixture("analysis-project")
         self.file(project, "src/app/code/Foo/Bar/etc/adminhtml/menu.xml",
             '<config><menu><add id="Foo_Bar::hce" title="HCE Menu" resource="Magento_Catalog::test"/></menu></config>')
+        self.file(project, "src/app/etc/config.php", "<?php return ['modules' => ['Magento_Catalog' => 1, 'Foo_Bar' => 1]];")
+        override = "src/app/code/Foo/Bar/etc/adminhtml/events.xml"
+        self.file(project, override,
+            '<config><event name="test_event_in_test_class"><observer name="test_observer" disabled="true"/></event></config>')
         with self.client(project) as client:
             def inspect(kind, parameters):
                 return client.call_text("magento_inspect", mode="query", queryType=kind,
@@ -434,6 +438,25 @@ class HceRuntimeContracts(unittest.TestCase):
             observers = inspect("observers_for_event", {"eventName": "test_event_in_test_class"})
             self.assertIn("observer=test_observer", observers)
             self.assertIn("src/vendor/magento/module-catalog/etc/events.xml", observers)
+            declarations = json.loads(inspect("observers_for_event", {"eventName": "test_event_in_test_class",
+                "format": "json", "module": "Magento_Catalog"}))
+            self.assertEqual(1, declarations["total"])
+            self.assertEqual("declaration", declarations["records"][0]["status"])
+            self.assertEqual("Magento_Catalog", declarations["records"][0]["module"])
+            resolved = json.loads(inspect("observers_for_event", {"eventName": "test_event_in_test_class",
+                "format": "json", "area": "global", "effectiveArea": "adminhtml"}))
+            self.assertEqual("ok", resolved["status"])
+            self.assertEqual("effective", resolved["mode"])
+            self.assertTrue(resolved["complete"])
+            self.assertEqual(1, resolved["total"])
+            record = resolved["records"][0]
+            self.assertEqual("disabled", record["status"])
+            self.assertEqual(override, record["decidedBy"])
+            self.assertEqual("src/vendor/magento/module-catalog/etc/events.xml", record["path"])
+            self.assertEqual("Magento_Catalog", record["module"])
+            self.assertGreater(record["line"], 0)
+            unavailable = json.loads(inspect("plugins_for_method", {"format": "json"}))
+            self.assertEqual("unavailable", unavailable["status"])
             self.assertIn("Test Resource", inspect("acl_or_menu", {"identifier": "Magento_Catalog::test"}))
             menu = inspect("acl_or_menu", {"identifier": "Foo_Bar::hce"})
             self.assertIn("title=HCE Menu", menu)

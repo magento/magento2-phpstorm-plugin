@@ -28,6 +28,39 @@ internal object MagentoModuleQueries {
     }
 
     private fun findMagentoModuleWithReadyIndexes(project: Project, query: String, indexKeys: MagentoIndexKeys?): String {
+        val matches = moduleRecords(project, query, indexKeys)
+        if (matches.isEmpty()) {
+            return "No Magento modules matched \"$query\"."
+        }
+
+        val names = matches.map { it.key }.distinct()
+        val shown = names.take(MagentoMcpSupport.MAX_MATCHES).toSet()
+        val lines = mutableListOf("Found ${names.size} Magento module match(es) for \"$query\".")
+        for (record in matches.filter { it.key in shown }) {
+            lines += ""
+            lines += record.key
+            lines += "path: ${record.path ?: "<unresolved>"}"
+            if (matches.count { it.key == record.key } > 1) {
+                lines += "preferred: ${if (record.fields["preferred"] == true) "yes" else "no"}"
+            }
+            lines += "editable: ${if (record.fields["editable"] == true) "yes" else "no"}"
+            lines += "etc: ${record.fields["etc"] ?: "-"}"
+            lines += "view: ${record.fields["view"] ?: "-"}"
+        }
+
+        if (names.size > MagentoMcpSupport.MAX_MATCHES) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
+        return lines.joinToString("\n")
+    }
+
+    /**
+     * Every indexed copy of every matching module, in match order. The copy that other features use comes first and
+     * is marked preferred. The record path is the module directory, `.` at the project root.
+     */
+    fun moduleRecords(project: Project, moduleName: String, indexKeys: MagentoIndexKeys? = null): List<InspectionRecord> {
+        val query = moduleName.trim()
         val moduleIndex = ModuleIndex(project)
         val candidateNames = linkedSetOf<String>()
         candidateNames += if (indexKeys == null) moduleIndex.moduleNames
@@ -35,32 +68,24 @@ internal object MagentoModuleQueries {
         if (indexKeys == null && moduleIndex.getModuleDirectoryByModuleName(query) != null) {
             candidateNames += query
         }
-        val matches = MagentoMcpSupport.prioritizeMatches(candidateNames, query)
-        if (matches.isEmpty()) {
-            return "No Magento modules matched \"$query\"."
+        return MagentoMcpSupport.prioritizeMatches(candidateNames, query).flatMap { name ->
+            val preferred = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
+            val copies = moduleIndex.getIndexedModuleDirectories(name).filter { it != preferred }
+                .sortedBy { MagentoMcpSupport.relativePath(project, it) }
+            (listOf(preferred) + copies).map { moduleRecord(project, name, it, it == preferred) }
         }
+    }
 
-        val lines = mutableListOf("Found ${matches.size} Magento module match(es) for \"$query\".")
-        for (name in matches.take(MagentoMcpSupport.MAX_MATCHES)) {
-            val directory = moduleIndex.getModuleDirectoryVirtualFileByModuleName(name)
-            val path = directory?.let { MagentoMcpSupport.relativePath(project, it) } ?: "<unresolved>"
-            val editable = directory?.let(::isEditableModuleDirectory) ?: false
-            val etcPath = directory?.findChild("etc")?.let {
-                MagentoMcpSupport.relativePath(project, it)
-            } ?: "-"
-            val viewPath = directory?.findChild("view")?.let {
-                MagentoMcpSupport.relativePath(project, it)
-            } ?: "-"
-
-            lines += ""
-            lines += name
-            lines += "path: $path"
-            lines += "editable: ${if (editable) "yes" else "no"}"
-            lines += "etc: $etcPath"
-            lines += "view: $viewPath"
-        }
-
-        return lines.joinToString("\n")
+    private fun moduleRecord(project: Project, name: String, directory: VirtualFile?, preferred: Boolean): InspectionRecord {
+        val relative = directory?.let { MagentoMcpSupport.relativePath(project, it) }
+        return InspectionRecord("module", name, relative?.ifEmpty { "." }, null, null, linkedMapOf(
+            "name" to name,
+            // A module at the project root is the project being edited.
+            "editable" to (relative == "" || directory?.let(::isEditableModuleDirectory) == true),
+            "etc" to directory?.findChild("etc")?.let { MagentoMcpSupport.relativePath(project, it) },
+            "view" to directory?.findChild("view")?.let { MagentoMcpSupport.relativePath(project, it) },
+            "preferred" to preferred
+        ), module = name)
     }
 
     private fun runWithReadyIndexes(project: Project, action: () -> String): String {

@@ -175,8 +175,15 @@ class MagentoMcpProjectToolset : McpToolset {
         "- `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the " +
         "capabilities available in this IDE.\n\n" +
 
+        "Structured results:\n" +
+        "- Text is the default. For `module`, `di_config`, `observers_for_event`, and `plugins_for_method`, " +
+        "add \"format\":\"json\" to parametersJson for source records and a shared status, total, returned, " +
+        "complete, and nextCursor. See `detailed_schema` for limit, cursor, and supported filters.\n" +
+        "- Both interception queries use area to filter declarations by source area and effectiveArea to " +
+        "resolve the merged runtime configuration before filtering. JSON records carry a separate decision status.\n\n" +
+
         "Coverage:\n" +
-        "- XML results describe declarations, not resolved PHP semantics."
+        "- XML queries provide source evidence. Method-plugin queries also use PHP hierarchy and method analysis."
     )
     suspend fun magentoInspect(
         mode: String,
@@ -189,8 +196,11 @@ class MagentoMcpProjectToolset : McpToolset {
             "query" -> if (queryType.isBlank()) {
                 MagentoInspectionCommands.MISSING_TYPE_MESSAGE
             } else {
+                // Structured results report setup and indexing as a status of their own.
+                val json = MagentoInspectionCommands.wantsJson(parametersJson)
                 MagentoMcpToolsetSupport.withProjectReadAction(
-                    requireSmartMode = MagentoInspectionCommands.requiresSmartMode(queryType)
+                    validateProject = !json,
+                    requireSmartMode = !json && MagentoInspectionCommands.requiresSmartMode(queryType)
                 ) {
                     MagentoInspectionCommands.query(it, queryType, parametersJson)
                 }

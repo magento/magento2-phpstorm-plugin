@@ -216,6 +216,15 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
         assertContains(MagentoInspectionCommands.query(project, "module",
             """{"moduleName":"Foo_Bar2"}""", indexKeys = MagentoIndexKeys { _, _ -> emptyList() }),
             "No Magento modules matched")
+        // Structured replies use the same host keys.
+        for ((type, parameters) in listOf(
+            "module" to """{"moduleName":"Foo_Bar2","format":"json"}"""
+        )) {
+            assertEquals(MagentoInspectionCommands.query(project, type, parameters),
+                MagentoInspectionCommands.query(project, type, parameters, indexKeys = hostKeys))
+            assertEquals(0, JSONObject(MagentoInspectionCommands.query(project, type, parameters,
+                indexKeys = MagentoIndexKeys { _, _ -> emptyList() })).getInt("total"))
+        }
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
             for ((type, parameters) in listOf("module" to """{"moduleName":"Foo_Bar2"}""",
                 "layout_entities" to """{"name":"test_index_index_block2"}""")) {
@@ -223,6 +232,22 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
                     MagentoInspectionCommands.query(project, type, parameters,
                         indexKeys = MagentoIndexKeys { _, _ -> error("Index access during indexing") }))
             }
+        }
+    }
+
+    @Test
+    fun testQueriesWithoutStructuredResultsKeepTheirParameters() {
+        // module_dependencies has its own limit and replies in JSON without format.
+        val dependencies = MagentoInspectionCommands.query(project, "module_dependencies",
+            """{"moduleName":"Foo_Bar","direction":"dependents","limit":20}""")
+        assertEquals(dependencies, "Foo_Bar", JSONObject(dependencies).getString("moduleName"))
+        for ((type, parameters) in listOf(
+            "module_dependencies" to """{"moduleName":"Foo_Bar","format":"json"}""",
+            "ui_template" to """{"templatePath":"Magento_Ui/form/field","format":"json"}"""
+        )) {
+            val json = JSONObject(MagentoInspectionCommands.query(project, type, parameters))
+            assertEquals(json.toString(), "invalid_request", json.getString("status"))
+            assertContains(json.getString("message"), "format `json` is not available for queryType `$type`")
         }
     }
 
@@ -244,6 +269,10 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             for (alias in listOf("modules", "layout", "plugins")) {
                 assertContains(MagentoInspectionCommands.query(project, alias, "{invalid", supported), "unavailable in this host")
             }
+            val json = JSONObject(MagentoInspectionCommands.query(project, "module",
+                "{\"moduleName\":\"Magento_Catalog\",\"format\":\"json\"}", supported))
+            assertEquals("unavailable", json.getString("status"))
+            assertContains(json.getString("message"), "unavailable in this host")
             assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                 MagentoInspectionCommands.query(project, "di", "{\"className\":\"Missing\"}", supported))
         }

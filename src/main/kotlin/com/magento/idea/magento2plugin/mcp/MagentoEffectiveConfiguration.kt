@@ -6,16 +6,19 @@ package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiManager
 import com.intellij.psi.xml.XmlFile
-import org.json.JSONObject
+import java.io.IOException
+import java.nio.file.Files
 
 /** A declaration retains absent attributes so a partial override can inherit them. */
 internal data class ConfigDeclaration(
     val subject: String, val name: String, val file: String, val area: String, val module: String?,
-    val instance: String?, val disabled: Boolean?, val sortOrder: Int? = null
+    val instance: String?, val disabled: Boolean?, val sortOrder: Int? = null, val line: Int? = null
 )
 
 internal data class ConfigDecision(
@@ -23,21 +26,43 @@ internal data class ConfigDecision(
     val instance: String? = source.instance, val sortOrder: Int? = source.sortOrder,
     val instanceFile: String? = source.file.takeIf { source.instance != null }
 ) {
-    fun record(): JSONObject = JSONObject().put("target", source.subject).put("name", source.name)
-        .put("file", source.file).put("area", source.area).put("module", source.module ?: JSONObject.NULL)
-        .put("instanceFile", instanceFile).put("declaredDisabled", source.disabled)
-        .put("status", status).put("decidedBy", decidedBy).put("instance", instance).put("sortOrder", sortOrder)
+    fun record(kind: String, area: String, extra: Map<String, Any?>): InspectionRecord =
+        InspectionRecord(kind, source.subject, source.file, source.line, area, linkedMapOf(
+            "target" to source.subject,
+            "name" to source.name,
+            "status" to status,
+            "decidedBy" to decidedBy,
+            "instance" to instance,
+            "instanceFile" to instanceFile,
+            "declaredDisabled" to source.disabled,
+            "sortOrder" to sortOrder
+        ) + extra, source.module)
 }
 
 internal class MagentoEffectiveConfiguration(private val project: Project) {
-    private val fs = LocalFileSystem.getInstance()
-    private val root = MagentoMcpProjectContext.magentoRoot(project)?.let { fs.findFileByNioFile(it) }
     private val projectRoot = MagentoMcpSupport.projectRoot(project)
+    private val fs = projectRoot?.fileSystem ?: VirtualFileManager.getInstance().getFileSystem(StandardFileSystems.FILE_PROTOCOL)
+    private val rootPath = MagentoMcpProjectContext.magentoRoot(project)
+    private val root = rootPath?.let { fs.findFileByPath(FileUtil.toSystemIndependentName(it.toString())) }
     private val owners = mutableMapOf<String, Pair<String, String?>>()
     val modules by lazy {
-        root?.findFileByRelativePath("app/etc/config.php")
-            ?.let { FileDocumentManager.getInstance().getDocument(it)?.text }
-            ?.let(MagentoModuleLoadOrder::parse)
+        val document = root?.findFileByRelativePath(CONFIG_PATH)
+            ?.let { FileDocumentManager.getInstance().getDocument(it) }
+        (document?.text ?: readConfigFile())?.let(MagentoModuleLoadOrder::parse)
+    }
+
+    // Hosts without a PHP document can still read the literal module list from the configured root.
+    private fun readConfigFile(): String? {
+        val file = rootPath?.let { MagentoCliEnvironment.resolveProjectPath(it, CONFIG_PATH) } ?: return null
+        return try {
+            if (!Files.isRegularFile(file)) return null
+            Files.newInputStream(file).use { input ->
+                input.readNBytes(MAX_CONFIG_BYTES + 1).takeIf { it.size <= MAX_CONFIG_BYTES }
+                    ?.decodeToString(throwOnInvalidSequence = true)
+            }
+        } catch (_: IOException) {
+            null
+        }
     }
 
     fun location(path: String): Pair<String, String?> = owners.getOrPut(path) {
@@ -53,6 +78,9 @@ internal class MagentoEffectiveConfiguration(private val project: Project) {
     }
 
     companion object {
+        private const val CONFIG_PATH = "app/etc/config.php"
+        private const val MAX_CONFIG_BYTES = 1024 * 1024
+
         /** Each call merges one name. Subjects arrive in Magento inheritance order, ancestors first. */
         fun resolve(
             rows: List<ConfigDeclaration>, area: String?, modules: Map<String, Boolean>?, observer: Boolean,
@@ -112,27 +140,30 @@ internal class MagentoEffectiveConfiguration(private val project: Project) {
             return decisions
         }
 
-        fun render(rows: List<JSONObject>, area: String?, modulesKnown: Boolean, json: Boolean): String {
-            val mode = when {
-                area == null -> "declarations"
-                !modulesKnown -> "candidates"
-                else -> "effective"
-            }
-            val note = when (mode) {
-                "declarations" -> "Declaration-only results. Specify an area to resolve overrides."
-                "candidates" -> "Cannot establish module load order from app/etc/config.php."
-                else -> "Configuration resolved for area $area."
-            }
-            val limit = 200
-            val shown = rows.sortedWith(compareBy<JSONObject>(
-                { it.optString("status") != "applies" }, { it.optInt("sortOrder", 0) }
-            )).take(limit)
-            if (json) return JSONObject().put("mode", mode).put("area", area ?: JSONObject.NULL).put("message", note)
-                .put("total", rows.size).put("truncated", rows.size > limit).put("records", shown).toString()
+        fun result(rows: List<InspectionRecord>, area: String?, modulesKnown: Boolean): InspectionQueryResult {
+            if (area == null) return InspectionQueryResult(rows, "declarations",
+                "Declaration-only results. Specify effectiveArea to resolve overrides.")
+            val ordered = rows.sortedWith(compareBy(
+                { it.fields["status"] != "applies" }, { it.fields["sortOrder"] as? Int ?: 0 }
+            ))
+            return if (modulesKnown) InspectionQueryResult(ordered, "effective", "Configuration resolved for area $area.")
+            else InspectionQueryResult(ordered, "candidates", "Cannot establish module load order from app/etc/config.php.")
+        }
+
+        fun renderText(result: InspectionQueryResult, fileArea: String?): String {
+            val rows = result.records.filter { fileArea == null || it.area == fileArea }
+            val shown = rows.take(200)
             return buildString {
-                append(note)
-                for (row in shown) append("\n").append(row.keySet().sorted().joinToString(" ") { "$it=${row.get(it)}" })
-                if (shown.size < rows.size) append("\nShowing ${shown.size} of ${rows.size} records.")
+                append(result.message.orEmpty())
+                for (row in shown) {
+                    val fields = row.fields + mapOf("file" to row.path, "area" to row.area, "module" to (row.module ?: "null"))
+                    append("\n").append(fields.toSortedMap().entries.filter { it.value != null }
+                        .joinToString(" ") { (key, value) -> "$key=$value" })
+                }
+                if (shown.size < rows.size) {
+                    append("\nShowing ${shown.size} of ${rows.size} records.\n")
+                    append(MagentoInspectionResults.TEXT_TRUNCATED_HINT)
+                }
             }
         }
     }

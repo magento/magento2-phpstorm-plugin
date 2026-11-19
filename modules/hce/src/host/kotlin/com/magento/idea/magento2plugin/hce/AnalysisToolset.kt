@@ -49,7 +49,7 @@ class AnalysisToolset : McpToolset {
 
     @McpTool(name = "magento_inspect")
     @McpToolHints(readOnlyHint = TRUE)
-    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, module_dependencies (requires JSON PSI), layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Returns project-relative source paths. PHP semantics are unavailable; XML declarations do not establish merge order or runtime behavior.")
+    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, module_dependencies (requires JSON PSI), layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Text is the default. module, di_config and observers_for_event support format=json with status, source records, filters and pagination. For observers, area filters source declarations and effectiveArea resolves the merged configuration. Method-plugin analysis requires desktop PHP support.")
     suspend fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String {
         when (mode.trim().lowercase()) {
             "help" -> return MagentoInspectionCommands.help(queries)
@@ -57,14 +57,16 @@ class AnalysisToolset : McpToolset {
             "query" -> Unit
             else -> return "mode must be help, detailed_schema, or query."
         }
+        fun unavailable(message: String) = MagentoInspectionCommands.unavailable(queryType, parametersJson, message)
+
         val project = currentCoroutineContext().project
-        val root = project.basePath ?: return "HCE project path is unavailable."
+        val root = project.basePath ?: return unavailable("HCE project path is unavailable.")
         val configured = settingsStore().load(Path.of(root))
-        if (!configured.enabled) return "Magento integration is disabled; use configure_magento_project."
-        if (configured.magentoPath == null) return "Magento root is not configured; use configure_magento_project."
+        if (!configured.enabled) return unavailable("Magento integration is disabled; use configure_magento_project.")
+        if (configured.magentoPath == null) return unavailable("Magento root is not configured; use configure_magento_project.")
         val magentoRoot = Path.of(configured.magentoPath)
         if (!Files.isDirectory(magentoRoot) || !magentoRoot.toRealPath().startsWith(Path.of(root).toRealPath())) {
-            return "Configured Magento root is unavailable or outside this project; use configure_magento_project."
+            return unavailable("Configured Magento root is unavailable or outside this project; use configure_magento_project.")
         }
         return MagentoMcpToolsetSupport.withProjectReadAction(validateProject = false) { analysisProject ->
             Settings.getInstance(analysisProject).apply {

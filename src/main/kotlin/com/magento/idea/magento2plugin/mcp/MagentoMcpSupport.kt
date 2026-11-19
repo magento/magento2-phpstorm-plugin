@@ -8,12 +8,13 @@ package com.magento.idea.magento2plugin.mcp
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VfsUtilCore
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
+import com.intellij.psi.xml.XmlTag
 import com.magento.idea.magento2plugin.project.Settings
 import com.magento.idea.magento2plugin.util.PhpNameUtil
 import java.io.File
@@ -97,6 +98,20 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
+    /** Line starts of one file, built once so that each tag costs a binary search. */
+    class LineIndex(text: CharSequence) {
+        private val starts = buildList {
+            add(0)
+            for (index in text.indices) if (text[index] == '\n') add(index + 1)
+        }
+
+        /** One-based line of a tag in this file. */
+        fun lineOf(tag: XmlTag): Int {
+            val found = starts.binarySearch(tag.textOffset)
+            return if (found >= 0) found + 1 else -found - 1
+        }
+    }
+
     fun relativePath(project: Project, virtualFile: VirtualFile): String {
         val projectRoot = projectRoot(project)
         if (projectRoot != null) {
@@ -117,7 +132,8 @@ internal object MagentoMcpSupport {
     }
 
     fun determineConfigScope(filePath: String, fileName: String): String {
-        val normalized = filePath.replace('\\', '/')
+        // The leading slash lets a module at the project root match: its files start with `etc/`.
+        val normalized = "/" + filePath.replace('\\', '/')
         val suffix = "/$fileName"
         val etcIndex = normalized.lastIndexOf("/etc/")
         if (etcIndex == -1) {

@@ -41,7 +41,7 @@ kotlin.sourceSets.named("host") {
     kotlin.srcDir(shared.resolve("kotlin"))
     kotlin.include("com/magento/idea/magento2plugin/hce/**", "com/magento/idea/magento2plugin/mcp/Maintenance*.kt")
     kotlin.exclude("**/MaintenanceDesktop.kt")
-    listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
+    listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoInspectionResults", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
         "MagentoEffectiveConfiguration", "MagentoModuleLoadOrder", "MagentoMcpProjectContext",
         "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
         "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",

@@ -14,14 +14,17 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.psi.xml.XmlTag
+import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex
 
 internal object MagentoMcpSnapshots {
     private val DI_SNAPSHOT_KEY = Key.create<CachedValue<DiSnapshot>>("magento.mcp.diSnapshot")
     private val EVENT_SNAPSHOT_KEY = Key.create<CachedValue<EventSnapshot>>("magento.mcp.eventSnapshot")
     private val ACL_MENU_SNAPSHOT_KEY = Key.create<CachedValue<AclMenuSnapshot>>("magento.mcp.aclMenuSnapshot")
+    private val MODULE_OWNERS_KEY = Key.create<CachedValue<Map<String, String>>>("magento.mcp.moduleOwners")
 
     fun diSnapshot(project: Project): DiSnapshot = getCachedValue(project, DI_SNAPSHOT_KEY) {
         buildDiSnapshot(project)
@@ -34,6 +37,25 @@ internal object MagentoMcpSnapshots {
     fun aclMenuSnapshot(project: Project): AclMenuSnapshot = getCachedValue(project, ACL_MENU_SNAPSHOT_KEY) {
         buildAclMenuSnapshot(project)
     }
+
+    /**
+     * Project-relative module directories mapped to module names, from the module index. Every indexed copy of a
+     * module is included, because the snapshots read the files of every copy. A directory that declares several
+     * modules keeps the first name in sorted order.
+     */
+    fun moduleOwners(project: Project, indexKeys: MagentoIndexKeys?): Map<String, String> =
+        getCachedValue(project, MODULE_OWNERS_KEY) {
+            val index = ModuleIndex(project)
+            val names = if (indexKeys == null) index.moduleNames
+                else index.getModuleNames(indexKeys.keys(ModuleXmlIndex.KEY, project))
+            val owners = linkedMapOf<String, String>()
+            for (name in names) {
+                for (directory in index.getIndexedModuleDirectories(name)) {
+                    owners.putIfAbsent(MagentoMcpSupport.relativePath(project, directory), name)
+                }
+            }
+            owners
+        }
 
     private fun <T> getCachedValue(
         project: Project,
@@ -61,10 +83,12 @@ internal object MagentoMcpSnapshots {
             val rootTag = xmlFile.rootTag ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
             val scope = MagentoMcpSupport.determineConfigScope(filePath, ModuleDiXml.FILE_NAME)
+            val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
 
             for (preferenceTag in rootTag.findSubTags(ModuleDiXml.PREFERENCE_TAG_NAME)) {
                 val record = PreferenceRecord(
                     filePath = filePath,
+                    line = lines.lineOf(preferenceTag),
                     preferenceFor = MagentoMcpSupport.presentableFqn(
                         preferenceTag.getAttributeValue(ModuleDiXml.PREFERENCE_ATTR_FOR)
                     ),
@@ -84,19 +108,21 @@ internal object MagentoMcpSnapshots {
                     .orEmpty()
                 typeDeclarations.getOrPut(typeName, ::mutableListOf) += TypeDeclarationRecord(
                     filePath = filePath,
+                    line = lines.lineOf(typeTag),
                     typeName = typeName,
                     argumentNames = argumentNames
                 )
 
                 for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
                     pluginDeclarations.getOrPut(typeName, ::mutableListOf) +=
-                        PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope)
+                        PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope, lines.lineOf(pluginTag))
                 }
             }
 
             for (virtualTypeTag in rootTag.findSubTags(ModuleDiXml.VIRTUAL_TYPE_TAG)) {
                 val record = VirtualTypeRecord(
                     filePath = filePath,
+                    line = lines.lineOf(virtualTypeTag),
                     name = MagentoMcpSupport.presentableFqn(
                         virtualTypeTag.getAttributeValue(ModuleDiXml.NAME_ATTR)
                     ),
@@ -115,7 +141,7 @@ internal object MagentoMcpSnapshots {
             typeDeclarations = typeDeclarations.freezeByFilePath(),
             virtualTypesByName = virtualTypeByName.freezeByFilePath(),
             virtualTypesByTarget = virtualTypeByTarget.freezeByFilePath(),
-            pluginDeclarations = pluginDeclarations.freeze(compareBy<PluginDeclarationRecord>({ it.scope }, { it.sortOrder }, { it.filePath }))
+            pluginDeclarations = pluginDeclarations.freeze(compareBy<PluginDeclarationRecord>({ it.scope }, { it.sortOrder }, { it.filePath }, { it.line }))
         )
     }
 
@@ -127,12 +153,14 @@ internal object MagentoMcpSnapshots {
 
             val rootTag = xmlFile.rootTag ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
+            val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
 
             for (eventTag in rootTag.findSubTags("event")) {
                 val eventName = eventTag.getAttributeValue("name") ?: continue
                 for (observerTag in eventTag.findSubTags("observer")) {
                     observersByEvent.getOrPut(eventName, ::mutableListOf) += EventObserverRecord(
                         filePath = filePath,
+                        line = lines.lineOf(observerTag),
                         observerName = observerTag.getAttributeValue("name") ?: "-",
                         observerInstance = MagentoMcpSupport.presentableFqn(
                             observerTag.getAttributeValue("instance")
@@ -144,7 +172,7 @@ internal object MagentoMcpSnapshots {
         }
 
         return EventSnapshot(
-            observersByEvent = observersByEvent.freeze(compareBy<EventObserverRecord>({ it.filePath }, { it.observerName }))
+            observersByEvent = observersByEvent.freeze(compareBy<EventObserverRecord>({ it.filePath }, { it.line }, { it.observerName }))
         )
     }
 
@@ -245,24 +273,28 @@ internal interface HasFilePath {
 
 internal data class PreferenceRecord(
     override val filePath: String,
+    val line: Int,
     val preferenceFor: String?,
     val preferenceType: String?
 ) : HasFilePath
 
 internal data class TypeDeclarationRecord(
     override val filePath: String,
+    val line: Int,
     val typeName: String,
     val argumentNames: List<String>
 ) : HasFilePath
 
 internal data class VirtualTypeRecord(
     override val filePath: String,
+    val line: Int,
     val name: String?,
     val targetType: String?
 ) : HasFilePath
 
 internal data class PluginDeclarationRecord(
     override val filePath: String,
+    val line: Int,
     val targetFqn: String,
     val pluginName: String,
     val pluginType: String?,
@@ -271,8 +303,9 @@ internal data class PluginDeclarationRecord(
     val scope: String
 ) : HasFilePath {
     companion object {
-        fun fromTag(tag: XmlTag, target: String, path: String, scope: String) = PluginDeclarationRecord(
+        fun fromTag(tag: XmlTag, target: String, path: String, scope: String, line: Int) = PluginDeclarationRecord(
             filePath = path,
+            line = line,
             targetFqn = target,
             pluginName = tag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
             pluginType = MagentoMcpSupport.presentableFqn(tag.getAttributeValue(ModuleDiXml.TYPE_ATTR)),
@@ -285,6 +318,7 @@ internal data class PluginDeclarationRecord(
 
 internal data class EventObserverRecord(
     override val filePath: String,
+    val line: Int,
     val observerName: String,
     val observerInstance: String,
     val disabled: Boolean?
