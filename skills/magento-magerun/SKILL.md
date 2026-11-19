@@ -21,13 +21,15 @@ For DDEV, review the parsed configuration and ordered override files. Append the
 4. Reuse metadata while paging or reading help. It expires after five minutes. Use `refresh: true` when the installed runtime changes or fresh discovery is requested. Refreshing `status` clears the cache. Refreshing `commands` probes the runtime.
 5. When the task calls for executing a discovered command, append its verified arguments to the returned `invocation.argv` and preserve `invocation.cwd`. Keep arguments separate. Running `sourceWrapper` directly can trigger installation. Adding a host `--root-dir` can point a container command at the wrong path. Report any failure in the selected runtime.
 
+For DDEV, an uncached metadata probe checks the project with `ddev describe --skip-hooks` before it runs `ddev exec`. If the tool returns `environment_not_running`, follow its message. Wait while the project is starting, or ask the developer to run `ddev start` from the DDEV project root. Running the returned `ddev exec` invocation directly would start a stopped project. If the status probe returns `runtime_unavailable` or `timeout`, report the blocker in the selected runtime.
+
 ```json
 {"mode":"commands","search":"sys:info","limit":10}
 ```
 
 ## Native Magerun MCP settings
 
-For a native MCP setup request, use `magento_magerun` with `mode: "mcp_config"`. Discover the installed commands first. Omit `include` for the tool's supported defaults, or pass narrow, space-separated `include` and optional `exclude` patterns. Preserve the returned command, arguments, working directory and environment. Check `serverStarted` and `configurationWritten` when reporting the result. Apply settings or start the server only if that work was requested.
+For a native MCP setup request, use `magento_magerun` with `mode: "mcp_config"`. Discover the installed commands first. Omit `include` for the tool's supported defaults, or pass narrow, space-separated `include` and optional `exclude` patterns. Preserve the returned command, arguments, working directory and environment. Check `serverStarted` and `configurationWritten` when reporting the result. Apply settings or start the server only if that work was requested. Launching a DDEV-backed configuration uses `ddev exec`, which starts a project that is stopped.
 
 ## Application and configuration
 
