@@ -36,6 +36,6 @@ public abstract class NamedComponentIndex extends ScalarIndexExtension<String> {
 
     @Override
     public int getVersion() {
-        return 0;
+        return 1;
     }
 }

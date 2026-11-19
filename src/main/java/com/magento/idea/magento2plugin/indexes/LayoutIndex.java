@@ -55,8 +55,30 @@ public class LayoutIndex {
 
     public static boolean isLayoutFile(VirtualFile virtualFile) {
         VirtualFile parent = virtualFile.getParent();
-        return virtualFile.getFileType() == XmlFileType.INSTANCE && parent.isDirectory()
-                && parent.getName().endsWith("layout");
+        if (virtualFile.getFileType() != XmlFileType.INSTANCE || parent == null || !parent.isDirectory()) {
+            return false;
+        }
+        if (parent.getName().endsWith("layout")) {
+            return true;
+        }
+
+        VirtualFile grandparent = parent.getParent();
+        if ("base".equals(parent.getName()) && isLayoutOverrideDirectory(grandparent)) {
+            return true;
+        }
+
+        // layout/override/theme/<parent vendor>/<parent theme>/<file>.xml
+        VirtualFile themeDirectory = grandparent == null ? null : grandparent.getParent();
+        return themeDirectory != null && "theme".equals(themeDirectory.getName())
+            && isLayoutOverrideDirectory(themeDirectory.getParent());
+    }
+
+    private static boolean isLayoutOverrideDirectory(@Nullable VirtualFile directory) {
+        if (directory == null || !"override".equals(directory.getName())) {
+            return false;
+        }
+        VirtualFile layout = directory.getParent();
+        return layout != null && ("layout".equals(layout.getName()) || "page_layout".equals(layout.getName()));
     }
 
     public static boolean isLayoutFile(PsiFile psiFile) {

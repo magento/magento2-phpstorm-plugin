@@ -21,15 +21,16 @@ internal class InvalidInspectionRequest(message: String) : RuntimeException(mess
 
 /** Shared options of `magento_inspect` queries: format, page size, continuation and filters. */
 internal data class InspectionOptions(
-    val json: Boolean,
     val limit: Int,
     val cursor: String?,
     val module: String?,
     val area: String?,
-    val path: String?
+    val path: String?,
+    val effectiveArea: String?
 ) {
     fun scope(): JSONObject = JSONObject().put("module", module ?: JSONObject.NULL)
         .put("area", area ?: JSONObject.NULL).put("path", path ?: JSONObject.NULL)
+        .apply { effectiveArea?.let { put("effectiveArea", it) } }
 }
 
 /**
@@ -43,10 +44,16 @@ internal data class InspectionRecord(
     val line: Int?,
     val area: String?,
     val fields: Map<String, Any?>,
-    /** Module of a file outside any module directory, such as a theme override. */
-    val moduleHint: String? = null,
     /** Module that owns the record regardless of its path. */
-    val module: String? = null
+    val module: String? = null,
+    /** Module of a file outside an indexed module directory, such as a theme override. */
+    val moduleHint: String? = null
+)
+
+internal data class InspectionQueryResult(
+    val records: List<InspectionRecord>,
+    val mode: String? = null,
+    val message: String? = null
 )
 
 internal object MagentoInspectionResults {
@@ -60,11 +67,15 @@ internal object MagentoInspectionResults {
     fun isJson(parameters: JSONObject): Boolean = parameters.optString("format").trim().lowercase() == "json"
 
     /** Reads the shared options; [filters] are the filters this query type supports. */
-    fun options(parameters: JSONObject, filters: Set<String>): InspectionOptions {
+    fun options(
+        parameters: JSONObject, filters: Set<String>, supportsEffectiveArea: Boolean = false
+    ): InspectionOptions {
         val format = parameters.optString("format", "text").trim().lowercase()
         if (format !in setOf("text", "json")) invalid("format must be `text` or `json`.")
         val json = format == "json"
-        val given = OPTION_KEYS.filter { parameters.has(it) && it != "format" }
+        val given = OPTION_KEYS.filter {
+            parameters.has(it) && it != "format" && !(supportsEffectiveArea && it == "area")
+        }
         if (!json && given.isNotEmpty()) {
             invalid("${given.joinToString(", ") { "`$it`" }} require `\"format\":\"json\"`.")
         }
@@ -81,34 +92,66 @@ internal object MagentoInspectionResults {
         } else {
             DEFAULT_LIMIT
         }
-        return InspectionOptions(json, limit, text(parameters, "cursor"), text(parameters, "module"),
-            text(parameters, "area")?.lowercase(), text(parameters, "path")?.let(::normalizePath))
+        if (parameters.has("effectiveArea") && !supportsEffectiveArea) {
+            invalid("effectiveArea is not supported for this queryType.")
+        }
+        return InspectionOptions(limit, text(parameters, "cursor"), text(parameters, "module"),
+            if (supportsEffectiveArea) area(parameters, "area") else text(parameters, "area")?.lowercase(),
+            text(parameters, "path")?.let(::normalizePath), area(parameters, "effectiveArea"))
     }
 
-    /** Applies filters, pages the ordered [records] and renders the JSON reply. */
+    private fun area(parameters: JSONObject, name: String): String? {
+        if (!parameters.has(name)) return null
+        val value = (parameters.opt(name) as? String)?.trim()
+        if (value == null || !AREA_NAME.matches(value)) {
+            invalid("`$name` must be a nonblank area name such as `frontend` or `global`.")
+        }
+        return value.lowercase()
+    }
+
+    /** Applies filters, pages the ordered results and renders the JSON reply. */
     fun respond(
         project: Project,
         queryType: String,
         query: String,
         records: List<InspectionRecord>,
         options: InspectionOptions
+    ): String = respond(project, queryType, query, InspectionQueryResult(records), options)
+
+    fun respond(
+        project: Project,
+        queryType: String,
+        query: String,
+        result: InspectionQueryResult,
+        options: InspectionOptions,
+        methodName: String? = null,
+        indexKeys: MagentoIndexKeys? = null
     ): String {
-        val owners = if (records.isEmpty()) emptyMap() else MagentoMcpSnapshots.moduleOwners(project)
+        val records = result.records
+        val owners = if (records.any { it.module == null }) MagentoMcpSnapshots.moduleOwners(project, indexKeys)
+            else emptyMap()
         // Records of a module at the project root are filtered out anyway when another module is requested.
         val rootModule = owners[""]?.takeIf { options.module == null || options.module == it }
             ?.let { RootModuleFiles(project, it) }
-        val owned = records.map { it to (it.module ?: ownerOf(it.path, owners, rootModule) ?: it.moduleHint) }
+        val owned = records.map { record ->
+            record to (record.module ?: ownerOf(record.path, owners) ?: record.moduleHint
+                ?: record.path?.let { rootModule?.owner(it) })
+        }
         val matching = owned.filter { (record, module) ->
             (options.module == null || module == options.module) &&
                 (options.area == null || record.area == options.area) &&
                 (options.path == null || record.path == options.path || record.path?.startsWith(options.path + "/") == true)
         }
-        val fingerprint = fingerprint(matching)
+        val identity = JSONArray(listOf(queryType, query, methodName, options.module, options.area, options.path,
+            options.effectiveArea, result.mode, result.message))
+        val fingerprint = fingerprint(identity, matching)
         val offset = options.cursor?.let { decodeCursor(it, fingerprint) } ?: 0
         if (offset > matching.size) invalid("cursor points past the end of the result. Start again without cursor.")
         val page = matching.drop(offset).take(options.limit)
         val next = offset + page.size
         return envelope(queryType, query, options, if (matching.isEmpty()) "no_matches" else "ok")
+            .put("mode", result.mode)
+            .put("message", result.message)
             .put("total", matching.size)
             .put("offset", offset)
             .put("returned", page.size)
@@ -135,15 +178,14 @@ internal object MagentoInspectionResults {
         .apply { record.fields.forEach { (name, value) -> put(name, value ?: JSONObject.NULL) } }
 
     /** The nearest enclosing module directory, so a nested module owns its own files. */
-    private fun ownerOf(path: String?, owners: Map<String, String>, rootModule: RootModuleFiles?): String? {
+    private fun ownerOf(path: String?, owners: Map<String, String>): String? {
         val file = path ?: return null
         var directory = file
         while (directory.isNotEmpty()) {
             owners[directory]?.let { return it }
             directory = directory.substringBeforeLast('/', "")
         }
-        // A module at the project root has the empty relative path.
-        return rootModule?.owner(file)
+        return null
     }
 
     /**
@@ -187,11 +229,11 @@ internal object MagentoInspectionResults {
         }
     }
 
-    private fun fingerprint(records: List<Pair<InspectionRecord, String?>>): String {
+    private fun fingerprint(identity: JSONArray, records: List<Pair<InspectionRecord, String?>>): String {
         val digest = MessageDigest.getInstance("SHA-256")
+        digest.update((identity.toString() + "\n").toByteArray(StandardCharsets.UTF_8))
         for ((record, module) in records) {
-            digest.update(("${record.kind}\u0000${record.key}\u0000${record.path}\u0000${record.line}\u0000" +
-                "${record.area}\u0000$module\u0000${record.fields}\n").toByteArray(StandardCharsets.UTF_8))
+            digest.update((json(record, module).toString() + "\n").toByteArray(StandardCharsets.UTF_8))
         }
         return digest.digest().take(8).joinToString("") { "%02x".format(it) }
     }
@@ -224,6 +266,7 @@ internal object MagentoInspectionResults {
         return segments.joinToString("/")
     }
 
+    private val AREA_NAME = Regex("[a-zA-Z][a-zA-Z0-9_]*")
     private val DRIVE = Regex("^[A-Za-z]:")
 
     private fun text(parameters: JSONObject, name: String): String? =
@@ -232,5 +275,5 @@ internal object MagentoInspectionResults {
     private fun invalid(message: String): Nothing = throw InvalidInspectionRequest(message)
 
     /** The declarations changed between pages; the caller must start again. */
-    class StaleCursor : RuntimeException("The declarations changed since this cursor was issued. Start again without cursor.")
+    class StaleCursor : RuntimeException("The query scope or results changed since this cursor was issued. Start again without cursor.")
 }

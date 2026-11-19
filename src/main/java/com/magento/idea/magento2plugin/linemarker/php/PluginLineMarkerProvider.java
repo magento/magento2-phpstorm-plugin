@@ -22,20 +22,19 @@ import com.magento.idea.magento2plugin.linemarker.php.data.PluginMethodData;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.PluginIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.data.PluginData;
+import com.magento.idea.magento2plugin.util.PhpNameUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PluginLineMarkerProvider implements LineMarkerProvider {
 
     private static final String TOOLTIP_TEXT = "Navigate to plugins";
-    private static final int MIN_PLUGIN_METHOD_NAME_LENGTH = 6;
 
     @Override
     public @Nullable LineMarkerInfo<?> getLineMarkerInfo(final @NotNull PsiElement psiElement) {
@@ -182,12 +181,7 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
 
             for (final Method method : pluginClass.getMethods()) {
                 if (method.getAccess().isPublic()) {
-                    final String pluginMethodName = method.getName();
-
-                    if (pluginMethodName.length() > MIN_PLUGIN_METHOD_NAME_LENGTH) {
-                        //@todo module sequence value should be set here instead of zero.
-                        methodList.add(getPluginMethodDataObject(method, sortOrder, 0));
-                    }
+                    methodList.add(getPluginMethodDataObject(method, sortOrder, 0));
                 }
             }
 
@@ -257,9 +251,10 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
                     pluginDataList,
                     methodClass.getProject()
             );
-            final String classMethodName = StringUtils.capitalize(psiElement.getName());
+            final String classMethodName = psiElement.getName();
 
-            pluginMethods.removeIf(pluginMethod -> !isPluginMethodName(pluginMethod.getMethodName(), classMethodName));
+            pluginMethods.removeIf(pluginMethod ->
+                    PhpNameUtil.interceptorKind(pluginMethod.getMethodName(), classMethodName) == null);
             sortMethods(pluginMethods, results);
 
             return results;
@@ -346,14 +341,6 @@ public class PluginLineMarkerProvider implements LineMarkerProvider {
             for (final PluginMethodData pluginMethodData: methodDataList) {
                 results.add(pluginMethodData.getMethod());
             }
-        }
-
-        private boolean isPluginMethodName(
-                final String pluginMethodName,
-                final String classMethodName
-        ) {
-            return pluginMethodName.substring(5).equals(classMethodName)
-                    || pluginMethodName.substring(6).equals(classMethodName);
         }
     }
 

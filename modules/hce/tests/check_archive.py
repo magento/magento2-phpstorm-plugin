@@ -5,6 +5,8 @@ import sys
 import xml.etree.ElementTree as ET
 import zipfile
 
+skill_root = Path(__file__).resolve().parents[3] / "skills"
+
 with zipfile.ZipFile(Path(sys.argv[1])) as archive:
     jars = [name for name in archive.namelist() if name.endswith(".jar")]
     assert len(jars) == 3, jars
@@ -19,10 +21,17 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                 assert not any("Probe" in name or "PhpMethodPluginQueryProvider" in name for name in names)
                 assert "com/magento/idea/magento2plugin/hce/AnalysisToolset.class" in names
                 assert "com/magento/idea/magento2plugin/hce/RuntimeToolset.class" in names
-                for skill in ("magento-inspect", "magento-magerun", "magento-scaffold"):
-                    assert f"skills/{skill}/SKILL.md" in names
+                expected = {f"skills/{p.parent.name}/SKILL.md": p for p in skill_root.glob("*/SKILL.md")}
+                packaged = {name for name in names if name.startswith("skills/") and name.endswith("/SKILL.md")}
+                assert expected and packaged == expected.keys(), (packaged, expected.keys())
+                for resource, source in expected.items():
+                    assert contents.read(resource) == source.read_bytes(), f"Outdated bundled skill: {resource}"
                 for inspection in ("CacheableFalseInDefaultLayoutInspection", "ModuleDeclarationInModuleXmlInspection"):
                     assert f"com/magento/idea/magento2plugin/inspections/xml/{inspection}.class" in names
+                for probe in ("cache", "patches", "inventory"):
+                    assert f"maintenance/{probe}.php" in names
+                assert "com/magento/idea/magento2plugin/mcp/MaintenanceService.class" in names
+                assert not any("MaintenanceDesktop" in name or "MaintenanceWidget" in name for name in names)
                 assert "magento2/inspection.properties" in names
                 assert "com/magento/idea/magento2plugin/util/magento/ui/TemplatePathResolver.class" in names
                 assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" not in names

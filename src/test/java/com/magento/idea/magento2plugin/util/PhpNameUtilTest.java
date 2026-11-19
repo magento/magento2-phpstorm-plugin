@@ -10,6 +10,16 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class PhpNameUtilTest extends TestCase {
+    public void testInterceptorRequiresARecognizedPrefixAndExactMethodName() {
+        assertNull(PhpNameUtil.interceptorKind("helperSave", "save"));
+        assertNull(PhpNameUtil.interceptorKind("otherSave", "save"));
+        assertNull(PhpNameUtil.interceptorKind("beforeSaveAll", "save"));
+        assertEquals("before", PhpNameUtil.interceptorKind("beforeSave", "save"));
+        assertEquals("around", PhpNameUtil.interceptorKind("aroundSave", "save"));
+        assertEquals("after", PhpNameUtil.interceptorKind("afterSave", "save"));
+        assertEquals("after", PhpNameUtil.interceptorKind("afterX", "x"));
+    }
+
     public void testConfigurationNamesPreservePhpNormalization() {
         final String[] names = {
                 "", "\\", "\\\\", "Vendor\\Module\\Model", "\\Vendor\\Module\\Model",

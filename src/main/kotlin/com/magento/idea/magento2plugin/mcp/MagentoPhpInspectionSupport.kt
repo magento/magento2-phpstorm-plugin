@@ -34,7 +34,7 @@ internal object MagentoPhpInspectionSupport {
         val kind: String
     ) {
         val sortOrder: Int
-            get() = data.sortOrder
+            get() = data.sortOrder ?: 0
 
         val scope: String
             get() = data.scope

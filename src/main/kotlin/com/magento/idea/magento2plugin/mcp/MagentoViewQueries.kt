@@ -226,14 +226,14 @@ internal object MagentoViewQueries {
             val path = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile ?: return null)
             val line = lineIndexes.getOrPut(path) { MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents) }.lineOf(tag)
             return InspectionRecord(kind, key, path, line, MagentoMcpSupport.viewArea(path), fields,
-                MagentoMcpSupport.themeOverrideModule(path))
+                moduleHint = MagentoMcpSupport.themeOverrideModule(path))
         }
         fun declarations(kind: String, key: String, tags: Collection<XmlTag>, fields: (XmlTag) -> Map<String, Any?>) =
             tags.sortedWith(compareBy({ it.containingFile?.virtualFile?.path }, { it.textOffset }))
                 .mapNotNull { declaration(kind, key, it, fields(it)) }
         val handles = findLayoutHandles(project, query).map {
             InspectionRecord("layout_handle", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
-                linkedMapOf("name" to it.name), MagentoMcpSupport.themeOverrideModule(it.filePath))
+                linkedMapOf("name" to it.name), moduleHint = MagentoMcpSupport.themeOverrideModule(it.filePath))
         }
         val blocks = matchedBlocks(project, query, indexKeys).flatMap { (blockName, tags) ->
             declarations("block", blockName, tags) {
@@ -250,7 +250,7 @@ internal object MagentoViewQueries {
 
     fun uiComponentRecords(project: Project, name: String): List<InspectionRecord> = uiComponents(project, name.trim()).map {
         InspectionRecord("ui_component", it.name, it.filePath, null, MagentoMcpSupport.viewArea(it.filePath),
-            linkedMapOf("name" to it.name, "rootTag" to it.rootTag), MagentoMcpSupport.themeOverrideModule(it.filePath))
+            linkedMapOf("name" to it.name, "rootTag" to it.rootTag), moduleHint = MagentoMcpSupport.themeOverrideModule(it.filePath))
     }
 
     /** Every ACL resource declaration, then every menu entry, in match order. */
