@@ -1,21 +1,35 @@
 ---
 name: magento-magerun
-description: Use n98-magerun2 to investigate or operate an installed Magento 2, Adobe Commerce, or Mage-OS project, including runtime, configuration, database, cron, and indexer workflows.
+description: Use n98-magerun2 to investigate or operate an installed Magento 2, Adobe Commerce, or Mage-OS project, including installed command discovery, Docker/DDEV wrappers, scoped configuration, database, cron, indexers, and native Magerun MCP settings.
 ---
 
 # Magento runtime with n98-magerun2
 
-Use this skill when a task needs the running Magento application or its database. Source configuration can establish declarations, but runtime results depend on the selected installation, area, scope, and deployed state.
+Call `magento_intelligence` in the intended project and follow the advertised invocation for each tool. For a question about Composer installation, Cloud patches, database setup or cache invalidation, use `magento_maintenance` first when available. Its `check` mode takes changed paths relative to the Magento root. Use `verify` for an explicitly requested runtime check. Report the finding's item, evidence and environment. Magerun discovery is only needed for a separate runtime question, such as inspecting a store-scoped setting.
 
-Call `magento_intelligence` to discover available Magento MCP tools. To check project skill copies via the router, pass `magento_skills --mode status --agentTarget agents` to `execute_tool`.
+## Select the runtime
 
-## Select and verify the runtime
+Call `describe_magento_cli_environment` and read the configured Magento root, preferred script, invocation and working directory. For a project with Compose at its root and Magento in `src/`, a preferred wrapper may run from the project root. A fallback displayed as `./src/bin/magento` may instead run as `./bin/magento` with `cwd` in `src/`. Use each invocation from its own working directory.
 
-1. Call `describe_magento_cli_environment` for the intended IDE project and check the Magento root, working directory, wrappers, and container configuration. Do not assume the host and container share paths or executables.
-2. Call `magento_magerun` with `mode: "status"`; detection alone does not verify a wrapper or running container. Use `mode: "commands"` with a focused `search`, followed by `mode: "command_help"` for an exact returned command. The installed version and custom modules determine what exists and which options it accepts.
-3. These MCP modes inspect metadata, not application state. Execute only commands needed for the user's task using the returned `invocation.argv` and `invocation.cwd`, preserving argument boundaries. Do not execute `sourceWrapper` in place of the returned invocation, switch runtimes after a failure, or assume native Magerun MCP is connected. If discovery or execution fails, report the actual blocker. `environment_not_running` means the DDEV project is not running; `ddev exec` would start it, so do not run the returned invocation. Follow the reply: ask the developer to run `ddev start`, or wait while it is starting.
+For DDEV, review the parsed configuration and ordered override files. Append the intended container command and its arguments to the returned `execPrefix` from its host `cwd`. Read `configuration.status` and coverage before using the prefix. Respect the configured project name and `working_dir.web`. The `docroot` serves web requests and `composer_root` controls `ddev composer`. If DDEV needs an interactive permission prompt, use the returned `terminalGuidance.command` from `terminalGuidance.cwd` in the indicated terminal. If a launcher or container fails, report that environment's blocker. Use a fallback only when fresh discovery selects it. Use the discovered Magento CLI wrapper for Magento CLI commands.
 
-For commands belonging to Magento rather than Magerun, use the discovered Magento CLI wrapper and its reported working directory. Confirm the environment and intended scope before operations that write data, send messages, run jobs, or rebuild indexes; run only the operation requested or necessary for the task. Explain meaningful side effects and report failures.
+## Discover installed Magerun commands
+
+1. Call `magento_magerun` with typed arguments and `mode: "status"`. Inspect `selected` and `invocation`. If there is no project-local candidate, a configured DDEV project can supply `magerun2` inside the container. File detection and cached metadata alone cannot confirm that the runtime is currently available.
+2. Call `mode: "commands"` with a focused `search` and `limit` (1–100). To page, pass `nextOffset` as `offset` and keep the search and limit unchanged. Stop when the command is found or `nextOffset` is null.
+3. Call `mode: "command_help"` with an exact returned command or alias in `command`. Check its installed arguments and options. Read the JSON `status` and `message` even for a successful MCP transport. `ok` indicates successful metadata retrieval. Distinguish missing launchers, incompatible installations, unsupported wrappers, and runtime failures from a missing command.
+4. Reuse metadata while paging or reading help. It expires after five minutes. Use `refresh: true` when the installed runtime changes or fresh discovery is requested. Refreshing `status` clears the cache. Refreshing `commands` probes the runtime.
+5. When the task calls for executing a discovered command, append its verified arguments to the returned `invocation.argv` and preserve `invocation.cwd`. Keep arguments separate. Running `sourceWrapper` directly can trigger installation. Adding a host `--root-dir` can point a container command at the wrong path. Report any failure in the selected runtime.
+
+For DDEV, an uncached metadata probe checks the project with `ddev describe --skip-hooks` before it runs `ddev exec`. If the tool returns `environment_not_running`, follow its message. Wait while the project is starting, or ask the developer to run `ddev start` from the DDEV project root. Running the returned `ddev exec` invocation directly would start a stopped project. If the status probe returns `runtime_unavailable` or `timeout`, report the blocker in the selected runtime.
+
+```json
+{"mode":"commands","search":"sys:info","limit":10}
+```
+
+## Native Magerun MCP settings
+
+For a native MCP setup request, use `magento_magerun` with `mode: "mcp_config"`. Discover the installed commands first. Omit `include` for the tool's supported defaults, or pass narrow, space-separated `include` and optional `exclude` patterns. Preserve the returned command, arguments, working directory and environment. Check `serverStarted` and `configurationWritten` when reporting the result. Apply settings or start the server only if that work was requested. Launching a DDEV-backed configuration uses `ddev exec`, which starts a project that is stopped.
 
 ## Application and configuration
 

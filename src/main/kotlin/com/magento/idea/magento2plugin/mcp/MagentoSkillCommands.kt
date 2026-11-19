@@ -28,19 +28,19 @@ internal object MagentoSkillCommands {
     fun help(): String = """
         Magento and Adobe Commerce bundled agent skills
         Use magento_intelligence for the full Magento MCP tool catalog.
-        For status via execute_tool, pass magento_skills --mode status --agentTarget agents.
+        For the Agents folder, use mode=status and agentTarget=agents with the invocation shown by magento_intelligence.
         mode=help: Show this documentation without reading or writing project files.
         mode=status (default): Read-only catalog and installation status for the selected agentTarget.
         mode=install: Install the explicitly selected skills; requires a non-empty skills array.
         skills: ["magento-inspect", "magento-scaffold", "magento-magerun"] or a subset. No automatic installation.
         agentTarget: project (default, skills/), agents (.agents/skills/), codex (.codex/skills/), claude (.claude/skills/).
         overwrite: false by default. Review customized files before explicitly replacing them with overwrite=true.
-        projectPath: Optional intended IDE project directory, verified before reading or writing skills.
+        projectPath (desktop): Optional intended IDE project directory, verified before reading or writing skills. HCE uses its opened project.
         Folders are relative to the IDE project root, not the configured Magento root or the user's home.
         Installation works before Magento integration is enabled and during indexing, without the PHP plugin.
-        magento-inspect: Configuration inspection, project setup, CLI discovery and upgrade compatibility where available.
-        magento-scaffold: Explicitly requested code creation; usage requires the JetBrains PHP plugin.
-        magento-magerun: Everyday Magento investigation with an installed n98-magerun2 and project runtime.
+        magento-inspect: Project setup, source inspection, XML diagnostics, maintenance checks, and desktop upgrade compatibility where available.
+        magento-scaffold: Explicitly requested code creation on a PHP-enabled desktop and checks for generated files.
+        magento-magerun: Installed n98-magerun2 command discovery, runtime investigation, and native MCP settings.
         Returns per-skill paths and results, and suggested Markdown links for an agent to merge into existing AGENTS.md.
         Never creates or edits AGENTS.md, downloads skills, or changes Magento settings. Existing identical files are unchanged.
         Suggested project guidance: $WIKI_URL
@@ -120,7 +120,7 @@ internal object MagentoSkillCommands {
     }
 
     fun guidance(project: Project, installed: List<Installation> = emptyList()): String = buildString {
-        appendLine("Optional agent skills: magento-inspect (inspection, CLI, setup and compatibility); magento-scaffold (explicit code creation; requires the JetBrains PHP plugin); magento-magerun (everyday Magento investigation using n98-magerun2).")
+        appendLine("Optional agent skills: magento-inspect for source and maintenance checks, magento-scaffold for requested code generation on a PHP-enabled desktop, and magento-magerun for n98-magerun2 runtime investigation.")
         appendLine("Use magento_skills with mode=status to inspect installed skills, or mode=install, skills=[\"magento-inspect\"], agentTarget=project|agents|codex|claude to install selected skills.")
         appendLine("Skill folders are relative to the IDE project root, even when Magento is under src/: project=skills, agents=.agents/skills, codex=.codex/skills, claude=.claude/skills.")
         appendLine("Suggested AGENTS.md guidance: $WIKI_URL")
@@ -134,9 +134,9 @@ internal object MagentoSkillCommands {
             appendLine("## Magento MCP skills")
             for (entry in installed) {
                 val purpose = when (entry.skill) {
-                    Skill.MAGENTO_INSPECT -> "Inspect Magento configuration, discover project CLI tools, and check upgrade compatibility where supported."
+                    Skill.MAGENTO_INSPECT -> "Inspect Magento declarations and XML diagnostics. Use magento_maintenance for file evidence and explicitly requested runtime verification."
                     Skill.MAGENTO_SCAFFOLD -> "Use for explicitly requested Magento code creation when magento_scaffold is available (requires the JetBrains PHP plugin)."
-                    Skill.MAGENTO_MAGERUN -> "Investigate Magento applications using the project's n98-magerun2 runtime."
+                    Skill.MAGENTO_MAGERUN -> "Discover commands, inspect application state, and configure native MCP with the project's n98-magerun2 runtime."
                 }
                 appendLine("- [${entry.skill.directoryName}](${entry.target.getProjectRelativePath(entry.skill)}): $purpose")
             }

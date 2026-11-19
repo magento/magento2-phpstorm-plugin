@@ -76,6 +76,7 @@ public class SettingsForm implements SearchableConfigurable {
     private MagentoUpdatesPanel updatesPanel;
     private JButton installMagentoScaffoldSkillButton;
     private JButton installMagentoInspectSkillButton;
+    private JButton installMagentoMagerunSkillButton;
     private JComboBox<AgentTarget> skillAgentTargetSelect;
     private final SettingsFormValidator validator = new SettingsFormValidator(this);
     private JLabel magentoVersionLabel;//NOPMD
@@ -115,6 +116,9 @@ public class SettingsForm implements SearchableConfigurable {
         );
         installMagentoInspectSkillButton.addActionListener(
                 event -> installMagentoSkill(Skill.MAGENTO_INSPECT)
+        );
+        installMagentoMagerunSkillButton.addActionListener(
+                event -> installMagentoSkill(Skill.MAGENTO_MAGERUN)
         );
         skillAgentTargetSelect.removeAllItems();
         for (final AgentTarget target : AgentTarget.values()) {
@@ -204,6 +208,7 @@ public class SettingsForm implements SearchableConfigurable {
         moduleDefaultLicenseName.setEnabled(isEnabled);
         installMagentoScaffoldSkillButton.setEnabled(isEnabled);
         installMagentoInspectSkillButton.setEnabled(isEnabled);
+        installMagentoMagerunSkillButton.setEnabled(isEnabled);
         skillAgentTargetSelect.setEnabled(isEnabled);
         excludeGeneratedFiles.setEnabled(isEnabled);
         additionalExcludedPaths.setEnabled(isEnabled);

@@ -10,6 +10,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import org.jetbrains.intellij.platform.gradle.tasks.ComposedJarTask
 import org.gradle.api.tasks.testing.TestDescriptor
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.api.tasks.testing.TestListener
 
@@ -84,6 +85,13 @@ sourceSets {
         compileClasspath += sourceSets.main.get().output
         runtimeClasspath += sourceSets.main.get().output
     }
+}
+
+for (suite in listOf("test", "uiTest")) {
+    kotlin.sourceSets.named(suite) { kotlin.srcDir("src/maintenanceTest/kotlin") }
+}
+tasks.named<ProcessResources>("processUiTestResources") {
+    from("src/test/resources") { include("maintenance/**") }
 }
 
 kotlin.target.compilations.getByName("coreTest").associateWith(kotlin.target.compilations.getByName("main"))
