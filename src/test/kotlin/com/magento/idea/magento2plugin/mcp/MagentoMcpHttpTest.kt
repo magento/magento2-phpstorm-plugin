@@ -62,6 +62,12 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(exclusionsStatus, exclusionsStatus.contains("Configure a valid Magento path before managing indexing exclusions."))
     }
 
+    fun testMaintenanceOverHttp() {
+        org.junit.Assume.assumeFalse("The Docker wrapper fixture uses a POSIX shebang.", java.io.File.separatorChar == '\\')
+        MaintenanceContract.prepare(root, root.resolve("src"))
+        MaintenanceContract.run(root) { args -> JSONObject(text("magento_maintenance", args)) }
+    }
+
     fun testModuleDependenciesOverHttp() {
         val fixture = JSONObject(javaClass.getResource("/mcp/module-dependencies-query.json")!!.readText())
         val files = fixture.getJSONObject("files")
@@ -239,6 +245,190 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
     }
 
+    fun testInheritedInterfacePluginDeclarationsOverHttp() {
+        val module = "src/app/code/Inspect/Module"
+        val diXml = "$module/etc/di.xml"
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Module' => 1]];")
+        myFixture.addFileToProject("$module/etc/module.xml", """<config><module name="Inspect_Module"/></config>""")
+        myFixture.addFileToProject("$module/Models.php", """<?php
+            interface ParentApi { public function save(); }
+            interface ChildApi extends ParentApi {}
+            class SavePlugin { public function beforeSave() {} }
+        """.trimIndent())
+        myFixture.addFileToProject(diXml, """
+            <config><type name="ParentApi"><plugin name="save_plugin" type="SavePlugin"/></type></config>
+        """.trimIndent())
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val args = JSONObject().put("className", "ChildApi").put("methodName", "save")
+        val text = inspect("query", "plugins_for_method", args.toString())
+        assertTrue(text, text.contains("target: ParentApi::save()"))
+        assertTrue(text, text.contains("pluginClass: SavePlugin"))
+        assertTrue(text, text.contains("pluginMethod: beforeSave()"))
+
+        val json = JSONObject(inspect("query", "plugins_for_method", args.put("format", "json").toString()))
+        assertEquals(1, json.getInt("schemaVersion"))
+        assertEquals("ok", json.getString("status"))
+        assertEquals("declarations", json.getString("mode"))
+        val records = json.getJSONArray("records")
+        assertEquals(json.toString(), 1, records.length())
+        val declaration = records.getJSONObject(0)
+        assertEquals("ParentApi", declaration.getString("target"))
+        assertEquals("save_plugin", declaration.getString("name"))
+        assertEquals("declaration", declaration.getString("status"))
+        assertEquals(diXml, declaration.getString("path"))
+        assertEquals(1, declaration.getInt("line"))
+        assertEquals("Inspect_Module", declaration.getString("module"))
+        assertEquals("global", declaration.getString("area"))
+        assertTrue(declaration.isNull("declaredDisabled"))
+        assertEquals(listOf("beforeSave"), declaration.getJSONArray("pluginMethods").toList())
+
+        val effective = JSONObject(inspect("query", "plugins_for_method", args.put("effectiveArea", "frontend").toString()))
+        assertEquals("effective", effective.getString("mode"))
+        assertEquals("no_matches", effective.getString("status"))
+        assertEquals(effective.toString(), 0, effective.getJSONArray("records").length())
+
+        val missing = JSONObject(inspect("query", "plugins_for_method", args.put("className", "MissingClass").toString()))
+        assertEquals("unresolved_target", missing.getString("mode"))
+        assertTrue(missing.getString("message").contains("MissingClass"))
+    }
+
+    fun testAreaResolutionThroughInspectionTool() {
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Base' => 1, 'Inspect_Later' => 1]];")
+        for (name in listOf("Base", "Later")) {
+            myFixture.addFileToProject("src/app/code/Inspect/$name/etc/module.xml", """<config><module name="Inspect_$name"/></config>""")
+        }
+        val base = "src/app/code/Inspect/Base/etc"
+        val local = "src/app/code/Inspect/Later/etc/adminhtml"
+        myFixture.addFileToProject("$base/events.xml", """<config><event name="placed"><observer name="log" instance="Logger"/></event></config>""")
+        myFixture.addFileToProject("$local/events.xml", """<config><event name="placed"><observer name="log" disabled="true"/></event></config>""")
+        myFixture.addFileToProject("$base/di.xml", """<config><type name="SaveInterface"><plugin name="log" type="SavePlugin" sortOrder="35"/></type></config>""")
+        myFixture.addFileToProject("$local/di.xml", """<config><type name="SaveModel"><plugin name="log" disabled="true"/></type></config>""")
+        myFixture.addFileToProject("src/app/code/Inspect/Base/Models.php", """<?php
+            interface SaveInterface { public function save(); }
+            class SaveModel implements SaveInterface { public function save() {} }
+            class SavePlugin { public function beforeSave() {} public function helperSave() {} }
+        """.trimIndent())
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        for ((query, args, file) in listOf(
+            Triple("observers_for_event", JSONObject().put("eventName", "placed"), "events.xml"),
+            Triple("plugins_for_method", JSONObject().put("className", "SaveModel").put("methodName", "save"), "di.xml")
+        )) {
+            fun query(vararg parameters: Pair<String, Any>): JSONObject =
+                JSONObject(inspect("query", query, JSONObject(args.toMap() + mapOf("format" to "json") + parameters).toString()))
+
+            val declarations = query("area" to "adminhtml")
+            assertEquals("declarations", declarations.getString("mode"))
+            val override = declarations.getJSONArray("records").getJSONObject(0)
+            assertEquals(1, declarations.getInt("total"))
+            assertEquals("declaration", override.getString("status"))
+            assertEquals("$local/$file", override.getString("path"))
+            assertEquals(1, override.getInt("line"))
+            assertEquals("Inspect_Later", override.getString("module"))
+            assertEquals("adminhtml", override.getString("area"))
+            assertTrue(override.getBoolean("declaredDisabled"))
+
+            val frontend = query("effectiveArea" to "frontend", "area" to "global")
+            assertEquals("ok", frontend.getString("status"))
+            val active = frontend.getJSONArray("records").getJSONObject(0)
+            assertEquals("applies", active.getString("status"))
+            assertEquals("$base/$file", active.getString("path"))
+            assertEquals("$base/$file", active.getString("instanceFile"))
+            assertEquals("Inspect_Base", active.getString("module"))
+            assertEquals(if (file == "di.xml") "SavePlugin" else "Logger", active.getString("instance"))
+            if (file == "di.xml") {
+                assertEquals(listOf("beforeSave"), active.getJSONArray("pluginMethods").toList())
+                assertEquals(35, active.getInt("sortOrder"))
+            }
+            for (filter in listOf("area" to "global", "module" to "Inspect_Base", "path" to base)) {
+                val admin = query("effectiveArea" to "adminhtml", filter)
+                assertEquals("ok", admin.getString("status"))
+                assertEquals("effective", admin.getString("mode"))
+                assertEquals("adminhtml", admin.getJSONObject("scope").getString("effectiveArea"))
+                assertEquals(1, admin.getInt("total"))
+                val disabled = admin.getJSONArray("records").getJSONObject(0)
+                assertEquals("$base/$file", disabled.getString("path"))
+                assertEquals("disabled", disabled.getString("status"))
+                assertEquals("$local/$file", disabled.getString("decidedBy"))
+                assertTrue(disabled.isNull("declaredDisabled"))
+            }
+
+            val text = inspect("query", query, JSONObject(args.toMap() +
+                mapOf("effectiveArea" to "adminhtml", "area" to "global")).toString())
+            assertTrue(text, text.contains("status=disabled") && text.contains("decidedBy=$local/$file"))
+            for ((key, value) in listOf("area" to " ", "area" to 1, "effectiveArea" to "etc/frontend",
+                "effectiveArea" to JSONObject.NULL, "limit" to 0)) {
+                val invalid = query(key to value)
+                assertEquals(invalid.toString(), "invalid_request", invalid.getString("status"))
+                assertTrue(invalid.toString(), invalid.getString("message").contains(key))
+            }
+        }
+    }
+
+    fun testEffectiveInspectionPagesAllRecordsAndBindsCursorsToScopeOverHttp() {
+        val module = "src/app/code/Inspect/Paged"
+        myFixture.addFileToProject("$module/etc/module.xml", """<config><module name="Inspect_Paged"/></config>""")
+        myFixture.addFileToProject("$module/Models.php", """<?php
+            class PagedTarget { public function save() {} public function delete() {} }
+            class PagedPlugin { public function beforeSave() {} public function beforeDelete() {} }
+        """.trimIndent())
+        val count = 207
+        val names = (1..count).map { "record_$it" }
+        val observers = names.joinToString("\n") { """<observer name="$it" instance="Logger"/>""" }
+        val plugins = names.joinToString("\n") { """<plugin name="$it" type="PagedPlugin"/>""" }
+        myFixture.addFileToProject("$module/etc/events.xml", """<config><event name="paged">$observers</event></config>""")
+        myFixture.addFileToProject("$module/etc/di.xml", """<config><type name="PagedTarget">$plugins</type></config>""")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val requests = mapOf(
+            "observers_for_event" to mapOf("eventName" to "paged"),
+            "plugins_for_method" to mapOf("className" to "PagedTarget", "methodName" to "save")
+        )
+        val cursors = requests.mapValues { (type, args) ->
+            fun query(vararg extra: Pair<String, Any>): JSONObject = JSONObject(inspect("query", type,
+                JSONObject(args + mapOf("format" to "json", "effectiveArea" to "frontend", "limit" to 100) + extra).toString()))
+
+            val first = query()
+            val cursor = first.getString("nextCursor")
+            val second = query("cursor" to cursor)
+            val last = query("cursor" to second.getString("nextCursor"))
+            val seen = listOf(first, second, last).flatMap { page ->
+                assertEquals("ok", page.getString("status"))
+                assertEquals(count, page.getInt("total"))
+                assertEquals("candidates", page.getString("mode"))
+                assertTrue(page.getString("message").contains("config.php"))
+                val records = page.getJSONArray("records")
+                assertEquals(records.length(), page.getInt("returned"))
+                (0 until records.length()).map {
+                    val record = records.getJSONObject(it)
+                    assertEquals("candidate", record.getString("status"))
+                    record.getString("name")
+                }
+            }
+            assertEquals(names, seen)
+            assertEquals(200, last.getInt("offset"))
+            assertTrue(last.getBoolean("complete"))
+            assertTrue(last.isNull("nextCursor"))
+            assertEquals("stale_cursor", query("cursor" to cursor, "effectiveArea" to "adminhtml").getString("status"))
+            assertEquals("stale_cursor", query("cursor" to cursor, "area" to "global").getString("status"))
+            if (type == "plugins_for_method") {
+                assertEquals("stale_cursor", query("cursor" to cursor, "methodName" to "delete").getString("status"))
+            }
+            cursor
+        }
+
+        myFixture.addFileToProject("src/app/etc/config.php", "<?php return ['modules' => ['Inspect_Paged' => 1]];")
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+        for ((type, args) in requests) {
+            val parameters = JSONObject(args + mapOf("format" to "json", "effectiveArea" to "frontend"))
+            val changed = JSONObject(inspect("query", type, parameters.put("cursor", cursors.getValue(type)).toString()))
+            assertEquals(changed.toString(), "stale_cursor", changed.getString("status"))
+            val fresh = JSONObject(inspect("query", type, parameters.apply { remove("cursor") }.toString()))
+            assertEquals("effective", fresh.getString("mode"))
+            assertEquals("applies", fresh.getJSONArray("records").getJSONObject(0).getString("status"))
+        }
+    }
+
     fun testInspectAndScaffoldRequireOnlyModeOverHttp() {
         val client = mcp()
         IndexingTestUtil.waitUntilIndexesAreReady(project)
@@ -286,6 +476,13 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             }
             assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE,
                 inspect("query", "plugins_for_method", "{}"))
+            val unavailable = JSONObject(inspect("query", "plugins_for_method", """{"format":"json","effectiveArea":"global"}"""))
+            assertEquals("unavailable", unavailable.getString("status"))
+            assertEquals(MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE, unavailable.getString("message"))
+            assertFalse(unavailable.getBoolean("complete"))
+            assertEquals(0, unavailable.getJSONArray("records").length())
+            val indexing = JSONObject(inspect("query", "observers_for_event", """{"format":"json","eventName":"placed"}"""))
+            assertEquals("indexing", indexing.getString("status"))
             assertTrue(inspect("detailed_schema", "layout_entities").contains("queryType: layout_entities"))
             assertTrue(inspect("help").contains("- `layout_entities`:"))
         }
@@ -332,6 +529,11 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         file("host tools/ddev", """
             #!/bin/sh
             printf '%s\n' "${'$'}*" >> ddev-calls.txt
+            if [ "${'$'}1" = describe ]; then
+              # Emulates a pre-describe exec-host hook, which DDEV runs unless --skip-hooks is passed.
+              case " ${'$'}* " in *" --skip-hooks "*) ;; *) echo pre-describe >> describe-hook-ran ;; esac
+              printf '{"level":"info","msg":"","raw":{"status":"%s"}}\n' "${'$'}(cat ddev-status 2>/dev/null || echo running)"; exit 0
+            fi
             [ "${'$'}1" = exec ] && [ "${'$'}2" = --raw ] && [ "${'$'}3" = --service=web ] && [ "${'$'}4" = --project=commerce-local ] && [ "${'$'}5" = --dir=/var/www/html/src ] && [ "${'$'}6" = -- ] && [ "${'$'}7" = magerun2 ] || exit 91
             if [ -f ddev-stopped ]; then echo 'DDEV project is stopped or permission denied' >&2; exit 1; fi
             if [ -f missing-magerun ]; then echo 'magerun2: command not found' >&2; exit 127; fi
@@ -374,6 +576,13 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             file("src/missing-magerun", "missing")
             assertEquals("missing_installation", magerun("commands").getString("status"))
             assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
+            file("ddev-status", "stopped")
+            val stopped = magerun("commands", JSONObject().put("refresh", true))
+            assertFalse(Files.exists(root.resolve("describe-hook-ran")))
+            assertEquals(stopped.toString(), "environment_not_running", stopped.getString("status"))
+            assertTrue(stopped.getString("message").contains("DDEV project 'commerce-local' is stopped"))
+            assertEquals(6, Files.readAllLines(root.resolve("src/ddev-calls.txt")).size)
+            assertEquals(List(6) { "describe --skip-hooks --json-output commerce-local" }, Files.readAllLines(root.resolve("ddev-calls.txt")))
         }
     }
 
@@ -396,10 +605,16 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
         assertTrue(description, description.contains("--project=commerce-local --dir=/var/www/html/src -- php -v"))
         assertTrue(description, description.contains("8.4") && description.contains("src/pub"))
         assertTrue(description, description.contains(JSONObject.quote(root.resolve(".ddev/config.local.yaml").toString())))
+        assertTrue(description, description.contains("\"commands\": []"))
+        file(".ddev/commands/web/test-integration", "#!/bin/sh\n## Description: Run integration tests\n## Usage: test-integration <path>\n")
+        val withCommands = text("describe_magento_cli_environment")
+        assertTrue(withCommands, withCommands.contains("\"invocation\": \"ddev test-integration\""))
+        assertTrue(withCommands, withCommands.contains("Run integration tests"))
         file(".ddev/config.local.yaml", "working_dir: [invalid")
         val invalid = text("describe_magento_cli_environment")
         assertTrue(invalid, invalid.contains("invalid_configuration"))
         assertFalse(invalid, invalid.contains("execPrefix"))
+        assertFalse(invalid, invalid.contains("projectCommands"))
         assertEquals("invalid_configuration", magerun("commands").getString("status"))
     }
 

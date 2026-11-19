@@ -143,6 +143,7 @@ internal object MagentoCliEnvironment {
             if (ddev.configuration.error == null) {
                 lines += "  example: ${ddev.example(listOf("php", "-v"))}"
                 lines += "Use this DDEV execution prefix for commands that belong in the container. Existing project wrappers retain their priority. Discovery does not start DDEV or run a process."
+                lines += "Project DDEV commands in projectCommands are the project's own entrypoints, such as test runners. They are project scripts: when one fits the task, run it as its invocation only after the developer agrees."
                 if (magerunAvailable) {
                     lines += "Optional Magerun: use magento_magerun to verify installation and inspect commands in this runtime."
                 }
@@ -289,10 +290,7 @@ internal object MagentoCliEnvironment {
         val roots = linkedSetOf<String>()
         var directory = magentoRoot
         while (directory.startsWith(normalizedProjectRoot)) {
-            if (DOCKER_COMPOSE_FILES.any { name ->
-                    resolveProjectPath(normalizedProjectRoot, directory.resolve(name).toString())
-                        ?.let { Files.isRegularFile(it) } == true
-                }) {
+            if (hasComposeConfiguration(normalizedProjectRoot, directory)) {
                 roots += relativeProjectPath(normalizedProjectRoot, directory).ifEmpty { "." }
                 break
             }
@@ -304,6 +302,11 @@ internal object MagentoCliEnvironment {
         roots += relativeProjectPath(normalizedProjectRoot, magentoRoot).ifEmpty { "." }
         return roots.toList()
     }
+
+    internal fun hasComposeConfiguration(projectRoot: Path, directory: Path): Boolean =
+        DOCKER_COMPOSE_FILES.any { name ->
+            resolveProjectPath(projectRoot, directory.resolve(name).toString())?.let(Files::isRegularFile) == true
+        }
 
     private fun buildDetectedTool(
         relativePath: String,

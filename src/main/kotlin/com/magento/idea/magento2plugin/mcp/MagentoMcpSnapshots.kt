@@ -18,6 +18,7 @@ import com.magento.idea.magento2plugin.indexes.ModuleIndex
 import com.magento.idea.magento2plugin.magento.files.ModuleAclXml
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
 import com.magento.idea.magento2plugin.magento.files.ModuleMenuXml
+import com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex
 
 internal object MagentoMcpSnapshots {
     private val DI_SNAPSHOT_KEY = Key.create<CachedValue<DiSnapshot>>("magento.mcp.diSnapshot")
@@ -42,16 +43,19 @@ internal object MagentoMcpSnapshots {
      * module is included, because the snapshots read the files of every copy. A directory that declares several
      * modules keeps the first name in sorted order.
      */
-    fun moduleOwners(project: Project): Map<String, String> = getCachedValue(project, MODULE_OWNERS_KEY) {
-        val index = ModuleIndex(project)
-        val owners = linkedMapOf<String, String>()
-        for (name in index.moduleNames) {
-            for (directory in index.getIndexedModuleDirectories(name)) {
-                owners.putIfAbsent(MagentoMcpSupport.relativePath(project, directory), name)
+    fun moduleOwners(project: Project, indexKeys: MagentoIndexKeys?): Map<String, String> =
+        getCachedValue(project, MODULE_OWNERS_KEY) {
+            val index = ModuleIndex(project)
+            val names = if (indexKeys == null) index.moduleNames
+                else index.getModuleNames(indexKeys.keys(ModuleXmlIndex.KEY, project))
+            val owners = linkedMapOf<String, String>()
+            for (name in names) {
+                for (directory in index.getIndexedModuleDirectories(name)) {
+                    owners.putIfAbsent(MagentoMcpSupport.relativePath(project, directory), name)
+                }
             }
+            owners
         }
-        owners
-    }
 
     private fun <T> getCachedValue(
         project: Project,
@@ -110,19 +114,8 @@ internal object MagentoMcpSnapshots {
                 )
 
                 for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
-                    pluginDeclarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
-                        filePath = filePath,
-                        line = lines.lineOf(pluginTag),
-                        targetFqn = typeName,
-                        pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
-                        pluginType = MagentoMcpSupport.presentableFqn(
-                            pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
-                        ),
-                        sortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull() ?: 0,
-                        disabled = pluginTag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)
-                            .equals("true", ignoreCase = true),
-                        scope = scope
-                    )
+                    pluginDeclarations.getOrPut(typeName, ::mutableListOf) +=
+                        PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope, lines.lineOf(pluginTag))
                 }
             }
 
@@ -172,7 +165,7 @@ internal object MagentoMcpSnapshots {
                         observerInstance = MagentoMcpSupport.presentableFqn(
                             observerTag.getAttributeValue("instance")
                         ) ?: "-",
-                        disabled = observerTag.getAttributeValue("disabled").equals("true", ignoreCase = true)
+                        disabled = observerTag.getAttributeValue("disabled")?.let { it == "true" }
                     )
                 }
             }
@@ -305,17 +298,30 @@ internal data class PluginDeclarationRecord(
     val targetFqn: String,
     val pluginName: String,
     val pluginType: String?,
-    val sortOrder: Int,
-    val disabled: Boolean,
+    val sortOrder: Int?,
+    val disabled: Boolean?,
     val scope: String
-) : HasFilePath
+) : HasFilePath {
+    companion object {
+        fun fromTag(tag: XmlTag, target: String, path: String, scope: String, line: Int) = PluginDeclarationRecord(
+            filePath = path,
+            line = line,
+            targetFqn = target,
+            pluginName = tag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
+            pluginType = MagentoMcpSupport.presentableFqn(tag.getAttributeValue(ModuleDiXml.TYPE_ATTR)),
+            sortOrder = tag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull(),
+            disabled = tag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)?.let { it == "1" || it.equals("true", true) },
+            scope = scope
+        )
+    }
+}
 
 internal data class EventObserverRecord(
     override val filePath: String,
     val line: Int,
     val observerName: String,
     val observerInstance: String,
-    val disabled: Boolean
+    val disabled: Boolean?
 ) : HasFilePath
 
 internal data class LayoutHandleRecord(

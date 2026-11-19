@@ -31,8 +31,11 @@ internal object MagentoInspectionCommands {
     private val jsonFilters = mapOf(
         "module" to setOf("path"),
         "di_config" to setOf("module", "area", "path"),
+        "plugins_for_method" to setOf("module", "area", "path"),
         "observers_for_event" to setOf("module", "area", "path")
     )
+
+    private val effectiveQueries = setOf("plugins_for_method", "observers_for_event")
 
     private val filterHelp = mapOf(
         "module" to "module: exact name of the module that owns the file.",
@@ -55,7 +58,7 @@ internal object MagentoInspectionCommands {
         "module" to "Find modules by exact or partial Magento module name.",
         "module_dependencies" to "Inspect declared sequence ordering and Composer package requirements in either direction.",
         "di_config" to "Find di.xml declarations related to a PHP FQN or virtual type.",
-        "plugins_for_method" to "Find plugins that intercept a target class or interface method.",
+        "plugins_for_method" to "Find declared plugin methods or resolve them for an effective area.",
         "observers_for_event" to "Find observer declarations by full or partial Magento event name.",
         "layout_entities" to "Find layout handles, block names, and container names.",
         "ui_component" to "Find UI component XML definitions by component file name.",
@@ -98,13 +101,20 @@ internal object MagentoInspectionCommands {
 
         val filters = jsonFilters[normalizedType] ?: return typeHelp(normalizedType)
         val parameter = queryParameters.getValue(normalizedType)
+        val example = when (normalizedType) {
+            "plugins_for_method" -> """{"className":"Magento\\Catalog\\Api\\ProductRepositoryInterface","methodName":"save","effectiveArea":"adminhtml","area":"global","format":"json","limit":50}"""
+            "observers_for_event" -> """{"eventName":"catalog_product_save_after","effectiveArea":"frontend","area":"global","format":"json","limit":50}"""
+            else -> """{"$parameter":"…","format":"json","limit":50}"""
+        }
         return typeHelp(normalizedType) + "\n\n" + """
             Structured results (optional): add "format":"json" to parametersJson.
-            Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}), cursor (nextCursor of the previous page, with the same parameters), filters ${filters.sorted().joinToString(", ")}.
+            Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}) and cursor (nextCursor from the previous page; keep the query and filters the same).
+            Supported JSON filters ${filters.sorted().joinToString(", ")}.
             ${filters.sorted().joinToString(" ") { filterHelp.getValue(it) }}
-            Reply: status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
+            Reply: schemaVersion, queryType, query, scope, status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, offset, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
+            For successful replies, total counts records after filtering, and complete means the last matching record has been returned.
             Example parametersJson:
-            {"$parameter":"…","format":"json","limit":50}
+            $example
         """.trimIndent()
     }
 
@@ -115,23 +125,15 @@ internal object MagentoInspectionCommands {
     ): String {
         val normalizedType = normalizeType(queryType)
         if (normalizedType !in supportedTypes) {
-            return unknownTypeMessage(normalizedType, queryTypes)
+            val message = unknownTypeMessage(normalizedType, queryTypes)
+            return if (wantsJson(parametersJson)) {
+                MagentoInspectionResults.status(normalizedType, "", null, "invalid_request", message)
+            } else message
         }
 
-        hostUnavailable(normalizedType, queryTypes)?.let {
-            return if (wantsJson(parametersJson)) {
-                MagentoInspectionResults.status(normalizedType, "", null, "unavailable", it)
-            } else {
-                it
-            }
-        }
-        if (!isAvailable(normalizedType) && wantsJson(parametersJson)) {
-            return MagentoInspectionResults.status(normalizedType, "", null, "unavailable",
-                MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE)
-        }
-        if (!isAvailable(normalizedType)) {
-            return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
-        }
+        val unavailableMessage = hostUnavailable(normalizedType, queryTypes)
+            ?: MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE.takeUnless { isAvailable(normalizedType) }
+        if (unavailableMessage != null) return unavailable(normalizedType, parametersJson, unavailableMessage)
 
         val parameters = try {
             parseParameters(parametersJson)
@@ -142,22 +144,19 @@ internal object MagentoInspectionCommands {
         if (MagentoInspectionResults.isJson(parameters)) {
             return jsonQuery(project, normalizedType, parameters, indexKeys)
         }
-        // Query types without structured results keep their own parameters, such as limit of module_dependencies.
-        jsonFilters[normalizedType]?.let { filters ->
-            try {
-                MagentoInspectionResults.options(parameters, filters)
-            } catch (exception: InvalidInspectionRequest) {
-                return exception.message.orEmpty()
-            }
-        }
-
         return try {
+            // Queries with a native payload, such as module_dependencies, keep their own parameters.
+            val options = jsonFilters[normalizedType]?.let {
+                MagentoInspectionResults.options(parameters, it, normalizedType in effectiveQueries)
+            }
             if (DumbService.getInstance(project).isDumb) {
                 return MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
             }
-            dispatch(project, normalizedType, parameters, indexKeys)
+            dispatch(project, normalizedType, parameters, indexKeys, options)
         } catch (exception: MissingParameterException) {
             "Missing required parameter `${exception.parameterName}` for queryType `$normalizedType`. Call magento_inspect with mode `detailed_schema` and queryType `$normalizedType` for the expected parameters."
+        } catch (exception: InvalidInspectionRequest) {
+            exception.message.orEmpty()
         } catch (_: IndexNotReadyException) {
             MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE
         }
@@ -178,7 +177,13 @@ internal object MagentoInspectionCommands {
     private fun isAvailable(queryType: String): Boolean =
         queryType != "plugins_for_method" || MagentoMethodPluginQueryProvider.isAvailable()
 
-    private fun dispatch(project: Project, queryType: String, parameters: JSONObject, indexKeys: MagentoIndexKeys?): String {
+    private fun dispatch(
+        project: Project,
+        queryType: String,
+        parameters: JSONObject,
+        indexKeys: MagentoIndexKeys?,
+        options: InspectionOptions?
+    ): String {
         return when (queryType) {
             "module" -> MagentoModuleQueries.findMagentoModule(
                 project = project,
@@ -199,12 +204,13 @@ internal object MagentoInspectionCommands {
             "plugins_for_method" -> MagentoDiQueries.findPluginsForMethod(
                 project = project,
                 className = parameters.requireString("className"),
-                methodName = parameters.requireString("methodName")
+                methodName = parameters.requireString("methodName"),
+                effectiveArea = options?.effectiveArea, fileArea = options?.area
             )
 
             "observers_for_event" -> MagentoEventQueries.findObserversForEvent(
                 project = project,
-                eventName = parameters.requireString("eventName")
+                eventName = parameters.requireString("eventName"), effectiveArea = options?.effectiveArea, fileArea = options?.area
             )
 
             "layout_entities" -> MagentoViewQueries.findLayoutEntities(
@@ -232,6 +238,11 @@ internal object MagentoInspectionCommands {
         }
     }
 
+    fun unavailable(queryType: String, parametersJson: String, message: String): String =
+        if (wantsJson(parametersJson)) {
+            MagentoInspectionResults.status(normalizeType(queryType), "", null, "unavailable", message)
+        } else message
+
     /** Whether the caller asked for structured results; malformed JSON is reported by [query]. */
     fun wantsJson(parametersJson: String): Boolean = try {
         MagentoInspectionResults.isJson(parseParameters(parametersJson))
@@ -247,7 +258,7 @@ internal object MagentoInspectionCommands {
         fun status(status: String, message: String, options: InspectionOptions? = null) =
             MagentoInspectionResults.status(queryType, query, options, status, message)
         val options = try {
-            MagentoInspectionResults.options(parameters, filters)
+            MagentoInspectionResults.options(parameters, filters, queryType in effectiveQueries)
         } catch (exception: InvalidInspectionRequest) {
             return status("invalid_request", exception.message.orEmpty())
         }
@@ -257,14 +268,20 @@ internal object MagentoInspectionCommands {
         }
         return try {
             val value = parameters.requireString(queryParameter)
-            val records = when (queryType) {
-                "module" -> MagentoModuleQueries.moduleRecords(project, value, indexKeys)
-                "di_config" -> MagentoDiQueries.diConfigRecords(project, value)
-                else -> MagentoEventQueries.observerRecords(project, value)
+            val method = if (queryType == "plugins_for_method") parameters.requireString("methodName") else null
+            val result = when (queryType) {
+                "module" -> InspectionQueryResult(MagentoModuleQueries.moduleRecords(project, value, indexKeys))
+                "di_config" -> InspectionQueryResult(MagentoDiQueries.diConfigRecords(project, value))
+                "plugins_for_method" -> {
+                    val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
+                        ?: return status("unavailable", MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE, options)
+                    provider.pluginRecords(project, value, checkNotNull(method), options.effectiveArea)
+                }
+                else -> MagentoEventQueries.observerRecords(project, value, options.effectiveArea)
             }
-            MagentoInspectionResults.respond(project, queryType, query, records, options)
-        } catch (_: MissingParameterException) {
-            status("invalid_request", "Missing required parameter `$queryParameter` for queryType `$queryType`.", options)
+            MagentoInspectionResults.respond(project, queryType, query, result, options, method, indexKeys)
+        } catch (exception: MissingParameterException) {
+            status("invalid_request", "Missing required parameter `${exception.parameterName}` for queryType `$queryType`.", options)
         } catch (exception: InvalidInspectionRequest) {
             status("invalid_request", exception.message.orEmpty(), options)
         } catch (exception: MagentoInspectionResults.StaleCursor) {
@@ -295,6 +312,14 @@ internal object MagentoInspectionCommands {
             else -> queryType.trim().lowercase().replace('-', '_')
         }
     }
+
+    private val effectiveAreaHelp =
+        "Optional in text or JSON: area filters by source configuration area, and effectiveArea selects the Magento " +
+            "runtime area. Both accept area names such as global, frontend or adminhtml. You can combine them. " +
+            "Resolution uses all applicable declarations before any record filters or paging. " +
+            "In JSON, mode and message describe resolution coverage, including candidates when module load order is " +
+            "unknown. Record status is the decision for that declaration. Records include decidedBy, instance, " +
+            "instanceFile, declaredDisabled and sortOrder when applicable. Text is the default."
 
     private fun typeHelp(queryType: String): String = when (queryType) {
         "module" -> """
@@ -330,7 +355,9 @@ internal object MagentoInspectionCommands {
 
         "plugins_for_method" -> """
             queryType: plugins_for_method
-            Finds Magento plugins that intercept a target class or interface method.
+            Lists declaration matches across the PHP hierarchy, including inherited interfaces, by default. With effectiveArea, resolves configuration in module and PHP inheritance order.
+            $effectiveAreaHelp
+            A target PHP class that cannot be resolved returns mode=unresolved_target with a diagnostic.
             Required: className, methodName. methodName must be the bare PHP method name, such as `save` or `getById`, without `before`, `around`, or `after` prefixes.
             Example parametersJson:
             {"className":"Magento\\Catalog\\Api\\ProductRepositoryInterface","methodName":"save"}
@@ -338,7 +365,8 @@ internal object MagentoInspectionCommands {
 
         "observers_for_event" -> """
             queryType: observers_for_event
-            Finds observer declarations for a Magento event.
+            Lists observer declarations by default. With effectiveArea, merges applicable observer configuration in enabled module order.
+            $effectiveAreaHelp
             Required: eventName. Use a full event name such as `catalog_product_save_after` or a partial search such as `product_save`.
             Example parametersJson:
             {"eventName":"catalog_product_save_after"}

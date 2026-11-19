@@ -25,7 +25,8 @@ public record UctAnalysisContext(IssueSeverityLevel minimumSeverity, UctVersionS
         final UctSettingsService settings = UctSettingsService.getInstance(holder.getProject());
         final VirtualFile file = holder.getFile().getVirtualFile();
         return settings.isEnabled()
-                && !UctExcludedPaths.contains(settings.getExcludedPaths(), file == null ? null : file.getPath())
+                && !UctExcludedPaths.matcher(holder.getProject(), settings.getExcludedPaths())
+                        .matches(file)
                 && holder.getProject().getService(UctReleasePreparation.class).hasEditorData(
                         settings.getConfiguredCurrentVersion(),
                         settings.getConfiguredTargetVersion(),

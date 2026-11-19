@@ -21,7 +21,7 @@ internal object MagentoDdevEnvironment {
                 directory.resolve(".ddev/config.yaml").toString())
             if (config != null && Files.isRegularFile(config) && Files.isReadable(config)) {
                 val executable = findExecutable()?.takeIf { it.isAbsolute && Files.isRegularFile(it) && Files.isExecutable(it) }
-                return Runtime(config, magentoRoot, executable, MagentoDdevConfiguration.read(projectRoot, config))
+                return Runtime(config, magentoRoot, executable, MagentoDdevConfiguration.read(projectRoot, config), projectRoot)
             }
             if (directory == projectRoot) break
             directory = directory.parent ?: break
@@ -49,7 +49,8 @@ internal object MagentoDdevEnvironment {
     }
 
     data class Runtime(val config: Path, val cwd: Path, val executable: Path?,
-                       val configuration: MagentoDdevConfiguration) {
+                       val configuration: MagentoDdevConfiguration,
+                       val ideProjectRoot: Path) {
         /** Keep each configured value as one argument; no shell interpretation. */
         fun execArguments(command: List<String>, service: String = "web"): List<String> = buildList {
             addAll(listOf("exec", "--raw", "--service=$service"))
@@ -58,6 +59,15 @@ internal object MagentoDdevEnvironment {
             add("--")
             addAll(command)
         }
+
+        val projectRoot: Path get() = config.parent.parent
+
+        /**
+         * `ddev describe` reports the status and, unlike `ddev exec`, does not start a stopped project.
+         * `--skip-hooks` keeps project describe hooks, which may run host commands, out of the probe.
+         */
+        fun statusArguments(): List<String> = listOf("describe", "--skip-hooks", "--json-output") +
+            listOfNotNull(configuration.string("name"))
 
         fun example(command: List<String>): String = (listOf("ddev") + execArguments(command))
             .joinToString(" ", transform = MagentoCliEnvironment::shellQuote)
@@ -74,14 +84,16 @@ internal object MagentoDdevEnvironment {
                 else -> "configured"
             })
             .put("configuration", configuration.json())
-            .put("projectRoot", config.parent.parent.toString()).put("cwd", cwd.toString())
+            .put("projectRoot", projectRoot.toString()).put("cwd", cwd.toString())
             .put("executable", executable?.toString() ?: JSONObject.NULL)
             .put("runtimeProbed", false)
             .apply {
                 if (configuration.error == null) {
                     put("execPrefix", JSONArray(listOf(executable?.toString() ?: "ddev") + execArguments(emptyList())))
                     put("terminalGuidance", terminalGuidance(terminalName = terminalName))
-                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed.")
+                    put("projectCommands", MagentoDdevCommands.json(ideProjectRoot,
+                        MagentoDdevCommands.read(ideProjectRoot, config.parent, configuration.string("type"))))
+                    put("usage", "Append the intended command and each argument to execPrefix; run from cwd. The default service is web. working_dir.web is inside the container; docroot is the web document root, and composer_root controls ddev composer. Without working_dir.web, DDEV selects its project-type default. This is static configuration, not proof that DDEV or a command is running or installed. ddev exec starts a project that is not running, so check `ddev describe --skip-hooks` first and ask the developer before starting it.")
                 }
             }
     }

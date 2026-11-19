@@ -54,7 +54,7 @@ internal object MagentoMagerunSupport {
             .put("identityVerified", false).apply {
                 ddev?.let {
                     put("runtime", "ddev").put("executable", it.executable?.toString() ?: JSONObject.NULL)
-                        .put("ddevProjectRoot", it.config.parent.parent.toString())
+                        .put("ddevProjectRoot", it.projectRoot.toString())
                         .put("service", "web").put("configuration", it.configuration.json())
                 }
             }
@@ -81,7 +81,8 @@ internal object MagentoMagerunSupport {
         val runtime: String,
         val source: Path,
         val preflight: List<String>? = null,
-        val fingerprintFiles: List<Path> = emptyList()
+        val fingerprintFiles: List<Path> = emptyList(),
+        val ddev: MagentoDdevEnvironment.Runtime? = null
     ) {
         fun json(): JSONObject = JSONObject().put("argv", JSONArray(argv)).put("cwd", cwd.toString())
             .put("runtime", runtime).put("sourceWrapper", source.toString())
@@ -99,7 +100,7 @@ internal object MagentoMagerunSupport {
             val executable = ddev.executable ?: throw Unavailable("missing_launcher",
                 "DDEV configuration was found, but the ddev executable is unavailable on the IDE's PATH. Make DDEV available to the IDE and retry; no other runtime was tried.")
             return LaunchPlan(listOf(executable.toString()) + ddev.execArguments(listOf("magerun2")),
-                root, "ddev", ddev.config, fingerprintFiles = listOf(executable) + ddev.configuration.files)
+                root, "ddev", ddev.config, fingerprintFiles = listOf(executable) + ddev.configuration.files, ddev = ddev)
         }
         return planFile(environment, candidate.path, candidate.cwd, root, candidate.path, emptySet())
     }

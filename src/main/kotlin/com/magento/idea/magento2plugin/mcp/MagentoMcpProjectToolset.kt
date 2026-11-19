@@ -59,7 +59,10 @@ class MagentoMcpProjectToolset : McpToolset {
         "name, type, document/Composer roots, runtime versions and container working directories with " +
         "source files.\n" +
         "- The general execPrefix includes the configured project and web working directory; append " +
-        "the intended command as separate arguments and run from cwd. This does not require Magerun.\n\n" +
+        "the intended command as separate arguments and run from cwd. This does not require Magerun.\n" +
+        "- projectCommands lists the project's custom commands from .ddev/commands with their service, " +
+        "description, usage and examples. They are project scripts: run one as its invocation only when " +
+        "the task needs it and the developer agrees.\n\n" +
 
         "Execution guidance:\n" +
         "- The result includes Terminal guidance for interactive permission prompts.\n" +
@@ -92,12 +95,16 @@ class MagentoMcpProjectToolset : McpToolset {
         "candidate exists and .ddev/config.yaml is present.\n" +
         "- Magerun uses the shared DDEV CLI environment, including parsed project and container " +
         "working-directory settings. The host ddev executable is resolved from the IDE PATH.\n" +
+        "- A DDEV probe not served from cached metadata first checks ddev describe, because ddev exec " +
+        "starts a project that is not running. A project that is not running returns environment_not_running " +
+        "and ddev exec is not run; ask the developer to run ddev start.\n" +
         "- Commands never fall back to another runtime on failure.\n" +
         "- For interactive permissions, suggest the returned terminalGuidance command in PhpStorm's " +
         "Terminal (IDE console).\n\n" +
 
         "Probe limits:\n" +
-        "- Probes only check installation, version, command list and help; no installation, download, " +
+        "- Probes only check installation, version, command list and help, and the DDEV project status; " +
+        "no installation, download, " +
         "service start, or application command execution.\n" +
         "- Unsupported shell wrappers are reported without executing them."
     )
@@ -118,6 +125,19 @@ class MagentoMcpProjectToolset : McpToolset {
                 MagentoMagerunQueries.execute(it,
                     MagerunRequest(mode, command, search, offset, limit, refresh, include, exclude)) { context.ensureActive() }
             }
+        }
+    }
+
+    @McpTool(name = "magento_maintenance")
+    @McpDescription(MaintenanceService.description)
+    suspend fun maintenance(mode: String = "check", checkIds: List<String> = emptyList(),
+                            changedFiles: List<String> = emptyList(), newlyEnabledModules: List<String> = emptyList(),
+                            devMode: String = "dev"): String = withContext(Dispatchers.IO) {
+        val context = currentCoroutineContext()
+        MagentoMcpToolsetSupport.withProjectAction(validateProject = false, requireSmartMode = false) {
+            MaintenanceDesktop.execute(it, mode, checkIds, changedFiles, newlyEnabledModules, devMode) {
+                context.ensureActive()
+            }.toString()
         }
     }
 
@@ -156,13 +176,14 @@ class MagentoMcpProjectToolset : McpToolset {
         "capabilities available in this IDE.\n\n" +
 
         "Structured results:\n" +
-        "- For `module`, `di_config` and `observers_for_event`, add \"format\":\"json\" to parametersJson " +
-        "for flat records with path, line, module and area, a status (ok, no_matches, indexing, unavailable, " +
-        "invalid_request, stale_cursor), total and nextCursor. Optional limit (1-100, default 20), cursor, " +
-        "and the module, area and path filters that `detailed_schema` lists. Text output says when it was cut.\n\n" +
+        "- Text is the default. For `module`, `di_config`, `observers_for_event`, and `plugins_for_method`, " +
+        "add \"format\":\"json\" to parametersJson for source records and a shared status, total, returned, " +
+        "complete, and nextCursor. See `detailed_schema` for limit, cursor, and supported filters.\n" +
+        "- Both interception queries use area to filter declarations by source area and effectiveArea to " +
+        "resolve the merged runtime configuration before filtering. JSON records carry a separate decision status.\n\n" +
 
         "Coverage:\n" +
-        "- XML results describe declarations, not resolved PHP semantics."
+        "- XML queries provide source evidence. Method-plugin queries also use PHP hierarchy and method analysis."
     )
     suspend fun magentoInspect(
         mode: String,

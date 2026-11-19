@@ -12,13 +12,16 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
 import com.intellij.util.indexing.FileBasedIndex
 import com.jetbrains.php.PhpIndex
+import com.jetbrains.php.lang.psi.elements.PhpClass
 import com.magento.idea.magento2plugin.magento.files.ModuleDiXml
+import com.magento.idea.magento2plugin.util.PhpNameUtil
 
 internal object MagentoPhpDiQueries {
     /**
      * Resolves the target class hierarchy and reports plugin methods that match the requested method name.
      */
-    fun findPluginsForMethod(project: Project, className: String, methodName: String): String {
+    fun findPluginsForMethod(project: Project, className: String, methodName: String,
+                             effectiveArea: String? = null, fileArea: String? = null): String {
         val targetClassName = MagentoMcpSupport.normalizeFqn(className)
         val targetMethodName = methodName.trim()
         if (targetClassName.isEmpty() || targetMethodName.isEmpty()) {
@@ -28,9 +31,14 @@ internal object MagentoPhpDiQueries {
         val phpIndex = PhpIndex.getInstance(project)
         val targetClasses = MagentoPhpInspectionSupport.resolveTargetClasses(phpIndex, targetClassName)
         if (targetClasses.isEmpty()) {
-            return "Could not resolve target class \"$targetClassName\"."
+            return unresolvedTarget(targetClassName)
         }
 
+        if (effectiveArea != null) {
+            return MagentoEffectiveConfiguration.renderText(
+                resolveEffective(project, targetClasses, targetMethodName, effectiveArea), fileArea
+            )
+        }
         val allTargetFqns = linkedSetOf(targetClassName)
         targetClasses.forEach { MagentoPhpInspectionSupport.collectClassHierarchy(it, allTargetFqns) }
         val pluginDeclarations = findPluginDeclarations(project, allTargetFqns)
@@ -38,13 +46,13 @@ internal object MagentoPhpDiQueries {
 
         for (targetFqn in allTargetFqns) {
             for (pluginDeclaration in pluginDeclarations[targetFqn].orEmpty()) {
-                if (pluginDeclaration.disabled) {
+                if (pluginDeclaration.disabled == true || (fileArea != null && pluginDeclaration.scope != fileArea)) {
                     continue
                 }
                 val pluginType = pluginDeclaration.pluginType ?: continue
                 for (pluginClass in phpIndex.getClassesByFQN(pluginType)) {
                     for (method in pluginClass.methods) {
-                        val pluginKind = MagentoMcpSupport.getPluginKind(method.name, targetMethodName) ?: continue
+                        val pluginKind = PhpNameUtil.interceptorKind(method.name, targetMethodName) ?: continue
                         if (!method.access.isPublic) {
                             continue
                         }
@@ -61,7 +69,7 @@ internal object MagentoPhpDiQueries {
         }
 
         if (pluginCandidates.isEmpty()) {
-            return "No plugins matched ${targetClassName}::${targetMethodName}()."
+            return "Declaration-only results. No plugins matched ${targetClassName}::${targetMethodName}()."
         }
 
         val sorted = pluginCandidates
@@ -77,6 +85,7 @@ internal object MagentoPhpDiQueries {
             )
 
         val lines = mutableListOf(
+            "Declaration-only results. Specify effectiveArea to resolve overrides.",
             "Found ${sorted.size} plugin method match(es) for ${targetClassName}::${targetMethodName}()."
         )
         for (match in sorted.take(MagentoMcpSupport.MAX_MATCHES)) {
@@ -91,6 +100,96 @@ internal object MagentoPhpDiQueries {
         }
 
         return lines.joinToString("\n")
+    }
+
+    fun pluginRecords(project: Project, className: String, methodName: String, effectiveArea: String?): InspectionQueryResult {
+        val target = MagentoMcpSupport.normalizeFqn(className)
+        val targets = MagentoPhpInspectionSupport.resolveTargetClasses(PhpIndex.getInstance(project), target)
+        if (targets.isEmpty()) return InspectionQueryResult(emptyList(), "unresolved_target", unresolvedTarget(target))
+        if (effectiveArea != null) return resolveEffective(project, targets, methodName, effectiveArea)
+
+        val hierarchy = linkedSetOf(target)
+        targets.forEach { MagentoPhpInspectionSupport.collectClassHierarchy(it, hierarchy) }
+        return configurationRecords(project, hierarchy, methodName, area = null)
+    }
+
+    private fun unresolvedTarget(target: String) = "Could not resolve target class \"$target\"."
+
+    private fun resolveEffective(
+        project: Project, targets: List<PhpClass>, method: String, area: String
+    ): InspectionQueryResult {
+        val hierarchy = linkedSetOf<String>()
+        val interfaces = linkedSetOf<String>()
+        val visitedClasses = mutableSetOf<String>()
+        fun addInterfaces(types: List<PhpClass>) {
+            val added = types.filter { interfaces.add(it.presentableFQN) }
+            added.forEach { hierarchy += it.presentableFQN }
+            added.forEach { parent -> addInterfaces(parent.supers.filter { it.isInterface }) }
+        }
+        fun visit(type: PhpClass) {
+            if (!visitedClasses.add(type.fqn)) return
+            if (type.isInterface) {
+                // Magento's runtime relation reader calls class_exists() before inspecting parents.
+                interfaces += type.presentableFQN
+            } else {
+                type.superClass?.let(::visit)
+                addInterfaces(type.implementedInterfaces.toList())
+            }
+            hierarchy += type.presentableFQN
+        }
+        targets.forEach(::visit)
+        return configurationRecords(project, hierarchy, method, area, interfaces)
+    }
+
+    private fun configurationRecords(
+        project: Project, hierarchy: Set<String>, method: String, area: String?, interfaces: Set<String> = emptySet()
+    ): InspectionQueryResult {
+        val context = MagentoEffectiveConfiguration(project)
+        val modules = if (area != null) context.modules else null
+        val snapshot = MagentoMcpSnapshots.diSnapshot(project)
+        val declarations = hierarchy.flatMap { type ->
+            snapshot.pluginDeclarations[type].orEmpty().map { plugin ->
+                val (scope, module) = context.location(plugin.filePath)
+                ConfigDeclaration(type, plugin.pluginName, plugin.filePath, scope, module,
+                    plugin.pluginType, plugin.disabled, plugin.sortOrder, plugin.line)
+            }
+        }
+        val phpIndex = PhpIndex.getInstance(project)
+        val hooks = mutableMapOf<String, List<String>?>()
+        fun hooksFor(instance: String): List<String>? {
+            if (instance !in hooks) {
+                val classes = phpIndex.getClassesByFQN(instance)
+                hooks[instance] = classes.takeIf { it.isNotEmpty() }?.flatMap { plugin ->
+                    plugin.methods.filter { it.access.isPublic && PhpNameUtil.interceptorKind(it.name, method) != null }
+                        .map { it.name }
+                }?.distinct()?.sorted()
+            }
+            return hooks[instance]
+        }
+
+        val records = declarations.groupBy { it.name }.values.flatMap { group ->
+            ProgressManager.checkCanceled()
+            val decisions = MagentoEffectiveConfiguration.resolve(group, area, modules, observer = false, interfaces = interfaces)
+            // Keep suppression evidence even when the replacing class has no hook for this method.
+            if (group.mapNotNull { it.instance }.all { hooksFor(it)?.isEmpty() == true }) return@flatMap emptyList()
+            decisions.map { decision ->
+                val methods = decision.instance?.let(::hooksFor)
+                val status = when {
+                    decision.status != "applies" -> decision.status
+                    methods == null -> "unresolved_class"
+                    methods.isEmpty() -> "no_interceptor"
+                    else -> decision.status
+                }
+                val sourceArea = decision.source.area.ifEmpty {
+                    MagentoMcpSupport.determineConfigScope(decision.source.file, ModuleDiXml.FILE_NAME)
+                }
+                decision.copy(status = status).record("plugin", sourceArea, linkedMapOf(
+                    "method" to method,
+                    "pluginMethods" to methods
+                ))
+            }
+        }
+        return MagentoEffectiveConfiguration.result(records, area, modules != null)
     }
 
     private fun findPluginDeclarations(
@@ -149,19 +248,8 @@ internal object MagentoPhpDiQueries {
             }
 
             for (pluginTag in typeTag.findSubTags(ModuleDiXml.PLUGIN_TAG_NAME)) {
-                declarations.getOrPut(typeName, ::mutableListOf) += PluginDeclarationRecord(
-                    filePath = filePath,
-                    line = lines.lineOf(pluginTag),
-                    targetFqn = typeName,
-                    pluginName = pluginTag.getAttributeValue(ModuleDiXml.NAME_ATTR) ?: "-",
-                    pluginType = MagentoMcpSupport.presentableFqn(
-                        pluginTag.getAttributeValue(ModuleDiXml.TYPE_ATTR)
-                    ),
-                    sortOrder = pluginTag.getAttributeValue(ModuleDiXml.SORT_ORDER_ATTR)?.toIntOrNull() ?: 0,
-                    disabled = pluginTag.getAttributeValue(ModuleDiXml.DISABLED_ATTR_NAME)
-                        .equals("true", ignoreCase = true),
-                    scope = scope
-                )
+                declarations.getOrPut(typeName, ::mutableListOf) +=
+                    PluginDeclarationRecord.fromTag(pluginTag, typeName, filePath, scope, lines.lineOf(pluginTag))
             }
         }
     }

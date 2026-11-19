@@ -327,7 +327,7 @@ internal object MagentoCompatibilityCommands {
                 if (directory == null) invalid("moduleName", "Magento module `$moduleName` was not found.", listOf("an installed Vendor_Module name"))
                 Path.of(directory.path)
             }
-        } else root.resolve(path!!)
+        } else root.resolve(path!!).normalize()
         if (!Files.exists(resolved)) {
             val magentoRoot = MagentoMcpProjectContext.magentoRoot(project)
             val suggestion = path?.takeUnless { Path.of(it).isAbsolute }?.let { magentoRoot?.resolve(it)?.normalize() }
@@ -340,16 +340,16 @@ internal object MagentoCompatibilityCommands {
             throw ParameterException("Analysis path does not exist: $resolved. Relative paths use pathBase ($root), the IDE project directory." +
                 if (suggestion != null) " Retry with path=$suggestion." else "", details)
         }
-        val canonical = resolved.toRealPath()
-        validate(canonical.startsWith(root), "path", "Analysis path must stay inside the current project.", listOf("path inside $root"))
-        if (!Files.isDirectory(canonical)) {
-            validate(Files.isRegularFile(canonical), "path", "Analysis path must be a regular file or component directory.", listOf("regular file", "component directory"))
+        val scanned = insideProject(root, resolved)
+            ?: invalid("path", "Analysis path must stay inside the current project.", listOf("path inside $root"))
+        if (!Files.isDirectory(scanned)) {
+            validate(Files.isRegularFile(scanned), "path", "Analysis path must be a regular file or component directory.", listOf("regular file", "component directory"))
             ReadAction.computeBlocking<Unit, RuntimeException> {
-                val file = requireNotNull(LocalFileSystem.getInstance().findFileByNioFile(canonical)) {
-                    "Analysis file is unavailable in the IDE: $canonical. Wait for the IDE to refresh files and retry."
+                val file = requireNotNull(LocalFileSystem.getInstance().findFileByNioFile(scanned)) {
+                    "Analysis file is unavailable in the IDE: $scanned. Wait for the IDE to refresh files and retry."
                 }
                 validate(UctAnalysisService.isSupportedFile(project, file), "path",
-                    "Unsupported analysis file: $canonical. Select a PHP, PHTML, XML, or HTML file recognized by IDE PHP/XML PSI. No scan was started.",
+                    "Unsupported analysis file: $scanned. Select a PHP, PHTML, XML, or HTML file recognized by IDE PHP/XML PSI. No scan was started.",
                     listOf("PHP", "PHTML", "XML", "HTML"))
             }
         }
@@ -364,7 +364,7 @@ internal object MagentoCompatibilityCommands {
         validate(!ignore || current != null, "ignoreCurrentVersion", "ignoreCurrentVersion requires a detected or explicit currentVersion.", listOf("false", "true with a detected or explicit currentVersion"))
         val explain = boolean(parameters, "explainSuppressed", false)
         validate(!explain || ignore, "explainSuppressed", "explainSuppressed requires ignoreCurrentVersion=true.", listOf("false", "true with ignoreCurrentVersion=true"))
-        return UctAnalysisRequest(listOf(canonical.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore, explain,
+        return UctAnalysisRequest(listOf(scanned.toString()), current, target, IssueSeverityLevel.valueOf(severity.uppercase()), ignore, explain,
             excludedPaths(project, parameters))
     }
 
@@ -536,12 +536,30 @@ internal object MagentoCompatibilityCommands {
         val explicit = excludedPathsOption(parameters) ?: return UctSettingsService.getInstance(project).excludedPaths
         val root = Path.of(requireNotNull(project.basePath) { "Project directory is unavailable." }).toRealPath()
         return explicit.map { value ->
-            val resolved = root.resolve(value).normalize()
-            val path = if (Files.exists(resolved)) resolved.toRealPath() else resolved
-            validate(path.startsWith(root), "excludedPaths", "Excluded paths must stay inside the current project: $value", listOf("path inside $root"))
+            val path = insideProject(root, root.resolve(value))
+                ?: invalid("excludedPaths", "Excluded paths must stay inside the current project: $value", listOf("path inside $root"))
             FileUtil.toSystemIndependentName(path.toString())
         }
     }
+
+    /**
+     * The path as requested when it lies inside the project. Its real path may leave the project only below a symlink to a
+     * Magento component, as Composer path repositories install modules; other symlinks do not open files outside the project.
+     */
+    private fun insideProject(root: Path, path: Path): Path? {
+        val requested = path.normalize()
+        if (!Files.exists(requested)) return requested.takeIf { it.startsWith(root) }
+        val real = requested.toRealPath()
+        if (!requested.startsWith(root)) return real.takeIf { it.startsWith(root) }
+        if (real.startsWith(root)) return requested
+        val component = generateSequence(requested) { it.parent }.takeWhile { it != root }
+            .firstOrNull { isLink(it) && Files.isRegularFile(it.resolve("registration.php")) }
+        return requested.takeIf { component != null && real.startsWith(component.toRealPath()) }
+    }
+
+    // Composer installs path repositories as junctions on Windows, which Files.isSymbolicLink does not report.
+    private fun isLink(path: Path): Boolean =
+        Files.isSymbolicLink(path) || path.parent?.let { path.toRealPath() != it.toRealPath().resolve(path.fileName) } == true
 
     private fun relative(project: Project, paths: List<String>): List<String> {
         val root = Path.of(project.basePath!!)

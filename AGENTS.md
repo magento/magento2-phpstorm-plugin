@@ -35,7 +35,7 @@ Use the existing project roadmap for feature priorities and sequencing. Keep rep
 
 - Use [magento-php-independent-features](.agents/skills/magento-php-independent-features/SKILL.md) for plugin dependency separation and WebStorm feature portability.
 - Use [magento-ai-analysis](.agents/skills/magento-ai-analysis/SKILL.md) for inspections, analysis services, and agent-facing MCP capabilities.
-- `skills/magento-inspect` and `skills/magento-scaffold` are bundled user skills for working on Magento applications. Repository development skills belong in `.agents/skills` and are not packaged as plugin resources.
+- `skills/magento-inspect`, `skills/magento-scaffold`, and `skills/magento-magerun` are bundled user skills for working on Magento applications. Repository development skills belong in `.agents/skills` and are not packaged as plugin resources.
 
 ## Verification
 
