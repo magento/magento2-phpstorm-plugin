@@ -19,7 +19,9 @@ internal interface MagentoMethodPluginQueryProvider {
         "This PHP provider supports declaration-only text results."
     }
 
-    fun pluginRecords(project: Project, className: String, methodName: String, effectiveArea: String?): InspectionQueryResult
+    /** A text-only provider can leave structured results unavailable. */
+    fun pluginRecords(project: Project, className: String, methodName: String, effectiveArea: String?): InspectionQueryResult? =
+        null
 
     companion object {
         val EP_NAME = ExtensionPointName.create<MagentoMethodPluginQueryProvider>(

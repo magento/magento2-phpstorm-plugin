@@ -355,6 +355,11 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             assertEquals(if (file == "di.xml") "SavePlugin" else "Logger", active.getString("instance"))
             if (file == "di.xml") {
                 assertEquals(listOf("beforeSave"), active.getJSONArray("pluginMethods").toList())
+                val hook = active.getJSONArray("pluginMethodLocations").getJSONObject(0)
+                assertEquals("beforeSave", hook.getString("method"))
+                assertEquals("before", hook.getString("pluginKind"))
+                assertEquals("src/app/code/Inspect/Base/Models.php", hook.getString("methodPath"))
+                assertEquals(4, hook.getInt("methodLine"))
                 assertEquals(35, active.getInt("sortOrder"))
             }
             for (filter in listOf("area" to "global", "module" to "Inspect_Base", "path" to base)) {

@@ -1,5 +1,7 @@
 package com.magento.idea.magento2plugin.mcp
 
+import com.intellij.openapi.project.Project
+import com.intellij.testFramework.ExtensionTestUtil
 import com.intellij.testFramework.IndexingTestUtil
 import com.intellij.testFramework.PlatformTestUtil
 import com.magento.idea.magento2plugin.BaseProjectTestCase
@@ -7,6 +9,7 @@ import com.magento.idea.magento2plugin.project.Settings
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Comparator
+import org.json.JSONObject
 import org.junit.Test
 
 class MagentoMcpQueriesTest : BaseProjectTestCase() {
@@ -129,6 +132,107 @@ class MagentoMcpQueriesTest : BaseProjectTestCase() {
 
         assertFalse("Disabled plugin should not be returned:\n$result", result.contains("Foo\\Bar\\Plugin\\DisabledPluginClass"))
         assertContains(result, "pluginClass: Magento\\Catalog\\Plugin\\PluginClass")
+    }
+
+    @Test
+    fun testPluginsForMethodReturnsStructuredRecords() {
+        addPluginTarget()
+        val plugins = (1..21).joinToString("\n") {
+            """        <plugin name="many$it" type="Foo\Bar\Plugin\Many" sortOrder="$it"/>"""
+        }
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/Plugin/Many.php",
+            "<?php\nnamespace Foo\\Bar\\Plugin;\n\nclass Many\n{\n    public function afterSomeMethod()\n    {\n    }\n\n    public function aroundSomeMethod() {}\n}\n"
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar/etc/frontend/di.xml",
+            "<?xml version=\"1.0\"?>\n<config>\n    <type name=\"Magento\\Theme\\Block\\PluginClass\">\n$plugins\n    </type>\n</config>\n"
+        )
+        PlatformTestUtil.dispatchAllEventsInIdeEventQueue()
+        IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val text = MagentoDiQueries.findPluginsForMethod(project, "Magento\\Theme\\Block\\PluginClass", "someMethod")
+        assertContains(text, "Found 43 plugin method match(es)")
+        assertContains(text, MagentoInspectionResults.TEXT_TRUNCATED_HINT)
+
+        fun page(extra: String = ""): JSONObject = JSONObject(MagentoInspectionCommands.query(project, "plugins_for_method",
+            """{"className":"Magento\\Theme\\Block\\PluginClass","methodName":"someMethod","format":"json"$extra}"""))
+        val first = page(""","limit":100""")
+        assertEquals("ok", first.getString("status"))
+        assertEquals("Magento\\Theme\\Block\\PluginClass", first.getString("query"))
+        assertEquals(22, first.getInt("total"))
+        val records = first.getJSONArray("records")
+        val byName = (0 until records.length()).map { records.getJSONObject(it) }
+            .associateBy { it.getString("name") }
+        val before = byName.getValue("pluginClass")
+        assertEquals("plugin", before.getString("kind"))
+        assertEquals("vendor/magento/module-catalog/etc/di.xml", before.getString("path"))
+        assertEquals(13, before.getInt("line"))
+        assertEquals("Magento_Catalog", before.getString("module"))
+        assertEquals("global", before.getString("area"))
+        assertEquals("Magento\\Catalog\\Plugin\\PluginClass", before.getString("instance"))
+        assertEquals("someMethod", before.getString("method"))
+        val beforeHook = before.getJSONArray("pluginMethodLocations").getJSONObject(0)
+        assertEquals("beforeSomeMethod", beforeHook.getString("method"))
+        assertEquals("before", beforeHook.getString("pluginKind"))
+        assertEquals("vendor/magento/module-catalog/Plugin/PluginClass.php", beforeHook.getString("methodPath"))
+        assertEquals(11, beforeHook.getInt("methodLine"))
+
+        val last = byName.getValue("many21")
+        assertEquals(24, last.getInt("line"))
+        assertEquals("frontend", last.getString("area"))
+        assertEquals("Foo_Bar", last.getString("module"))
+        assertEquals(listOf("afterSomeMethod", "aroundSomeMethod"), last.getJSONArray("pluginMethods").toList())
+        val hooks = last.getJSONArray("pluginMethodLocations")
+        assertEquals(2, hooks.length())
+        val after = hooks.getJSONObject(0)
+        val around = hooks.getJSONObject(1)
+        assertEquals("after", after.getString("pluginKind"))
+        assertEquals("around", around.getString("pluginKind"))
+        assertEquals("app/code/Foo/Bar/Plugin/Many.php", around.getString("methodPath"))
+        assertEquals(6, after.getInt("methodLine"))
+        assertEquals(10, around.getInt("methodLine"))
+
+        assertEquals(21, page(""","area":"frontend"""").getInt("total"))
+        assertEquals(1, page(""","module":"Magento_Catalog"""").getInt("total"))
+        assertEquals(21, page(""","path":"app/code/Foo/Bar"""").getInt("total"))
+        val second = page(""","cursor":"${page().getString("nextCursor")}"""")
+        assertEquals(2, second.getInt("returned"))
+        assertTrue(second.getBoolean("complete"))
+
+        val unresolved = JSONObject(MagentoInspectionCommands.query(project, "plugins_for_method",
+            """{"className":"Missing\\Target","methodName":"someMethod","format":"json"}"""))
+        assertEquals("no_matches", unresolved.getString("status"))
+        assertEquals("unresolved_target", unresolved.getString("mode"))
+        assertContains(unresolved.getString("message"), "Could not resolve target class")
+        val noMethod = JSONObject(MagentoInspectionCommands.query(project, "plugins_for_method",
+            """{"className":"Magento\\Theme\\Block\\PluginClass","format":"json"}"""))
+        assertEquals("invalid_request", noMethod.getString("status"))
+        assertContains(noMethod.getString("message"), "`methodName`")
+        val none = JSONObject(MagentoInspectionCommands.query(project, "plugins_for_method",
+            """{"className":"Magento\\Theme\\Block\\PluginClass","methodName":"otherMethod","format":"json"}"""))
+        assertEquals("no_matches", none.getString("status"))
+    }
+
+    @Test
+    fun testTextOnlyPluginProviderAnswersJsonWithUnavailable() {
+        ExtensionTestUtil.maskExtensions(MagentoMethodPluginQueryProvider.EP_NAME, listOf(object : MagentoMethodPluginQueryProvider {
+            override fun findPluginsForMethod(project: Project, className: String, methodName: String) = "text"
+        }), testRootDisposable)
+
+        val result = JSONObject(MagentoInspectionCommands.query(project, "plugins_for_method",
+            """{"className":"A","methodName":"b","format":"json"}"""))
+
+        assertEquals("unavailable", result.getString("status"))
+        assertContains(result.getString("message"), "returns text only")
+        assertEquals("text", MagentoInspectionCommands.query(project, "plugins_for_method", """{"className":"A","methodName":"b"}"""))
+    }
+
+    private fun addPluginTarget() {
+        myFixture.addFileToProject(
+            "vendor/magento/module-theme/Block/PluginClass.php",
+            "<?php\nnamespace Magento\\Theme\\Block;\n\nclass PluginClass\n{\n    public function someMethod()\n    {\n    }\n}\n"
+        )
     }
 
     @Test

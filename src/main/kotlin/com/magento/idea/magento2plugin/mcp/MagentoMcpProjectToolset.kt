@@ -180,6 +180,8 @@ class MagentoMcpProjectToolset : McpToolset {
         "`ui_component`, `acl_or_menu`, and `plugins_for_method`, " +
         "add \"format\":\"json\" to parametersJson for source records and a shared status, total, returned, " +
         "complete, and nextCursor. See `detailed_schema` for limit, cursor, and supported filters.\n" +
+        "- `module_dependencies` and `ui_template` use their own response formats. Method-plugin JSON includes " +
+        "resolved hook locations in `pluginMethodLocations`.\n" +
         "- Both interception queries use area to filter declarations by source area and effectiveArea to " +
         "resolve the merged runtime configuration before filtering. JSON records carry a separate decision status.\n\n" +
 

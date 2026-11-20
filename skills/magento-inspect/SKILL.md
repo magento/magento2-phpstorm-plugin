@@ -48,6 +48,8 @@ Present a `suggestedCommand` using its exact `argv` and `cwd`. Run a remediation
 
 Text is the default. Set `"format":"json"` in `parametersJson` for `module`, `di_config`, `observers_for_event`, `layout_entities`, `ui_component`, `acl_or_menu`, or `plugins_for_method` when the host advertises it. The shared response includes `status`, `total`, `returned`, `complete`, `nextCursor`, and `records` with project-relative paths and source lines. Use the filters listed by `detailed_schema`. Follow each `nextCursor` with the same query and filters. Restart after `stale_cursor`. Read the response status to distinguish `no_matches` from `indexing`, `unavailable`, and `invalid_request`. If text reports truncation, use JSON pagination.
 
+For method-plugin JSON, the record's `path` and `line` locate the `di.xml` declaration. Read `pluginMethodLocations` for each resolved PHP hook's name, kind, path, and line.
+
 For both observer and method-plugin queries, omit `effectiveArea` to inspect declarations. Set `effectiveArea` to resolve the merged configuration for a Magento runtime area. Set `area` to filter by a source configuration area, such as `global` or `adminhtml`. You can combine both arguments in text or JSON. Resolution uses the applicable configuration before applying record filters. This example returns global declarations with their decisions in the Admin runtime area.
 
 ```json

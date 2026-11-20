@@ -7,6 +7,7 @@ package com.magento.idea.magento2plugin.mcp
 
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.xml.XmlFile
@@ -36,7 +37,7 @@ internal object MagentoPhpDiQueries {
 
         if (effectiveArea != null) {
             return MagentoEffectiveConfiguration.renderText(
-                resolveEffective(project, targetClasses, targetMethodName, effectiveArea), fileArea
+                resolveEffective(project, targetClasses, targetMethodName, effectiveArea, includeMethodLocations = false), fileArea
             )
         }
         val allTargetFqns = linkedSetOf(targetClassName)
@@ -99,6 +100,10 @@ internal object MagentoPhpDiQueries {
             lines += "file: ${MagentoMcpSupport.relativePath(project, match.method.containingFile.virtualFile)}"
         }
 
+        if (sorted.size > MagentoMcpSupport.MAX_MATCHES) {
+            lines += ""
+            lines += MagentoInspectionResults.TEXT_TRUNCATED_HINT
+        }
         return lines.joinToString("\n")
     }
 
@@ -116,7 +121,7 @@ internal object MagentoPhpDiQueries {
     private fun unresolvedTarget(target: String) = "Could not resolve target class \"$target\"."
 
     private fun resolveEffective(
-        project: Project, targets: List<PhpClass>, method: String, area: String
+        project: Project, targets: List<PhpClass>, method: String, area: String, includeMethodLocations: Boolean = true
     ): InspectionQueryResult {
         val hierarchy = linkedSetOf<String>()
         val interfaces = linkedSetOf<String>()
@@ -138,11 +143,12 @@ internal object MagentoPhpDiQueries {
             hierarchy += type.presentableFQN
         }
         targets.forEach(::visit)
-        return configurationRecords(project, hierarchy, method, area, interfaces)
+        return configurationRecords(project, hierarchy, method, area, interfaces, includeMethodLocations)
     }
 
     private fun configurationRecords(
-        project: Project, hierarchy: Set<String>, method: String, area: String?, interfaces: Set<String> = emptySet()
+        project: Project, hierarchy: Set<String>, method: String, area: String?,
+        interfaces: Set<String> = emptySet(), includeMethodLocations: Boolean = true
     ): InspectionQueryResult {
         val context = MagentoEffectiveConfiguration(project)
         val modules = if (area != null) context.modules else null
@@ -155,14 +161,28 @@ internal object MagentoPhpDiQueries {
             }
         }
         val phpIndex = PhpIndex.getInstance(project)
-        val hooks = mutableMapOf<String, List<String>?>()
-        fun hooksFor(instance: String): List<String>? {
+        val hooks = mutableMapOf<String, PluginHooks?>()
+        val lineIndexes = mutableMapOf<PsiFile, MagentoMcpSupport.LineIndex>()
+        fun hooksFor(instance: String): PluginHooks? {
             if (instance !in hooks) {
                 val classes = phpIndex.getClassesByFQN(instance)
-                hooks[instance] = classes.takeIf { it.isNotEmpty() }?.flatMap { plugin ->
-                    plugin.methods.filter { it.access.isPublic && PhpNameUtil.interceptorKind(it.name, method) != null }
-                        .map { it.name }
-                }?.distinct()?.sorted()
+                val matches = classes.takeIf { it.isNotEmpty() }?.flatMap { plugin ->
+                    plugin.methods.mapNotNull { hook ->
+                        if (!hook.access.isPublic) return@mapNotNull null
+                        val kind = PhpNameUtil.interceptorKind(hook.name, method) ?: return@mapNotNull null
+                        hook to kind
+                    }
+                }
+                hooks[instance] = matches?.let {
+                    val names = it.map { (hook, _) -> hook.name }.distinct().sorted()
+                    val locations = if (includeMethodLocations) it.mapNotNull { (hook, kind) ->
+                        val file = hook.containingFile ?: return@mapNotNull null
+                        val virtualFile = file.virtualFile ?: return@mapNotNull null
+                        val lines = lineIndexes.getOrPut(file) { MagentoMcpSupport.LineIndex(file.viewProvider.contents) }
+                        PluginMethodLocation(hook.name, kind, MagentoMcpSupport.relativePath(project, virtualFile), lines.lineOf(hook))
+                    }.distinct().sortedWith(compareBy({ it.method }, { it.path }, { it.line })) else emptyList()
+                    PluginHooks(names, locations.map { location -> location.fields() })
+                }
             }
             return hooks[instance]
         }
@@ -171,25 +191,33 @@ internal object MagentoPhpDiQueries {
             ProgressManager.checkCanceled()
             val decisions = MagentoEffectiveConfiguration.resolve(group, area, modules, observer = false, interfaces = interfaces)
             // Keep suppression evidence even when the replacing class has no hook for this method.
-            if (group.mapNotNull { it.instance }.all { hooksFor(it)?.isEmpty() == true }) return@flatMap emptyList()
+            if (group.mapNotNull { it.instance }.all { hooksFor(it)?.names?.isEmpty() == true }) return@flatMap emptyList()
             decisions.map { decision ->
                 val methods = decision.instance?.let(::hooksFor)
                 val status = when {
                     decision.status != "applies" -> decision.status
                     methods == null -> "unresolved_class"
-                    methods.isEmpty() -> "no_interceptor"
+                    methods.names.isEmpty() -> "no_interceptor"
                     else -> decision.status
                 }
                 val sourceArea = decision.source.area.ifEmpty {
                     MagentoMcpSupport.determineConfigScope(decision.source.file, ModuleDiXml.FILE_NAME)
                 }
-                decision.copy(status = status).record("plugin", sourceArea, linkedMapOf(
-                    "method" to method,
-                    "pluginMethods" to methods
-                ))
+                val fields = linkedMapOf<String, Any?>("method" to method, "pluginMethods" to methods?.names)
+                if (includeMethodLocations) {
+                    fields["pluginMethodLocations"] = methods?.locations
+                }
+                decision.copy(status = status).record("plugin", sourceArea, fields)
             }
         }
         return MagentoEffectiveConfiguration.result(records, area, modules != null)
+    }
+
+    private data class PluginHooks(val names: List<String>, val locations: List<Map<String, Any>>)
+
+    private data class PluginMethodLocation(val method: String, val kind: String, val path: String, val line: Int) {
+        fun fields(): Map<String, Any> =
+            linkedMapOf("method" to method, "pluginKind" to kind, "methodPath" to path, "methodLine" to line)
     }
 
     private fun findPluginDeclarations(

@@ -285,6 +285,7 @@ internal object MagentoInspectionCommands {
                     val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
                         ?: return status("unavailable", MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE, options)
                     provider.pluginRecords(project, value, checkNotNull(method), options.effectiveArea)
+                        ?: return status("unavailable", "The registered `plugins_for_method` provider returns text only. Omit format to get text.", options)
                 }
                 else -> MagentoEventQueries.observerRecords(project, value, options.effectiveArea)
             }
@@ -366,6 +367,7 @@ internal object MagentoInspectionCommands {
             queryType: plugins_for_method
             Lists declaration matches across the PHP hierarchy, including inherited interfaces, by default. With effectiveArea, resolves configuration in module and PHP inheritance order.
             $effectiveAreaHelp
+            JSON records point to the di.xml declaration. pluginMethodLocations lists each resolved hook's method, pluginKind, methodPath and methodLine.
             A target PHP class that cannot be resolved returns mode=unresolved_target with a diagnostic.
             Required: className, methodName. methodName must be the bare PHP method name, such as `save` or `getById`, without `before`, `around`, or `after` prefixes.
             Example parametersJson:
