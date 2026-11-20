@@ -176,7 +176,8 @@ class MagentoMcpProjectToolset : McpToolset {
         "capabilities available in this IDE.\n\n" +
 
         "Structured results:\n" +
-        "- Text is the default. For `module`, `di_config`, `observers_for_event`, and `plugins_for_method`, " +
+        "- Text is the default. For `module`, `di_config`, `observers_for_event`, `layout_entities`, " +
+        "`ui_component`, `acl_or_menu`, and `plugins_for_method`, " +
         "add \"format\":\"json\" to parametersJson for source records and a shared status, total, returned, " +
         "complete, and nextCursor. See `detailed_schema` for limit, cursor, and supported filters.\n" +
         "- Both interception queries use area to filter declarations by source area and effectiveArea to " +

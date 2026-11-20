@@ -57,6 +57,6 @@ public class LayoutTemplateBlockIndex extends FileBasedIndexExtension<String, Se
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 }

@@ -54,6 +54,8 @@ class MagentoInspectionUiTest {
                 "app/code/Acme/Shipping/view/frontend/layout/shipping_mcp.xml" to """
                     <page><body><container name="shipping_container"><block name="shipping_block" template="Acme_Shipping::example.phtml"/></container></body></page>
                 """.trimIndent(),
+                "app/design/frontend/Acme/theme/Acme_Shipping/layout/override/base/shipping_override.xml" to
+                    "<page><body><block name=\"override_block\"/></body></page>",
                 "app/code/Acme/Shipping/view/frontend/ui_component/shipping_listing.xml" to "<listing/>",
                 "app/code/Acme/Shipping/etc/acl.xml" to """
                     <config><acl><resources><resource id="Acme_Shipping::root" title="Shipping root"/></resources></acl></config>
@@ -86,6 +88,12 @@ class MagentoInspectionUiTest {
                 check(dependencies.getJSONArray("edges").toString().contains("composer_require")) { dependencies.toString() }
                 check(result.getString("status") == "ok") { result.toString() }
                 check(result.getJSONArray("diagnostics").getJSONObject(0).getString("ruleId") == "CacheableFalseInDefaultLayoutInspection")
+                val layout = org.json.JSONObject(mcp.callText("magento_inspect", org.json.JSONObject()
+                    .put("mode", "query").put("queryType", "layout_entities")
+                    .put("parametersJson", """{"name":"override_block","format":"json","area":"frontend","module":"Acme_Shipping"}""")))
+                check(layout.getString("status") == "ok" && layout.getInt("total") == 1) { layout.toString() }
+                val block = layout.getJSONArray("records").getJSONObject(0)
+                check(block.getString("path").endsWith("/layout/override/base/shipping_override.xml")) { block.toString() }
             }
         } finally { bridge.stopSession() }
         val project = singleProject()

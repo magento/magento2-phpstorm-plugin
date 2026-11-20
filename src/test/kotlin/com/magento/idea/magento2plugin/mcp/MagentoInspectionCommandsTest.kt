@@ -218,7 +218,8 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             "No Magento modules matched")
         // Structured replies use the same host keys.
         for ((type, parameters) in listOf(
-            "module" to """{"moduleName":"Foo_Bar2","format":"json"}"""
+            "module" to """{"moduleName":"Foo_Bar2","format":"json"}""",
+            "layout_entities" to """{"name":"test_index_index_block2","format":"json"}"""
         )) {
             assertEquals(MagentoInspectionCommands.query(project, type, parameters),
                 MagentoInspectionCommands.query(project, type, parameters, indexKeys = hostKeys))

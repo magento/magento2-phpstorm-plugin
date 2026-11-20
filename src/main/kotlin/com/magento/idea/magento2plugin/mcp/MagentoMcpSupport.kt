@@ -98,6 +98,40 @@ internal object MagentoMcpSupport {
         else -> 3
     }
 
+    /**
+     * Area of a view file: the folder after `app/design/`, the area in a `theme-<area>-…` package name, or the
+     * folder after a module's `view/`. Null when the path does not say, as for theme packages named otherwise.
+     */
+    fun viewArea(path: String): String? {
+        val segments = path.replace('\\', '/').split('/')
+        val design = segments.indices.firstOrNull { i ->
+            i + 5 < segments.size && segments[i] == "app" && segments[i + 1] == "design" &&
+                segments[i + 2] in VIEW_AREAS
+        }
+        if (design != null) return segments[design + 2]
+
+        val view = segments.indices.lastOrNull { i ->
+            i + 3 < segments.size && segments[i] == "view" && segments[i + 1] in VIEW_AREAS &&
+                segments[i + 2] in THEME_MODULE_FOLDERS
+        }
+        if (view != null) return segments[view + 1]
+
+        return segments.asReversed().firstNotNullOfOrNull { THEME_PACKAGE.matchEntire(it)?.groupValues?.get(1) }
+    }
+
+    /** Module named by a theme override folder, such as `Magento_Catalog` in `…/Magento_Catalog/layout/x.xml`. */
+    fun themeOverrideModule(path: String): String? {
+        val segments = path.replace('\\', '/').split('/')
+        return segments.indices.firstOrNull { index ->
+            index + 1 < segments.size && MODULE_FOLDER.matches(segments[index]) && segments[index + 1] in THEME_MODULE_FOLDERS
+        }?.let { segments[it] }
+    }
+
+    private val VIEW_AREAS = setOf("frontend", "adminhtml", "base")
+    private val THEME_PACKAGE = Regex("theme-(frontend|adminhtml)-.+")
+    private val MODULE_FOLDER = Regex("[A-Z][A-Za-z0-9]*_[A-Z][A-Za-z0-9]*")
+    private val THEME_MODULE_FOLDERS = setOf("layout", "page_layout", "templates", "ui_component", "web", "email")
+
     /** Line starts of one file, built once so that each tag costs a binary search. */
     class LineIndex(text: CharSequence) {
         private val starts = buildList {

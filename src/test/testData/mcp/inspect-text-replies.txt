@@ -76,3 +76,69 @@ file: vendor/magento/module-catalog/etc/events.xml observer=test_observer instan
 Missing required parameter `moduleName` for queryType `module`. Call magento_inspect with mode `detailed_schema` and queryType `module` for the expected parameters.
 ### di_config {"className":""}
 Missing required parameter `className` for queryType `di_config`. Call magento_inspect with mode `detailed_schema` and queryType `di_config` for the expected parameters.
+### layout_entities {"name":"test_index"}
+Layout entities for "test_index"
+
+layout handles
+test_index_index -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml
+test_index_index2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index2.xml
+
+blocks
+test_index_index_block -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml class=- template=-
+test_index_index_block2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml class=- template=-
+
+containers
+test_index_index_container -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml htmlTag=- htmlClass=-
+test_index_index_container2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml htmlTag=- htmlClass=-
+### layout_entities {"name":"e"}
+Layout entities for "e"
+
+layout handles
+template_block_test -> app/code/Foo/Bar/view/frontend/layout/template_block_test.xml
+test_index_index -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml
+test_index_index2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index2.xml
+
+blocks
+foo.bar.template.block -> app/code/Foo/Bar/view/frontend/layout/template_block_test.xml class=Foo\Bar\Block\Widget\TestMethod template=Foo_Bar::widget/customer_creations.phtml
+test_index_index_block -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml class=- template=-
+test_index_index_block2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml class=- template=-
+
+containers
+test_index_index_container -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml htmlTag=- htmlClass=-
+test_index_index_container2 -> vendor/magento/module-catalog/view/frontend/layout/test_index_index.xml htmlTag=- htmlClass=-
+### ui_component {"name":"recently"}
+Found 2 UI component match(es) for "recently".
+
+recently_viewed
+file: vendor/magento/module-catalog/view/frontend/ui_component/recently_viewed.xml
+rootTag: listing
+
+recently_viewed_2
+file: vendor/magento/module-catalog/view/frontend/ui_component/recently_viewed_2.xml
+rootTag: listing
+### acl_or_menu {"identifier":"Magento_Catalog"}
+ACL and menu matches for "Magento_Catalog"
+
+acl resources
+Magento_Catalog::test -> title=Test Resource
+tree: Magento_Catalog::test(Test Resource)
+file: vendor/magento/module-catalog/etc/acl.xml
+
+menu entries
+Magento_Catalog::catalog -> title=Catalog resource=Magento_Catalog::catalog parent=- action=-
+file: vendor/magento/module-catalog/etc/adminhtml/menu.xml
+Magento_Catalog::inventory -> title=Inventory resource=Magento_Catalog::catalog parent=Magento_Catalog::catalog action=-
+file: vendor/magento/module-catalog/etc/adminhtml/menu.xml
+### acl_or_menu {"identifier":"catalog"}
+ACL and menu matches for "catalog"
+
+acl resources
+Magento_Catalog::test -> title=Test Resource
+tree: Magento_Catalog::test(Test Resource)
+file: vendor/magento/module-catalog/etc/acl.xml
+
+menu entries
+Magento_Catalog::catalog -> title=Catalog resource=Magento_Catalog::catalog parent=- action=-
+file: vendor/magento/module-catalog/etc/adminhtml/menu.xml
+Magento_Catalog::inventory -> title=Inventory resource=Magento_Catalog::catalog parent=Magento_Catalog::catalog action=-
+file: vendor/magento/module-catalog/etc/adminhtml/menu.xml

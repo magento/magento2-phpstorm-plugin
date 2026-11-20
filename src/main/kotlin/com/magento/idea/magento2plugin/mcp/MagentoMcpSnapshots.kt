@@ -191,6 +191,7 @@ internal object MagentoMcpSnapshots {
                 parentTag = resourcesTag,
                 ancestry = emptyList(),
                 filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile),
+                lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents),
                 records = aclResources
             )
         }
@@ -201,10 +202,12 @@ internal object MagentoMcpSnapshots {
             val rootTag = xmlFile.rootTag ?: continue
             val menuTag = rootTag.findFirstSubTag(ModuleMenuXml.menuTag) ?: continue
             val filePath = MagentoMcpSupport.relativePath(project, xmlFile.virtualFile)
+            val lines = MagentoMcpSupport.LineIndex(xmlFile.viewProvider.contents)
             for (addTag in menuTag.findSubTags(ModuleMenuXml.addTag)) {
                 val menuId = addTag.getAttributeValue(ModuleMenuXml.idTagAttribute) ?: continue
                 menuEntries.getOrPut(menuId, ::mutableListOf) += MenuEntryRecord(
                     filePath = filePath,
+                    line = lines.lineOf(addTag),
                     title = addTag.getAttributeValue(ModuleMenuXml.titleTagAttribute) ?: "-",
                     resource = addTag.getAttributeValue(ModuleMenuXml.resourceTagAttribute) ?: "-",
                     parent = addTag.getAttributeValue(ModuleMenuXml.parentTagAttribute) ?: "-",
@@ -214,8 +217,8 @@ internal object MagentoMcpSnapshots {
         }
 
         return AclMenuSnapshot(
-            aclResources = aclResources.freeze(compareBy<AclResourceRecord>({ it.filePath }, { it.title ?: "" })),
-            menuEntries = menuEntries.freeze(compareBy<MenuEntryRecord>({ it.filePath }, { it.title }, { it.parent }))
+            aclResources = aclResources.freeze(compareBy<AclResourceRecord>({ it.filePath }, { it.title ?: "" }, { it.line })),
+            menuEntries = menuEntries.freeze(compareBy<MenuEntryRecord>({ it.filePath }, { it.title }, { it.parent }, { it.line }))
         )
     }
 
@@ -223,6 +226,7 @@ internal object MagentoMcpSnapshots {
         parentTag: XmlTag,
         ancestry: List<AclTreeNode>,
         filePath: String,
+        lines: MagentoMcpSupport.LineIndex,
         records: MutableMap<String, MutableList<AclResourceRecord>>
     ) {
         for (resourceTag in parentTag.findSubTags(ModuleAclXml.XML_TAG_RESOURCE)) {
@@ -233,10 +237,11 @@ internal object MagentoMcpSnapshots {
             val tree = ancestry + AclTreeNode(resourceId, title)
             records.getOrPut(resourceId, ::mutableListOf) += AclResourceRecord(
                 filePath = filePath,
+                line = lines.lineOf(resourceTag),
                 title = title,
                 tree = tree
             )
-            collectAclResources(resourceTag, tree, filePath, records)
+            collectAclResources(resourceTag, tree, filePath, lines, records)
         }
     }
 
@@ -349,6 +354,7 @@ internal data class UiComponentRecord(
 
 internal data class AclResourceRecord(
     override val filePath: String,
+    val line: Int,
     val title: String?,
     val tree: List<AclTreeNode>
 ) : HasFilePath
@@ -360,6 +366,7 @@ internal data class AclTreeNode(
 
 internal data class MenuEntryRecord(
     override val filePath: String,
+    val line: Int,
     val title: String,
     val resource: String,
     val parent: String,

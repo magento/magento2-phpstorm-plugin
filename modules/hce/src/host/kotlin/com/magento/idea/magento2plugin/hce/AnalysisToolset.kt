@@ -49,7 +49,7 @@ class AnalysisToolset : McpToolset {
 
     @McpTool(name = "magento_inspect")
     @McpToolHints(readOnlyHint = TRUE)
-    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, module_dependencies (requires JSON PSI), layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Text is the default. module, di_config and observers_for_event support format=json with status, source records, filters and pagination. For observers, area filters source declarations and effectiveArea resolves the merged configuration. Method-plugin analysis requires desktop PHP support.")
+    @McpDescription("Read Magento XML declarations using shared IDE analysis. Modes: help, detailed_schema, query. Query types: module, module_dependencies (requires JSON PSI), layout_entities, di_config, observers_for_event, ui_component, ui_template, acl_or_menu. Text is the default. module, di_config, observers_for_event, layout_entities, ui_component and acl_or_menu support format=json with status, source records, filters and pagination. For observers, area filters source declarations and effectiveArea resolves the merged configuration. Method-plugin analysis requires desktop PHP support.")
     suspend fun inspect(mode: String, queryType: String = "", parametersJson: String = ""): String {
         when (mode.trim().lowercase()) {
             "help" -> return MagentoInspectionCommands.help(queries)

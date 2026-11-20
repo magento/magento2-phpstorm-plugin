@@ -243,6 +243,23 @@ class MagentoMcpHttpTest : McpHttpTestCase() {
             inspect("detailed_schema", "plugins_for_method"))
         assertTrue(inspect("query", "di_config", "{}").contains("Missing required parameter `className`"))
         assertTrue(inspect("query", "acl_or_menu", "{invalid").contains("parametersJson must be a valid JSON object"))
+
+        for ((queryType, parameter, kind) in listOf(
+            Triple("layout_entities", "name" to "inspect_block", "block"),
+            Triple("ui_component", "name" to "inspect_listing", "ui_component"),
+            Triple("acl_or_menu", "identifier" to "Inspect_Module::root", "acl_resource")
+        )) {
+            val schema = inspect("detailed_schema", queryType)
+            assertTrue(schema, schema.contains("filters area, module, path"))
+            val args = JSONObject().put(parameter.first, parameter.second)
+                .put("format", "json").put("module", "Inspect_Module")
+            val result = JSONObject(inspect("query", queryType, args.toString()))
+            assertEquals(result.toString(), "ok", result.getString("status"))
+            assertEquals(1, result.getInt("total"))
+            val record = result.getJSONArray("records").getJSONObject(0)
+            assertEquals(kind, record.getString("kind"))
+            assertEquals("Inspect_Module", record.getString("module"))
+        }
     }
 
     fun testInheritedInterfacePluginDeclarationsOverHttp() {

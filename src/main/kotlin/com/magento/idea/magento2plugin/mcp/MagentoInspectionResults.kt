@@ -44,7 +44,10 @@ internal data class InspectionRecord(
     val line: Int?,
     val area: String?,
     val fields: Map<String, Any?>,
-    val module: String? = null
+    /** Module that owns the record regardless of its path. */
+    val module: String? = null,
+    /** Module of a file outside an indexed module directory, such as a theme override. */
+    val moduleHint: String? = null
 )
 
 internal data class InspectionQueryResult(
@@ -130,7 +133,10 @@ internal object MagentoInspectionResults {
         // Records of a module at the project root are filtered out anyway when another module is requested.
         val rootModule = owners[""]?.takeIf { options.module == null || options.module == it }
             ?.let { RootModuleFiles(project, it) }
-        val owned = records.map { it to (it.module ?: ownerOf(it.path, owners, rootModule)) }
+        val owned = records.map { record ->
+            record to (record.module ?: ownerOf(record.path, owners) ?: record.moduleHint
+                ?: record.path?.let { rootModule?.owner(it) })
+        }
         val matching = owned.filter { (record, module) ->
             (options.module == null || module == options.module) &&
                 (options.area == null || record.area == options.area) &&
@@ -172,15 +178,14 @@ internal object MagentoInspectionResults {
         .apply { record.fields.forEach { (name, value) -> put(name, value ?: JSONObject.NULL) } }
 
     /** The nearest enclosing module directory, so a nested module owns its own files. */
-    private fun ownerOf(path: String?, owners: Map<String, String>, rootModule: RootModuleFiles?): String? {
+    private fun ownerOf(path: String?, owners: Map<String, String>): String? {
         val file = path ?: return null
         var directory = file
         while (directory.isNotEmpty()) {
             owners[directory]?.let { return it }
             directory = directory.substringBeforeLast('/', "")
         }
-        // A module at the project root has the empty relative path.
-        return rootModule?.owner(file)
+        return null
     }
 
     /**

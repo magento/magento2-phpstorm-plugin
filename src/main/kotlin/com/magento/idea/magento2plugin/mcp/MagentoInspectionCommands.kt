@@ -32,10 +32,15 @@ internal object MagentoInspectionCommands {
         "module" to setOf("path"),
         "di_config" to setOf("module", "area", "path"),
         "plugins_for_method" to setOf("module", "area", "path"),
-        "observers_for_event" to setOf("module", "area", "path")
+        "observers_for_event" to setOf("module", "area", "path"),
+        "layout_entities" to setOf("module", "area", "path"),
+        "ui_component" to setOf("module", "area", "path"),
+        "acl_or_menu" to setOf("module", "area", "path")
     )
 
     private val effectiveQueries = setOf("plugins_for_method", "observers_for_event")
+    private val viewQueries = setOf("layout_entities", "ui_component")
+    private const val VIEW_AREA_HELP = "area: frontend, adminhtml or base, inferred from the Magento view path."
 
     private val filterHelp = mapOf(
         "module" to "module: exact name of the module that owns the file.",
@@ -110,8 +115,9 @@ internal object MagentoInspectionCommands {
             Structured results (optional): add "format":"json" to parametersJson.
             Optional with format json: limit (1-${MagentoInspectionResults.MAX_LIMIT}, default ${MagentoInspectionResults.DEFAULT_LIMIT}) and cursor (nextCursor from the previous page; keep the query and filters the same).
             Supported JSON filters ${filters.sorted().joinToString(", ")}.
-            ${filters.sorted().joinToString(" ") { filterHelp.getValue(it) }}
+            ${filters.sorted().joinToString(" ") { if (it == "area" && normalizedType in viewQueries) VIEW_AREA_HELP else filterHelp.getValue(it) }}
             Reply: schemaVersion, queryType, query, scope, status (ok, no_matches, indexing, unavailable, invalid_request, stale_cursor), total, offset, returned, complete, nextCursor, and records with kind, key, path, line, module, area and query-specific fields.
+            Line is null for whole-file records such as modules, layout handles and UI components.
             For successful replies, total counts records after filtering, and complete means the last matching record has been returned.
             Example parametersJson:
             $example
@@ -272,6 +278,9 @@ internal object MagentoInspectionCommands {
             val result = when (queryType) {
                 "module" -> InspectionQueryResult(MagentoModuleQueries.moduleRecords(project, value, indexKeys))
                 "di_config" -> InspectionQueryResult(MagentoDiQueries.diConfigRecords(project, value))
+                "layout_entities" -> InspectionQueryResult(MagentoViewQueries.layoutRecords(project, value, indexKeys))
+                "ui_component" -> InspectionQueryResult(MagentoViewQueries.uiComponentRecords(project, value))
+                "acl_or_menu" -> InspectionQueryResult(MagentoViewQueries.aclOrMenuRecords(project, value))
                 "plugins_for_method" -> {
                     val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
                         ?: return status("unavailable", MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE, options)

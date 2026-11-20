@@ -360,6 +360,8 @@ class HceRuntimeContracts(unittest.TestCase):
 
     def test_module_and_layout_indexes_and_live_updates(self):
         project = self.fixture("module-layout-project")
+        theme_override = "src/app/design/frontend/Acme/theme/Magento_Catalog/layout/override/base/hce_override.xml"
+        self.file(project, theme_override, '<page><body><block name="hce_override_block"/></body></page>')
         with self.client(project) as client:
             def inspect(kind, **parameters):
                 return client.call_text("magento_inspect", mode="query", queryType=kind,
@@ -384,6 +386,11 @@ class HceRuntimeContracts(unittest.TestCase):
                 result = inspect("layout_entities", name=name)
                 self.assertIn(section, result)
                 self.assertIn(path, result)
+            override = json.loads(inspect("layout_entities", name="hce_override", format="json",
+                                          module="Magento_Catalog", area="frontend"))
+            self.assertEqual("ok", override["status"], override)
+            self.assertEqual(["layout_handle", "block"], [record["kind"] for record in override["records"]])
+            self.assertTrue(all(record["path"] == theme_override for record in override["records"]))
             self.assertIn("No layout handles, blocks, or containers matched",
                 inspect("layout_entities", name="NoSuchLayoutHce"))
             layout = project / path
