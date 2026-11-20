@@ -107,9 +107,8 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         val missing = query("observers_for_event", JSONObject().put("format", "json"))
         assertEquals("invalid_request", missing.getString("status"))
         assertTrue(missing.getString("message").contains("`eventName`"))
-        val plugins = query("plugins_for_method", JSONObject().put("className", "A").put("methodName", "b").put("format", "json"))
-        assertEquals("invalid_request", plugins.getString("status"))
-        assertTrue(plugins.getString("message").contains("Could not resolve target class"))
+        val uiTemplate = query("ui_template", JSONObject().put("templatePath", "Foo_Bar/widget").put("format", "json"))
+        assertEquals("invalid_request", uiTemplate.getString("status"))
         val schema = MagentoInspectionCommands.detailedSchema("module")
         assertTrue(schema, schema.contains("filters path") && schema.contains("path: project-relative"))
         assertTrue(schema, schema.contains("A module at the project root has path `.`, which no path filter selects"))
@@ -245,6 +244,9 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
     fun testViewAreaAndThemeOverrideModuleFollowThePath() {
         val cases = mapOf(
             "vendor/magento/module-catalog/view/frontend/layout/x.xml" to ("frontend" to null),
+            "packages/view/checkout/view/adminhtml/ui_component/order_grid.xml" to ("adminhtml" to null),
+            "packages/design/shop/app/design/frontend/Acme/luma/Magento_Catalog/layout/x.xml" to ("frontend" to "Magento_Catalog"),
+            "packages/view/adminhtml/other/layout/x.xml" to (null to null),
             "app/design/frontend/Acme/view/Magento_Catalog/layout/x.xml" to ("frontend" to "Magento_Catalog"),
             "vendor/magento/theme-adminhtml-backend/Magento_Backend/layout/x.xml" to ("adminhtml" to "Magento_Backend"),
             "vendor/hyva-themes/magento2-default-theme/Magento_Catalog/templates/x.phtml" to (null to "Magento_Catalog"),
@@ -265,6 +267,50 @@ class MagentoInspectionResultsTest : BaseProjectTestCase() {
         val blocks = records(result).filter { it.getString("kind") == "block" }
         assertEquals(result.toString(), listOf("a.phtml", "b.phtml"), blocks.map { it.getString("template") })
         assertTrue(blocks.all { it.getInt("line") == 1 })
+    }
+
+    fun testLayoutQueryIncludesModuleAndParentThemeOverrides() {
+        val themeLayout = "app/design/frontend/Acme/luma/Magento_Checkout/layout"
+        val baseOverride = "$themeLayout/override/base/acme_checkout.xml"
+        val parentOverride = "$themeLayout/override/theme/Magento/luma/acme_checkout.xml"
+        val layout = """
+            <page>
+                <body><container name="acme_checkout.container"><block name="acme_checkout.block"/></container></body>
+            </page>
+        """.trimIndent()
+        addFiles(
+            "etc/module.xml" to """<config><module name="Acme_Root"/></config>""",
+            baseOverride to layout,
+            parentOverride to layout,
+            "$themeLayout/other/base/acme_checkout.xml" to layout
+        )
+
+        val parameters = JSONObject().put("name", "acme_checkout").put("format", "json").put("area", "frontend")
+        val result = query("layout_entities", parameters)
+        assertEquals(result.toString(), "ok", result.getString("status"))
+        assertEquals(6, result.getInt("total"))
+        assertTrue(result.getBoolean("complete"))
+        val byPath = records(result).groupBy { it.getString("path") }
+        assertEquals(setOf(baseOverride, parentOverride), byPath.keys)
+        for (declarations in byPath.values) {
+            assertEquals(listOf("layout_handle", "block", "container"), declarations.map { it.getString("kind") })
+            assertTrue(declarations.all { it.getString("module") == "Magento_Checkout" })
+            assertTrue(declarations.first().isNull("line"))
+            assertTrue(declarations.drop(1).all { it.getInt("line") == 2 })
+        }
+        assertEquals(6, query("layout_entities", parameters.put("module", "Magento_Checkout")).getInt("total"))
+        val text = MagentoViewQueries.findLayoutEntities(project, "acme_checkout")
+        assertTrue(text, text.contains(baseOverride) && text.contains(parentOverride))
+    }
+
+    fun testUiComponentAreaFilterUsesTheViewDirectory() {
+        val file = "packages/view/checkout/view/adminhtml/ui_component/acme_order_grid.xml"
+        addFiles(file to "<listing/>")
+        val parameters = JSONObject().put("name", "acme_order_grid").put("format", "json").put("area", "adminhtml")
+        val result = query("ui_component", parameters)
+        assertEquals(result.toString(), "ok", result.getString("status"))
+        assertEquals(file, records(result).single().getString("path"))
+        assertEquals("no_matches", query("ui_component", parameters.put("area", "checkout")).getString("status"))
     }
 
     fun testUiAndAclTextSayWhenTheyWereCut() {

@@ -40,7 +40,7 @@ internal object MagentoDiQueries {
         }
         val pluginDeclarations = snapshot.pluginDeclarations[query].orEmpty().map { record ->
             "${record.filePath} -> plugin name=${record.pluginName} type=${record.pluginType ?: "-"} " +
-                "sortOrder=${record.sortOrder} disabled=${record.disabled} scope=${record.scope}"
+                "sortOrder=${record.sortOrder ?: 0} disabled=${record.disabled ?: false} scope=${record.scope}"
         }
 
         val lines = mutableListOf<String>()
@@ -79,20 +79,16 @@ internal object MagentoDiQueries {
             } +
             snapshot.pluginDeclarations[query].orEmpty().map {
                 InspectionRecord("plugin", query, it.filePath, it.line, it.scope, linkedMapOf("name" to it.pluginName,
-                    "type" to it.pluginType, "sortOrder" to it.sortOrder, "disabled" to it.disabled))
+                    "type" to it.pluginType, "sortOrder" to (it.sortOrder ?: 0), "disabled" to (it.disabled ?: false)))
             }).sortedWith(compareBy({ it.path }, { it.line }, { it.kind }, { it.fields["role"]?.toString() },
                 { it.fields["name"]?.toString() }))
     }
 
     /** Retains the existing query API while dispatching PHP semantics through the optional provider. */
-    fun findPluginsForMethod(project: Project, className: String, methodName: String): String {
+    fun findPluginsForMethod(project: Project, className: String, methodName: String, effectiveArea: String? = null,
+                             fileArea: String? = null): String {
         val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
             ?: return MagentoMethodPluginQueryProvider.UNAVAILABLE_MESSAGE
-        return provider.findPluginsForMethod(project, className, methodName)
+        return provider.findPluginsForMethod(project, className, methodName, effectiveArea, fileArea)
     }
-
-    /** Structured plugin matches, or null when the registered provider offers only text. */
-    fun pluginRecords(project: Project, className: String, methodName: String): List<InspectionRecord>? =
-        (MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull() as? MagentoMethodPluginRecordProvider)
-            ?.pluginRecords(project, className, methodName)
 }

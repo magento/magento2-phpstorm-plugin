@@ -25,7 +25,7 @@ class MagentoIntelligenceToolset : McpToolset {
     @McpToolHints(readOnlyHint = TRUE)
     @McpDescription(
         "Discover Magento and Adobe Commerce MCP tools for project inspection, setup, runtime, " +
-        "compatibility, scaffolding, and bundled agent skills. Lists available tools and their arguments on request."
+        "maintenance checks, compatibility, scaffolding, and bundled agent skills. Lists available tools and their arguments on request."
     )
     suspend fun magentoIntelligence(
         @McpDescription("Exact tool name to show its full description and argument schema. Omit for the catalog.")

@@ -34,7 +34,7 @@ class ProjectToolset : McpToolset {
 
     @McpTool(name = "describe_magento_cli_environment")
     @McpToolHints(readOnlyHint = TRUE)
-    @McpDescription("Describe project-local Magento, PHP, Composer and Magerun wrappers, Docker Compose priority, working directories and DDEV configuration. Reads files only: no wrapper, PHP code, Docker command or metadata probe is executed. Requires configured, enabled Magento integration; does not require PHP PSI or indexing.")
+    @McpDescription("Describe project-local Magento, PHP, Composer and Magerun wrappers, Docker Compose priority, working directories, DDEV configuration and DDEV project commands from .ddev/commands. Reads files only: no wrapper, PHP code, Docker command or metadata probe is executed. Requires configured, enabled Magento integration; does not require PHP PSI or indexing.")
     suspend fun describe(): String = withProject { service, project -> service.describeEnvironment(project).toString() }
 
     private suspend fun withProject(action: (ProjectService, Path) -> String): String = withContext(Dispatchers.IO) {

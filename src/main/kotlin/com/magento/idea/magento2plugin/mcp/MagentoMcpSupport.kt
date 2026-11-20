@@ -84,16 +84,6 @@ internal object MagentoMcpSupport {
             || normalizedCandidate.contains(normalizedQuery)
     }
 
-    fun getPluginKind(pluginMethodName: String, targetMethodName: String): String? {
-        val capitalizedMethod = targetMethodName.replaceFirstChar { it.uppercase() }
-        return when {
-            pluginMethodName == "before$capitalizedMethod" -> "before"
-            pluginMethodName == "around$capitalizedMethod" -> "around"
-            pluginMethodName == "after$capitalizedMethod" -> "after"
-            else -> null
-        }
-    }
-
     fun pluginKindOrder(kind: String): Int = when (kind) {
         "before" -> 0
         "around" -> 1
@@ -114,12 +104,19 @@ internal object MagentoMcpSupport {
      */
     fun viewArea(path: String): String? {
         val segments = path.replace('\\', '/').split('/')
-        val design = segments.indexOf("design")
-        if (design > 0 && segments[design - 1] == "app" && design + 2 < segments.size) return segments[design + 1]
-        segments.firstNotNullOfOrNull { THEME_PACKAGE.matchEntire(it)?.groupValues?.get(1) }?.let { return it }
-        val view = segments.indexOf("view")
-        if (view >= 0 && view + 2 < segments.size) return segments[view + 1]
-        return null
+        val design = segments.indices.firstOrNull { i ->
+            i + 5 < segments.size && segments[i] == "app" && segments[i + 1] == "design" &&
+                segments[i + 2] in VIEW_AREAS
+        }
+        if (design != null) return segments[design + 2]
+
+        val view = segments.indices.lastOrNull { i ->
+            i + 3 < segments.size && segments[i] == "view" && segments[i + 1] in VIEW_AREAS &&
+                segments[i + 2] in THEME_MODULE_FOLDERS
+        }
+        if (view != null) return segments[view + 1]
+
+        return segments.asReversed().firstNotNullOfOrNull { THEME_PACKAGE.matchEntire(it)?.groupValues?.get(1) }
     }
 
     /** Module named by a theme override folder, such as `Magento_Catalog` in `…/Magento_Catalog/layout/x.xml`. */
@@ -130,6 +127,7 @@ internal object MagentoMcpSupport {
         }?.let { segments[it] }
     }
 
+    private val VIEW_AREAS = setOf("frontend", "adminhtml", "base")
     private val THEME_PACKAGE = Regex("theme-(frontend|adminhtml)-.+")
     private val MODULE_FOLDER = Regex("[A-Z][A-Za-z0-9]*_[A-Z][A-Za-z0-9]*")
     private val THEME_MODULE_FOLDERS = setOf("layout", "page_layout", "templates", "ui_component", "web", "email")

@@ -8,8 +8,20 @@ import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 
 /** Optional method/interception analysis; its shared contract contains no PHP PSI types. */
-interface MagentoMethodPluginQueryProvider {
+internal interface MagentoMethodPluginQueryProvider {
     fun findPluginsForMethod(project: Project, className: String, methodName: String): String
+
+    fun findPluginsForMethod(
+        project: Project, className: String, methodName: String, effectiveArea: String?, fileArea: String?
+    ): String = if (effectiveArea == null && fileArea == null) {
+        findPluginsForMethod(project, className, methodName)
+    } else {
+        "This PHP provider supports declaration-only text results."
+    }
+
+    /** A text-only provider can leave structured results unavailable. */
+    fun pluginRecords(project: Project, className: String, methodName: String, effectiveArea: String?): InspectionQueryResult? =
+        null
 
     companion object {
         val EP_NAME = ExtensionPointName.create<MagentoMethodPluginQueryProvider>(
@@ -22,9 +34,4 @@ interface MagentoMethodPluginQueryProvider {
         /** Checking extension registration does not instantiate the optional PHP provider. */
         fun isAvailable(): Boolean = EP_NAME.hasAnyExtensions()
     }
-}
-
-/** Structured `plugins_for_method` results; a provider without it answers `format: json` with `unavailable`. */
-internal interface MagentoMethodPluginRecordProvider {
-    fun pluginRecords(project: Project, className: String, methodName: String): List<InspectionRecord>
 }

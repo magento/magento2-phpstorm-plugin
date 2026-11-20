@@ -10,6 +10,9 @@ import com.intellij.openapi.options.ConfigurationException
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.util.xmlb.XmlSerializer
 import com.magento.idea.magento2plugin.PhysicalMagentoTestCase
+import java.nio.file.Files
+import java.nio.file.Path
+import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JTextField
@@ -35,6 +38,20 @@ class SettingsFormTest : PhysicalMagentoTestCase() {
 
     private inline fun <reified T> field(form: SettingsForm, name: String): T =
         SettingsForm::class.java.getDeclaredField(name).apply { isAccessible = true }.get(form) as T
+
+    fun testInstallMagerunSkillFromSettingsIntoSelectedTarget() {
+        val form = createForm()
+        try {
+            field<JComboBox<*>>(form, "skillAgentTargetSelect").selectedItem = MagentoSkillInstaller.AgentTarget.AGENTS
+            field<JButton>(form, "installMagentoMagerunSkillButton").doClick()
+            val relative = "skills/magento-magerun/SKILL.md"
+            val expected = MagentoSkillInstaller::class.java.getResourceAsStream("/$relative")!!.use { it.readAllBytes() }
+            val installed = Path.of(project.basePath!!, ".agents", relative)
+            assertTrue(installed.toString(), expected.contentEquals(Files.readAllBytes(installed)))
+        } finally {
+            form.disposeUIResources()
+        }
+    }
 
     fun testDisableIntegrationWithMissingSavedDirectory() {
         val form = createForm()

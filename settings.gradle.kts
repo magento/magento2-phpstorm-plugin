@@ -3,6 +3,13 @@
  * See COPYING.txt for license details.
  */
 
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = "Magento 2 and Adobe Commerce"
 
 plugins {

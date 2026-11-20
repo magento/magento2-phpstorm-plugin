@@ -97,18 +97,31 @@ class UctAnalysisService @JvmOverloads constructor(
 
         val components = linkedMapOf<String, Component>()
         val files = linkedMapOf<String, VirtualFile>()
-        fun isExcluded(file: VirtualFile) = UctExcludedPaths.contains(request.excludedPaths, file.path)
-        val roots = request.paths.distinct().map { path ->
+        val exclusions = UctExcludedPaths.matcher(request.excludedPaths)
+        fun isExcluded(file: VirtualFile) = exclusions.matches(file)
+        // A symlink and its target are one component or file, so scans keep the first path they reach it by.
+        // Skipped links are checked before visiting, so a link reached first does not hide its target.
+        fun identity(file: VirtualFile) = file.canonicalPath ?: file.path
+        val requested = request.paths.distinct().map { path ->
             LocalFileSystem.getInstance().findFileByNioFile(Path.of(path))
                 ?: throw IllegalArgumentException("Analysis path does not exist: $path")
-        }.filterNot(::isExcluded)
+        }
+        val roots = requested.filterNot(::isExcluded)
+        require(roots.isNotEmpty() || requested.isEmpty()) {
+            "Every requested path is excluded: ${requested.joinToString { it.path }}. Remove the exclusion or choose another path."
+        }
         val excluded = ExcludeMagentoBundledFilter()
+        // A requested directory is scanned even when it is a bundled module or a symlink, as Composer path
+        // repositories install modules in vendor; the bundled filter and the symlink rule apply below the roots.
+        val requestedDirectories = roots.filter { it.isDirectory }.map { it.path }.toSet()
+        fun isSkippedLink(directory: VirtualFile) =
+            directory.path !in requestedDirectories && directory.`is`(VFileProperty.SYMLINK)
         val directories = ArrayDeque(roots.filter { it.isDirectory })
-        roots.filterNot { it.isDirectory }.forEach { files[it.path] = it }
+        roots.filterNot { it.isDirectory }.forEach { files.putIfAbsent(identity(it), it) }
         val visited = hashSetOf<String>()
         while (directories.isNotEmpty()) {
             val directory = directories.removeFirst()
-            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK) || isExcluded(directory)) continue
+            if (isSkippedLink(directory) || !visited.add(identity(directory)) || isExcluded(directory)) continue
             require(visited.size <= 10000) { "Scan exceeds 10000 directories. Choose a narrower scope." }
             read {
                 val psiDirectory = PsiManager.getInstance(project).findDirectory(directory)
@@ -117,8 +130,8 @@ class UctAnalysisService @JvmOverloads constructor(
                 if (found.isEmpty()) {
                     directories.addAll(directory.children.filter { it.isDirectory })
                 } else {
-                    found.filterNot { excluded.isExcluded(it) }.forEach {
-                        components[directory.path] = Component(directory, it.type.toString() == "theme")
+                    found.filterNot { directory.path !in requestedDirectories && excluded.isExcluded(it) }.forEach {
+                        components[identity(directory)] = Component(directory, it.type.toString() == "theme")
                     }
                 }
             }
@@ -129,11 +142,11 @@ class UctAnalysisService @JvmOverloads constructor(
         visited.clear()
         while (pending.isNotEmpty()) {
             val directory = pending.removeFirst()
-            if (!visited.add(directory.path) || directory.`is`(VFileProperty.SYMLINK)) continue
+            if (isSkippedLink(directory) || !visited.add(identity(directory))) continue
             require(visited.size <= 10000 && files.size <= 10000) { "Scan exceeds 10000 files or directories. Choose a narrower scope." }
             read {
                 directory.children.filterNot { it.`is`(VFileProperty.SYMLINK) || isExcluded(it) }.forEach {
-                    if (it.isDirectory) pending.add(it) else files[it.path] = it
+                    if (it.isDirectory) pending.add(it) else files.putIfAbsent(identity(it), it)
                 }
             }
         }
