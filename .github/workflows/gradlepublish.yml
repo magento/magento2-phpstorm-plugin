@@ -61,3 +61,12 @@ jobs:
         run: ./gradlew publishPlugin -i --no-daemon
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}
+      - name: Include curated release notes when provided
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          notes=".github/release-notes/${RELEASE_TAG}.md"
+          if [[ -f "$notes" ]]; then
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$notes"
+          fi
