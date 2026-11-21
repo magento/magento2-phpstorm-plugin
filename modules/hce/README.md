@@ -1,6 +1,9 @@
 # Magento 2 and Adobe Commerce for HCE
 
-The HCE integration has its own plugin identity, build, tests, and CI. Project
+The HCE integration has its own runtime-specific build, tests, and CI. Its plugin ID
+is shared with the desktop plugin (`com.magento.idea.magento2plugin`), while the
+HCE update has a distinct `-hce` version and build-271 compatibility so both
+variants can be published under Marketplace listing 8024. Project
 settings, CLI environment discovery, bundled skill delivery, Magerun metadata, and
 shared XML analysis are its initial toolsets. The plugin can add
 Magento analysis toolsets without changing its identity or loading desktop UI,
@@ -16,7 +19,7 @@ Run setup as the developer who uses the Magento checkout. The pilot targets Linu
 installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
 ```
 
-This command downloads the installer from **GitHub Releases**. The installer then verifies and downloads the separately packaged HCE plugin from that same GitHub release. **HCE downloads are not counted as JetBrains Marketplace downloads.** The desktop IDE plugin is distributed via [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/8024-magento-2-and-adobe-commerce) (alpha channel: `https://plugins.jetbrains.com/plugins/alpha/8024`); it is a different plugin and cannot replace the HCE archive. Marketplace download counting for HCE requires a separately approved Marketplace listing for plugin ID `com.magento.idea.magento2plugin.hce` and changing release packaging to use the installer's supported `--marketplace` download source.
+The installer script is hosted in **GitHub Releases**, but its pinned HCE plugin archive is fetched from **JetBrains Marketplace plugin 8024** using the dedicated HCE build/version, not GitHub. The desktop plugin and HCE variant share the same Marketplace listing and download counter (download statistics are managed by JetBrains). The headless update must first pass Marketplace verification/approval; setup will not work until the alpha build is available. Do not substitute the desktop ZIP: HCE uses build 271 and the desktop plugin uses build 263. The [desktop plugin listing](https://plugins.jetbrains.com/plugin/8024-magento-2-and-adobe-commerce) is also available via the [alpha channel](https://plugins.jetbrains.com/plugins/alpha/8024).
 
 **Branch preview.** The HCE host-package job produces the two files as separate artifacts. Extract both to the same directory and run this from the Magento checkout. A maintainer can also build the same files locally using the commands below.
 
