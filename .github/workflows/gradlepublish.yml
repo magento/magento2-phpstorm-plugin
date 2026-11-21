@@ -38,29 +38,36 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - name: Package headless plugin and installer for this release
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - name: Package headless variant and Marketplace installer for this alpha
+        if: ${{ github.event.release.prerelease }}
         run: |
           python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
           ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon
           dist=modules/hce/build/distributions
           python3 modules/hce/tests/check_archive.py "$dist/magento-hce.zip"
-          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --github-repository "$GITHUB_REPOSITORY" --release-tag "$RELEASE_TAG" --output "$dist/magento-hce.pyz"
-      - name: Upload desktop ZIP, headless ZIP and installer
+          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --marketplace --output "$dist/magento-hce.pyz"
+      - name: Upload headless installer (plugin ZIP comes from Marketplace)
+        if: ${{ github.event.release.prerelease }}
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          shopt -s nullglob
-          desktop=(build/distributions/*.zip)
-          [[ ${#desktop[@]} == 1 ]]
-          dist=modules/hce/build/distributions
-          gh release upload "$RELEASE_TAG" "${desktop[0]}" "$dist/magento-hce.zip" "$dist/magento-hce.pyz" --repo "$GITHUB_REPOSITORY" --clobber
+          gh release upload "$RELEASE_TAG" modules/hce/build/distributions/magento-hce.pyz --repo "$GITHUB_REPOSITORY" --clobber
       - name: Publish desktop plugin to JetBrains Marketplace
         run: ./gradlew publishPlugin -i --no-daemon
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}
+      - name: Publish headless variant under the same Marketplace listing 8024
+        if: ${{ github.event.release.prerelease }}
+        env:
+          JET_BRAINS_TOKEN: ${{ secrets.JET_BRAINS_TOKEN }}
+        run: |
+          test -n "$JET_BRAINS_TOKEN"
+          curl --fail-with-body --silent --show-error --retry 3 \
+            --header "Authorization: Bearer $JET_BRAINS_TOKEN" \
+            -F "pluginId=8024" -F "channel=alpha" \
+            -F "file=@modules/hce/build/distributions/magento-hce.zip" \
+            https://plugins.jetbrains.com/api/updates/upload
       - name: Include curated release notes when provided
         env:
           GH_TOKEN: ${{ github.token }}
