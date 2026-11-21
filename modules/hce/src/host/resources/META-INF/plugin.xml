@@ -1,9 +1,9 @@
 <idea-plugin>
-    <id>com.magento.idea.magento2plugin.hce</id>
-    <name>Magento 2 and Adobe Commerce for HCE</name>
+    <id>com.magento.idea.magento2plugin</id>
+    <name>Magento 2 and Adobe Commerce</name>
     <version>${pluginVersion}</version>
     <vendor>Magento Inc.</vendor>
-    <description>Magento 2 and Adobe Commerce integration for JetBrains Headless Code Engine.</description>
+    <description>Headless Code Engine variant of the Magento 2 and Adobe Commerce plugin, distributed under the existing JetBrains Marketplace listing (8024).</description>
     <idea-version since-build="271.2085" until-build="271.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.ls.plugin.mcp</depends>
