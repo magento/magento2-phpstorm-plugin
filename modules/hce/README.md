@@ -280,10 +280,10 @@ Engine 2.9 matches the tested engine's bundled version.
 python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
 ```
 
-To build the installer for the packaged plugin:
+For a local build, pass the packaged ZIP to setup with `--plugin-file`. Build the installer with:
 
 ```sh
-python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --marketplace --output modules/hce/build/distributions/magento-hce.pyz
+python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --output modules/hce/build/distributions/magento-hce.pyz
 ```
 
 Extract `magento-hce.zip` into a dedicated plugins directory and pass that directory

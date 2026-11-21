@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import queue
+import sys
 import subprocess
 import threading
 import time
@@ -141,6 +142,11 @@ def launch_command(runtime, plugins, session, settings, log, consent_hash, licen
     if any('"' in str(value) or "\n" in str(value) for value in options.values()):
         raise ValueError("The runtime's JVM options cannot represent quotes or newlines in these paths")
     env = dict(os.environ)
+    bundled_jdk = Path(runtime) / "jbr"
+    if sys.platform == "darwin":
+        bundled_jdk = bundled_jdk / "Contents/Home"
+    if (bundled_jdk / "bin/javac").is_file():
+        env.setdefault("JAVA_HOME", str(bundled_jdk))
     env.pop("IJ_LAUNCHER_DEBUG", None)
     env["IJ_JAVA_OPTIONS"] = " ".join([env.get("IJ_JAVA_OPTIONS", "")] + [
         f'"-D{key}={value}"' for key, value in options.items()]).strip()
