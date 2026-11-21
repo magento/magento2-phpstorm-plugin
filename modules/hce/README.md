@@ -10,11 +10,13 @@ PHP, or JavaScript dependencies into this module unconditionally.
 
 Run setup as the developer who uses the Magento checkout. The pilot targets Linux x86-64 and Apple Silicon macOS with Python 3.12+ and a JetBrains license valid for the pinned engine. For Adobe Commerce Cloud, use a development VM or workstation with the checkout and its Composer dependencies installed. Run the command from the directory containing Magento’s `composer.json`.
 
-**Release one-liner.** Once a desktop release includes `magento-hce.pyz` and `magento-hce.zip`, copy its installer asset URL into this command. Choose `--client codex` (default), `--client claude`, or `--client stdio` to print configuration for another MCP client.
+**Alpha prerelease quick start (`2026.3.7-alpha-2`).** After the GitHub release is published and its assets are ready, run this **single shell command from the Magento checkout**. Choose `--client codex` (default), `--client claude`, or `--client stdio` to print configuration for another MCP client.
 
 ```sh
-installer=$(mktemp) && curl -fL 'INSTALLER_ASSET_URL' -o "$installer" && python3 "$installer" setup --client codex
+installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
 ```
+
+This command downloads the installer from **GitHub Releases**. The installer then verifies and downloads the separately packaged HCE plugin from that same GitHub release. **HCE downloads are not counted as JetBrains Marketplace downloads.** The desktop IDE plugin is distributed via [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/8024-magento-2-and-adobe-commerce) (alpha channel: `https://plugins.jetbrains.com/plugins/alpha/8024`); it is a different plugin and cannot replace the HCE archive. Marketplace download counting for HCE requires a separately approved Marketplace listing for plugin ID `com.magento.idea.magento2plugin.hce` and changing release packaging to use the installer's supported `--marketplace` download source.
 
 **Branch preview.** The HCE host-package job produces the two files as separate artifacts. Extract both to the same directory and run this from the Magento checkout. A maintainer can also build the same files locally using the commands below.
 
