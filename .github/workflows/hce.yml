@@ -99,7 +99,7 @@ jobs:
         run: >-
           python3 modules/hce/package_launcher.py
           --plugin modules/hce/build/distributions/magento-hce.zip
-          --github-repository "$GITHUB_REPOSITORY"
+          --marketplace
           --output modules/hce/build/distributions/magento-hce.pyz
       - uses: actions/upload-artifact@v7.0.2
         with:
@@ -136,7 +136,7 @@ jobs:
         run: ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$HCE_RUNTIME" --no-daemon --console=plain
       - name: Verify setup, Codex and Claude registration, MCP calls and a warm restart
         run: |
-          python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --github-repository "$GITHUB_REPOSITORY" --output modules/hce/build/distributions/magento-hce.pyz
+          python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --marketplace --output modules/hce/build/distributions/magento-hce.pyz
           python3 modules/hce/tests/launcher_smoke.py --launcher modules/hce/build/distributions/magento-hce.pyz --plugin modules/hce/build/distributions/magento-hce.zip --runtime "$HCE_RUNTIME" --license-dir "$HCE_LICENSE_DIR" --accept-eula
       - name: Exercise the actual HCE transport and restart behavior
         run: >-
