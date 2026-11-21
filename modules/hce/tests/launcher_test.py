@@ -200,6 +200,25 @@ class LauncherTest(unittest.TestCase):
             url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
         self.assertEqual("https://plugins.jetbrains.com/plugin/download?rel=true&updateId=123", url)
 
+    def test_import_stays_in_checkout_and_upgrades_generated_descriptors(self):
+        project = self.root / "checkout"
+        project.mkdir()
+        prepare_import(project)
+        module = project / "magento-hce.iml"
+        listing = project / ".idea/modules.xml"
+        body, current = module.read_text(), listing.read_text()
+        self.assertIn('file://$MODULE_DIR$"', body)
+        self.assertNotIn("/..", body)
+        module.unlink()
+        (project / ".idea/magento-hce.iml").write_text(body.replace("$MODULE_DIR$", "$MODULE_DIR$/.."))
+        listing.write_text(current.replace("/magento-hce.iml", "/.idea/magento-hce.iml"))
+        prepare_import(project)
+        self.assertEqual(current, listing.read_text())
+        self.assertEqual(body, module.read_text())
+        listing.write_text("<project/>")
+        prepare_import(project)
+        self.assertEqual("<project/>", listing.read_text())
+
     def test_checkout_import_uses_bundled_jdk(self):
         def java_home():
             _, env = installer.launch_command(self.runtime, self.root, self.root, self.root, self.root, "abc")

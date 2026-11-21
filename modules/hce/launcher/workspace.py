@@ -55,23 +55,34 @@ def prepare_import(project):
         raise ValueError("Cannot configure a symlinked .idea directory")
     idea.mkdir(exist_ok=True)
     modules = idea / "modules.xml"
-    if modules.exists():
-        return
-    module = idea / "magento-hce.iml"
+    module = project / "magento-hce.iml"
     body = ('<module type="JAVA_MODULE" version="4"><component name="NewModuleRootManager">'
-            '<content url="file://$MODULE_DIR$/.."><sourceFolder url="file://$MODULE_DIR$/.." '
+            '<content url="file://$MODULE_DIR$"><sourceFolder url="file://$MODULE_DIR$" '
             'isTestSource="false"/></content><orderEntry type="sourceFolder" forTests="false"/>'
             '</component></module>\n')
+    listing = ('<project version="4"><component name="ProjectModuleManager"><modules>'
+               '<module fileurl="file://$PROJECT_DIR$/magento-hce.iml" '
+               'filepath="$PROJECT_DIR$/magento-hce.iml"/></modules></component></project>\n')
+    if modules.is_symlink():
+        return
+    migrate = modules.exists()
+    if migrate:
+        previous = idea / module.name
+        if (modules.read_text() != listing.replace("/magento-hce.iml", "/.idea/magento-hce.iml")
+                or previous.is_symlink() or not previous.is_file()
+                or previous.read_text() != body.replace("$MODULE_DIR$", "$MODULE_DIR$/..")):
+            return
     try:
         with module.open("x") as output:
             output.write(body)
     except FileExistsError:
         if module.is_symlink() or module.read_text() != body:
             raise ValueError(f"Existing module descriptor conflicts with setup: {module}")
-    with modules.open("x") as output:
-        output.write('<project version="4"><component name="ProjectModuleManager"><modules>'
-                     '<module fileurl="file://$PROJECT_DIR$/.idea/magento-hce.iml" '
-                     'filepath="$PROJECT_DIR$/.idea/magento-hce.iml"/></modules></component></project>\n')
+    if migrate:
+        write(modules, listing.encode())
+    else:
+        with modules.open("x") as output:
+            output.write(listing)
 
 
 def register(project, client, launcher):
