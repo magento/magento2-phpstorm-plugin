@@ -47,7 +47,7 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                     "com.magento.idea.magento2plugin.hce.AnalysisSettings"
     assert len(descriptors) == 1
     descriptor = descriptors[0]
-    assert descriptor.findtext("id") == "com.magento.idea.magento2plugin.hce"
+    assert descriptor.findtext("id") == "com.magento.idea.magento2plugin"
     assert {element.text for element in descriptor.findall("depends") if element.get("optional") != "true"} == {
         "com.intellij.modules.platform", "org.jetbrains.ls.plugin.mcp"}
     assert descriptor.find("depends[@config-file='withXml.xml']").text == "com.intellij.modules.xml"
