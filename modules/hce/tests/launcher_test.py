@@ -96,7 +96,7 @@ class LauncherTest(unittest.TestCase):
         jar = io.BytesIO()
         with zipfile.ZipFile(jar, "w") as archive:
             descriptor = (HCE / "src/host/resources/META-INF/plugin.xml").read_text()
-            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42"))
+            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42-hce"))
         with zipfile.ZipFile(self.plugin, "w") as archive:
             archive.writestr("magento-hce/lib/test.jar", jar.getvalue())
         self.launcher = self.root / "magento-hce.pyz"
@@ -170,8 +170,8 @@ class LauncherTest(unittest.TestCase):
     def test_pinned_marketplace_url(self):
         with zipfile.ZipFile(self.launcher) as archive:
             url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
-        version = "2026.3.7-alpha.42"
-        self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin.hce&version=" + version, url)
+        version = "2026.3.7-alpha.42-hce"
+        self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin&version=" + version, url)
 
 
 if __name__ == "__main__":
