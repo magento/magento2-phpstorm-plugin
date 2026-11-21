@@ -1,22 +1,59 @@
 name: Release desktop and headless plugins
 
 on:
+  workflow_dispatch:
+    inputs:
+      draft_release_id:
+        description: Numeric ID of the draft alpha release
+        required: true
+        type: string
   release:
     types: [published]
 
 jobs:
   build:
-    if: ${{ !startsWith(github.event.release.tag_name, 'hce-') }}
+    if: >-
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/5.4.0-develop') ||
+      (github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'hce-') &&
+       !contains(github.event.release.assets.*.name, 'magento-hce.pyz'))
     permissions:
       contents: write
 
     runs-on: ubuntu-latest
     env:
-      GITHUB_RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
-      GITHUB_RELEASE_ID: ${{ github.event.release.id }}
+      GITHUB_RELEASE_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' || github.event.release.prerelease }}
+      GITHUB_RELEASE_ID: ${{ inputs.draft_release_id || github.event.release.id }}
 
     steps:
       - uses: actions/checkout@v7.0.1
+      - name: Require a staged installer for headless prereleases
+        if: github.event_name == 'release' && github.event.release.prerelease
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ -f ".github/release-notes/$TAG.md" ]] && grep -Fq 'magento-hce.pyz' ".github/release-notes/$TAG.md"; then
+            echo "::error::Stage the HCE prerelease from a draft before publishing it."
+            exit 1
+          fi
+      - name: Check the draft release target
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [[ "$GITHUB_RELEASE_ID" =~ ^[0-9]+$ ]]
+          release=$(gh api "repos/$GITHUB_REPOSITORY/releases/$GITHUB_RELEASE_ID")
+          jq -e '.draft and .prerelease' <<< "$release" >/dev/null
+          tag=$(jq -r .tag_name <<< "$release")
+          version=$(sed -n 's/^pluginVersion *= *//p' gradle.properties)
+          suffix=${tag#"$version"}
+          [[ "$suffix" != "$tag" && "$suffix" =~ ^-alpha(-[0-9]+)?$ ]]
+          if git ls-remote --exit-code --refs origin "refs/tags/$tag" >/dev/null; then
+            git fetch --no-tags origin "refs/tags/$tag"
+            [[ $(git rev-parse 'FETCH_HEAD^{commit}') == "$GITHUB_SHA" ]]
+          else
+            [[ $? == 2 && $(jq -r .target_commitish <<< "$release") == "$GITHUB_SHA" ]]
+          fi
+          echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
       - name: Set up JDK 25
         uses: actions/setup-java@v6.0.1
         with:
@@ -38,26 +75,56 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-      - name: Package headless plugin and installer for this release
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+      - name: Verify headless installer and core contracts before releasing
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3 modules/hce/tests/launcher_test.py
+          ./gradlew -p modules/hce test --no-daemon --console=plain
+      - name: Package headless variant and Marketplace installer for this alpha
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
           ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon
           dist=modules/hce/build/distributions
           python3 modules/hce/tests/check_archive.py "$dist/magento-hce.zip"
-          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --github-repository "$GITHUB_REPOSITORY" --release-tag "$RELEASE_TAG" --output "$dist/magento-hce.pyz"
-      - name: Upload desktop ZIP, headless ZIP and installer
+          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --marketplace --output "$dist/magento-hce.pyz"
+      - name: Attach the installer and notes to the draft
+        if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          shopt -s nullglob
-          desktop=(build/distributions/*.zip)
-          [[ ${#desktop[@]} == 1 ]]
-          dist=modules/hce/build/distributions
-          gh release upload "$RELEASE_TAG" "${desktop[0]}" "$dist/magento-hce.zip" "$dist/magento-hce.pyz" --repo "$GITHUB_REPOSITORY" --clobber
-      - name: Publish desktop plugin to JetBrains Marketplace
-        run: ./gradlew publishPlugin -i --no-daemon
+          gh release upload "$RELEASE_TAG" modules/hce/build/distributions/magento-hce.pyz --repo "$GITHUB_REPOSITORY" --clobber
+          notes=".github/release-notes/$RELEASE_TAG.md"
+          if [[ -f "$notes" ]]; then
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$notes"
+          fi
+      - name: Submit the HCE alpha
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          JET_BRAINS_TOKEN: ${{ secrets.JET_BRAINS_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            --header "Authorization: Bearer $JET_BRAINS_TOKEN" \
+            -F "pluginId=8024" -F "channel=hce-alpha" \
+            -F "file=@modules/hce/build/distributions/magento-hce.zip" \
+            https://plugins.jetbrains.com/api/updates/upload
+
+  publish-desktop:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GITHUB_RELEASE_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' || github.event.release.prerelease }}
+      GITHUB_RELEASE_ID: ${{ inputs.draft_release_id || github.event.release.id }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: gradle
+      - name: Publish the desktop plugin
+        run: ./gradlew publishPlugin --no-daemon
         env:
           MAGENTO_PHPSTORM_intellijPublishToken: ${{ secrets.JET_BRAINS_TOKEN }}

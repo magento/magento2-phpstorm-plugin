@@ -9,7 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- Use Magento MCP tools from Codex or Claude Code on a development server with JetBrains Headless Code Engine. Download `magento-hce.pyz` from the same GitHub release as the desktop plugin and run setup from your checkout. Setup verifies the runtime and plugin, offers JetBrains sign-in, and indexes the project before registering the client. See the [headless installation guide](modules/hce/README.md#install-on-a-development-host).
+- Codex and Claude Code can query Magento module dependencies, inspect XML declarations, and check whether a change requires a maintenance command through JetBrains Headless Code Engine. From a Magento checkout with Composer dependencies installed, set up Codex with one command:
+
+  ```bash
+  installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
+  ```
+
+  For Claude Code, use `--client claude`. See [supported hosts, licensing, and setup](modules/hce/README.md#install-on-a-development-host).
 
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.

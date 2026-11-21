@@ -21,7 +21,7 @@ sourceSets.main {
 // The core and its tests need no IDE or HCE distribution. Only this host adapter
 // compiles against the pinned engine API and is included in the plugin archive.
 val host = sourceSets.create("host")
-val releaseVersion = version.toString()
+val releaseVersion = "${version}-hce"
 tasks.named<org.gradle.language.jvm.tasks.ProcessResources>(host.processResourcesTaskName) {
     inputs.property("pluginVersion", releaseVersion)
     filesMatching("META-INF/plugin.xml") { expand(mapOf("pluginVersion" to releaseVersion)) }

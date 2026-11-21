@@ -24,15 +24,13 @@ from mcp import Server, magento_tools
 from workspace import check_index, digest, discover_module, lock, prepare_import, register, write
 
 
-def obtain(url, expected, staging, local=None):
+def obtain(url, staging, local=None):
     print("Verifying " + (str(local) if local else url), file=sys.stderr)
     archive = local
     if archive is None:
         archive = staging / "download"
         with urllib.request.urlopen(url, timeout=90) as source, archive.open("xb") as target:
             shutil.copyfileobj(source, target)
-    if digest(archive) != expected:
-        raise ValueError("SHA-256 mismatch for " + str(local or url))
     return archive
 
 
@@ -55,7 +53,9 @@ def install_runtime(home, manifest, provided):
         if not runtime.exists():
             with tempfile.TemporaryDirectory(dir=home) as tmp:
                 staging = Path(tmp)
-                archive = obtain(bundle["url"], bundle["sha256"], staging)
+                archive = obtain(bundle["url"], staging)
+                if digest(archive) != bundle["sha256"]:
+                    raise ValueError("SHA-256 mismatch for " + bundle["url"])
                 if system == "Darwin-arm64":
                     subprocess.run(["unzip", "-q", str(archive), "-d", tmp], check=True)
                 else:
@@ -69,20 +69,25 @@ def install_runtime(home, manifest, provided):
 
 
 def install_plugin(home, manifest, provided):
-    plugin = home / ("plugins-" + manifest["sha256"])
+    members = manifest["members"]
+    key = hashlib.sha256(json.dumps(members, sort_keys=True).encode()).hexdigest()
+    plugin = home / ("plugins-" + key)
     if not plugin.exists():
         with tempfile.TemporaryDirectory(dir=home) as tmp:
             staging = Path(tmp)
-            archive = obtain(manifest["url"], manifest["sha256"], staging, provided)
+            archive = obtain(manifest["url"], staging, provided)
             extracted = staging / "plugins"
             with zipfile.ZipFile(archive) as package:
-                for entry in package.infolist():
-                    path = Path(entry.filename)
-                    if entry.is_dir():
-                        continue
-                    if path.parent.as_posix() != "magento-hce/lib" or path.suffix != ".jar":
-                        raise ValueError("Unexpected plugin archive member: " + entry.filename)
-                    package.extract(entry, extracted)
+                files = [entry for entry in package.infolist() if not entry.is_dir()]
+                if sorted(entry.filename for entry in files) != sorted(members):
+                    raise ValueError("Unexpected plugin archive contents")
+                for entry in files:
+                    expected = members[entry.filename]
+                    if entry.file_size != expected["size"]:
+                        raise ValueError("Size mismatch for " + entry.filename)
+                    target = Path(package.extract(entry, extracted))
+                    if digest(target) != expected["sha256"]:
+                        raise ValueError("SHA-256 mismatch for " + entry.filename)
             extracted.rename(plugin)
     return plugin
 

@@ -1,20 +1,18 @@
 # Magento 2 and Adobe Commerce for HCE
 
-The HCE integration has its own plugin identity, build, tests, and CI. Project
-settings, CLI environment discovery, bundled skill delivery, Magerun metadata, and
-shared XML analysis are its initial toolsets. The plugin can add
-Magento analysis toolsets without changing its identity or loading desktop UI,
-PHP, or JavaScript dependencies into this module unconditionally.
+Use Magento MCP tools from Codex or Claude Code on a development host. The headless plugin can look up module dependencies and XML declarations, check maintenance requirements, and diagnose individual XML files.
 
 ## Install on a development host
 
-Run setup as the developer who uses the Magento checkout. The pilot targets Linux x86-64 and Apple Silicon macOS with Python 3.12+ and a JetBrains license valid for the pinned engine. For Adobe Commerce Cloud, use a development VM or workstation with the checkout and its Composer dependencies installed. Run the command from the directory containing Magento’s `composer.json`.
+Run setup as the developer who uses the Magento checkout. The alpha supports Linux x86-64 and Apple Silicon macOS with Python 3.12+ and curl. The pinned engine requires a valid IntelliJ IDEA Ultimate subscription or active JetBrains trial. For Adobe Commerce Cloud, use a development VM or workstation with the checkout and its Composer dependencies installed. Run the command from the directory containing Magento’s `composer.json`.
 
-**Release one-liner.** Once a desktop release includes `magento-hce.pyz` and `magento-hce.zip`, copy its installer asset URL into this command. Choose `--client codex` (default), `--client claude`, or `--client stdio` to print configuration for another MCP client.
+**Set up Codex**
 
 ```sh
-installer=$(mktemp) && curl -fL 'INSTALLER_ASSET_URL' -o "$installer" && python3 "$installer" setup --client codex
+installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
 ```
+
+For Claude Code, use `--client claude`. Use `--client stdio` to print the configuration for another MCP client.
 
 **Branch preview.** The HCE host-package job produces the two files as separate artifacts. Extract both to the same directory and run this from the Magento checkout. A maintainer can also build the same files locally using the commands below.
 
@@ -22,7 +20,7 @@ installer=$(mktemp) && curl -fL 'INSTALLER_ASSET_URL' -o "$installer" && python3
 python3 /path/to/magento-hce.pyz setup --client codex --plugin-file /path/to/magento-hce.zip
 ```
 
-Setup verifies the JetBrains runtime and plugin archive against the installer's SHA-256 pins. It presents the bundled JetBrains agreement and offers terminal sign-in if needed. A provisioned host can specify `--runtime /path/to/intellij-server-2027.1`, `--license-dir /path/to/store`, and, after reviewing that build’s `EULA.txt`, `--accept-eula`. With an existing runtime, setup checks its product and build. See `setup --help` for all options.
+Setup verifies the downloaded runtime archive and each plugin JAR against the installer's SHA-256 pins. It presents the bundled JetBrains agreement and offers terminal sign-in if needed. A provisioned host can specify `--runtime /path/to/intellij-server-2027.1`, `--license-dir /path/to/store`, and, after reviewing that build’s `EULA.txt`, `--accept-eula`. With an existing runtime, setup checks its product and build. See `setup --help` for all options.
 
 Setup imports and indexes the checkout, then resolves a real module through the plugin before registering the client. Use `--check-module Vendor_Module` to choose the verification target. Open or restart the client in this checkout and trust the project or approve its MCP entry when prompted. Try **“Which modules depend on Magento_Catalog? Show the declaration paths.”**
 
@@ -282,13 +280,11 @@ Engine 2.9 matches the tested engine's bundled version.
 python3 modules/hce/tests/check_archive.py modules/hce/build/distributions/magento-hce.zip
 ```
 
-One GitHub release job verifies the desktop plugin, packages HCE with the same version, attaches the desktop ZIP, HCE ZIP and installer to the same tag, and submits the desktop plugin to Marketplace. To reproduce the installer for a particular release, pass its actual tag.
+To build the installer for the packaged plugin:
 
 ```sh
-python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --github-repository OWNER/REPO --release-tag TAG --output modules/hce/build/distributions/magento-hce.pyz
+python3 modules/hce/package_launcher.py --plugin modules/hce/build/distributions/magento-hce.zip --marketplace --output modules/hce/build/distributions/magento-hce.pyz
 ```
-
-For an approved HCE Marketplace listing, use `--marketplace` in place of `--github-repository OWNER/REPO --release-tag TAG` and supply the exact ZIP served by Marketplace. The installer then fetches that version through JetBrains’ download API on a cache miss. The current plugin XML ID is `com.magento.idea.magento2plugin.hce`. The pilot uses GitHub release assets. Attribution to desktop listing 8024 would require a publishing arrangement with JetBrains.
 
 Extract `magento-hce.zip` into a dedicated plugins directory and pass that directory
 with `-Didea.plugins.path=...` through `IJ_JAVA_OPTIONS`. The engine's bundled

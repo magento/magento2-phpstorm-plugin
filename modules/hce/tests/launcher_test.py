@@ -96,7 +96,7 @@ class LauncherTest(unittest.TestCase):
         jar = io.BytesIO()
         with zipfile.ZipFile(jar, "w") as archive:
             descriptor = (HCE / "src/host/resources/META-INF/plugin.xml").read_text()
-            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42"))
+            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42-hce"))
         with zipfile.ZipFile(self.plugin, "w") as archive:
             archive.writestr("magento-hce/lib/test.jar", jar.getvalue())
         self.launcher = self.root / "magento-hce.pyz"
@@ -123,7 +123,7 @@ class LauncherTest(unittest.TestCase):
             return subprocess.run(base + extra, stdin=subprocess.DEVNULL, capture_output=True, text=True)
         self.assertIn("--accept-eula", run([]).stderr)
         self.plugin.write_bytes(b"corrupt")
-        self.assertIn("SHA-256 mismatch", run(["--accept-eula"]).stderr)
+        self.assertIn("not a zip file", run(["--accept-eula"]).stderr.lower())
         self.assertFalse((project / ".codex/config.toml").exists())
         self.assertFalse(list((self.root / "data").glob("plugins-*")))
 
@@ -159,19 +159,42 @@ class LauncherTest(unittest.TestCase):
                     installer.install_runtime(home, manifest, None)
                 self.assertFalse((home / ("runtime-" + "0" * 64)).exists())
 
-    def test_installer_pins_shared_release_tag(self):
-        subprocess.run([sys.executable, str(HCE / "package_launcher.py"), "--plugin", str(self.plugin),
-                        "--github-repository", "example/plugin", "--release-tag", "2026.3.7-preview",
-                        "--output", str(self.launcher)], check=True, stdout=subprocess.DEVNULL)
+    def test_marketplace_payload_and_cache(self):
         with zipfile.ZipFile(self.launcher) as archive:
-            url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
-        self.assertEqual("https://github.com/example/plugin/releases/download/2026.3.7-preview/magento-hce.zip", url)
+            manifest = json.loads(archive.read("distribution.json"))["plugin"]
+        with zipfile.ZipFile(self.plugin) as archive:
+            name, = archive.namelist()
+            jar = archive.read(name)
+
+        def repack(members):
+            data = io.BytesIO()
+            with zipfile.ZipFile(data, "w", zipfile.ZIP_DEFLATED) as archive:
+                archive.comment = b"Different outer ZIP"
+                for path, body in members:
+                    archive.writestr(path, body)
+            data.seek(0)
+            return data
+
+        home = self.root / "cache"
+        home.mkdir()
+        for contents in ([], [(name, jar + b"!")], [(name, bytes(len(jar)))],
+                         [(name, jar), ("magento-hce/lib/other.jar", jar)]):
+            with self.subTest(names=[path for path, _ in contents]):
+                with patch("urllib.request.urlopen", return_value=repack(contents)):
+                    with self.assertRaises(ValueError):
+                        installer.install_plugin(home, manifest, None)
+                self.assertEqual(list(home.iterdir()), [])
+        with patch("urllib.request.urlopen", return_value=repack([(name, jar)])) as download:
+            path = installer.install_plugin(home, manifest, None)
+            self.assertEqual(jar, (path / name).read_bytes())
+            self.assertEqual(path, installer.install_plugin(home, manifest, None))
+            download.assert_called_once_with(manifest["url"], timeout=90)
 
     def test_pinned_marketplace_url(self):
         with zipfile.ZipFile(self.launcher) as archive:
             url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
-        version = "2026.3.7-alpha.42"
-        self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin.hce&version=" + version, url)
+        version = "2026.3.7-alpha.42-hce"
+        self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin&version=" + version, url)
 
 
 if __name__ == "__main__":
