@@ -3,6 +3,7 @@ import hashlib
 import importlib.util
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -100,8 +101,12 @@ class LauncherTest(unittest.TestCase):
         with zipfile.ZipFile(self.plugin, "w") as archive:
             archive.writestr("magento-hce/lib/test.jar", jar.getvalue())
         self.launcher = self.root / "magento-hce.pyz"
-        subprocess.run([sys.executable, str(HCE / "package_launcher.py"), "--plugin", str(self.plugin),
-                        "--output", str(self.launcher), "--marketplace"], check=True, stdout=subprocess.DEVNULL)
+        self.update = self.root / "marketplace-update.json"
+        self.update.write_text(json.dumps({"id": 123, "pluginId": 8024, "channel": "hce-alpha",
+                                           "version": "2026.3.7-alpha.42-hce"}))
+        self.package = [sys.executable, str(HCE / "package_launcher.py"), "--plugin", str(self.plugin),
+                        "--output", str(self.launcher)]
+        subprocess.run([*self.package, "--marketplace", str(self.update)], check=True, stdout=subprocess.DEVNULL)
 
     def test_two_clients_and_restart(self):
         project, config = smoke(self.launcher, self.plugin, self.runtime, self.root)
@@ -193,8 +198,36 @@ class LauncherTest(unittest.TestCase):
     def test_pinned_marketplace_url(self):
         with zipfile.ZipFile(self.launcher) as archive:
             url = json.loads(archive.read("distribution.json"))["plugin"]["url"]
-        version = "2026.3.7-alpha.42-hce"
-        self.assertEqual("https://plugins.jetbrains.com/plugin/download?pluginId=com.magento.idea.magento2plugin&version=" + version, url)
+        self.assertEqual("https://plugins.jetbrains.com/plugin/download?rel=true&updateId=123", url)
+
+    def test_checkout_import_uses_bundled_jdk(self):
+        def java_home():
+            _, env = installer.launch_command(self.runtime, self.root, self.root, self.root, self.root, "abc")
+            return env["JAVA_HOME"]
+
+        for system, relative in (("linux", "jbr"), ("darwin", "jbr/Contents/Home")):
+            bundled = self.runtime / relative
+            (bundled / "bin").mkdir(parents=True)
+            (bundled / "bin/javac").touch()
+            with patch("sys.platform", system), patch.dict(os.environ, {}, clear=True):
+                self.assertEqual(str(bundled), java_home())
+                os.environ["JAVA_HOME"] = "/configured/jdk"
+                self.assertEqual("/configured/jdk", java_home())
+
+    def test_reject_another_marketplace_build(self):
+        update = json.loads(self.update.read_bytes())
+        for field, value in (("pluginId", 1), ("id", -1), ("channel", "alpha"), ("version", "other")):
+            self.update.write_text(json.dumps({**update, field: value}))
+            result = subprocess.run([*self.package, "--marketplace", str(self.update)], capture_output=True)
+            self.assertNotEqual(0, result.returncode)
+            self.assertIn(b"does not match", result.stderr)
+
+    def test_local_preview_requires_plugin_file(self):
+        subprocess.run(self.package, check=True, stdout=subprocess.DEVNULL)
+        with zipfile.ZipFile(self.launcher) as archive:
+            manifest = json.loads(archive.read("distribution.json"))["plugin"]
+        with self.assertRaisesRegex(ValueError, "--plugin-file"):
+            installer.install_plugin(self.root, manifest, None)
 
 
 if __name__ == "__main__":
