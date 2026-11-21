@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 ### Added
 
-- Use Magento MCP tools from Codex or Claude Code on a development server with JetBrains Headless Code Engine. Download `magento-hce.pyz` from the same GitHub release as the desktop plugin and run setup from your checkout. Setup verifies the runtime and plugin, offers JetBrains sign-in, and indexes the project before registering the client. See the [headless installation guide](modules/hce/README.md#install-on-a-development-host).
+- Use Magento MCP tools from Codex or Claude Code on a development server with JetBrains Headless Code Engine. Download the `magento-hce.pyz` installer from GitHub Releases and run setup from your checkout; the installer downloads the pinned HCE plugin variant from the existing JetBrains Marketplace listing 8024, so genuine HCE archive downloads contribute to the same plugin's download statistics. Setup verifies the runtime and plugin, offers JetBrains sign-in, and indexes the project before registering the client. See the [headless installation guide](modules/hce/README.md#install-on-a-development-host).
 
 - Headless alpha (`2026.3.7-alpha-2`) one-command setup, run inside a Magento checkout (Python 3.12+ and a suitable JetBrains license required):
 
@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
   installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
   ```
 
-  The installer configures Codex (use `--client claude` for Claude Code), verifies and downloads the separate HCE plugin, provisions the pinned runtime, indexes the checkout, and verifies module lookup. HCE packages are currently downloaded from GitHub Releases and do **not** contribute to JetBrains Marketplace download totals; the desktop alpha is available through the [Marketplace alpha channel](https://plugins.jetbrains.com/plugins/alpha/8024). See the [HCE installation guide](modules/hce/README.md#install-on-a-development-host).
+  The installer configures Codex (use `--client claude` for Claude Code), downloads the pinned HCE plugin **from JetBrains Marketplace listing 8024**, provisions the headless runtime, indexes the checkout, and verifies module lookup. The HCE variant and desktop plugin share the Marketplace ID but use distinct versions and platform compatibility; the desktop alpha is also available through the [Marketplace alpha channel](https://plugins.jetbrains.com/plugins/alpha/8024). Setup requires Marketplace approval of the HCE update. See the [HCE installation guide](modules/hce/README.md#install-on-a-development-host).
 
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
