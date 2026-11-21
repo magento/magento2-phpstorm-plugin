@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0).
 
 - Use Magento MCP tools from Codex or Claude Code on a development server with JetBrains Headless Code Engine. Download `magento-hce.pyz` from the same GitHub release as the desktop plugin and run setup from your checkout. Setup verifies the runtime and plugin, offers JetBrains sign-in, and indexes the project before registering the client. See the [headless installation guide](modules/hce/README.md#install-on-a-development-host).
 
+- Headless alpha (`2026.3.7-alpha-2`) one-command setup, run inside a Magento checkout (Python 3.12+ and a suitable JetBrains license required):
+
+  ```sh
+  installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
+  ```
+
+  The installer configures Codex (use `--client claude` for Claude Code), verifies and downloads the separate HCE plugin, provisions the pinned runtime, indexes the checkout, and verifies module lookup. HCE packages are currently downloaded from GitHub Releases and do **not** contribute to JetBrains Marketplace download totals; the desktop alpha is available through the [Marketplace alpha channel](https://plugins.jetbrains.com/plugins/alpha/8024). See the [HCE installation guide](modules/hce/README.md#install-on-a-development-host).
+
 - WebStorm now supports XML event name reference navigation in `events.xml` without the PHP plugin, resolving event declarations across modules while retaining PHP dispatch resolution when the PHP plugin is present.
 - WebStorm now supports XML dependency injection declaration inspections in `di.xml` without the PHP plugin, validating empty or missing attributes for plugins, preferences, and virtual types while retaining PHP class existence verification when the PHP plugin is present.
 - `magento_inspect` supports `"format":"json"` for `module`, `di_config`, `observers_for_event`, `plugins_for_method`, `layout_entities`, `ui_component`, and `acl_or_menu`. Layout results include theme overrides of module and parent-theme layouts. The shared response includes query status, project-relative source records, and pages of up to 100 records. Both interception queries use `effectiveArea` to resolve Magento configuration and `area` to filter source declarations after resolution. Their records include resolution decisions and source evidence. Method-plugin JSON includes PHP hook locations, and truncated declaration text points to JSON pagination. Cursors detect changes to the query scope or its results. Text remains the default. The `module` query lists all indexed copies and marks the preferred one. [#2776](https://github.com/magento/magento2-phpstorm-plugin/issues/2776)
