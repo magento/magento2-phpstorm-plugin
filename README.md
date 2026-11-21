@@ -79,7 +79,7 @@
 
 Magento settings exclude generated and runtime outputs by default, including directories named `.cache` anywhere under the configured Magento root. Newly created cache directories are picked up automatically. Source beside these caches remains indexed. You can preview the paths, disable exclusions, or reset plugin-managed exclusions through settings or MCP; existing manual exclusions are preserved.
 
-For Codex or Claude Code on a development server, see the [headless installer pilot](modules/hce/README.md#install-on-a-development-host).
+For Codex or Claude Code on a development server, see the [headless installer alpha](modules/hce/README.md#install-on-a-development-host). The headless installer comes from GitHub Releases, but the plugin archive is downloaded directly from the same [JetBrains Marketplace listing (8024)](https://plugins.jetbrains.com/plugin/8024) as the desktop plugin, so downloads are attributed to the existing plugin. HCE has its own compatible build and version; Marketplace approval of the alpha update is required.
 
 ## MCP tools
 
