@@ -80,24 +80,13 @@ jobs:
         run: |
           python3 modules/hce/tests/launcher_test.py
           ./gradlew -p modules/hce test --no-daemon --console=plain
-      - name: Package headless variant and Marketplace installer for this alpha
+      - name: Package the headless plugin for this alpha
         if: github.event_name == 'workflow_dispatch'
         run: |
           python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
           ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon
           dist=modules/hce/build/distributions
           python3 modules/hce/tests/check_archive.py "$dist/magento-hce.zip"
-          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --marketplace --output "$dist/magento-hce.pyz"
-      - name: Attach the installer and notes to the draft
-        if: github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release upload "$RELEASE_TAG" modules/hce/build/distributions/magento-hce.pyz --repo "$GITHUB_REPOSITORY" --clobber
-          notes=".github/release-notes/$RELEASE_TAG.md"
-          if [[ -f "$notes" ]]; then
-            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$notes"
-          fi
       - name: Submit the HCE alpha
         if: github.event_name == 'workflow_dispatch'
         env:
@@ -107,7 +96,19 @@ jobs:
             --header "Authorization: Bearer $JET_BRAINS_TOKEN" \
             -F "pluginId=8024" -F "channel=hce-alpha" \
             -F "file=@modules/hce/build/distributions/magento-hce.zip" \
-            https://plugins.jetbrains.com/api/updates/upload
+            https://plugins.jetbrains.com/api/updates/upload --output "$RUNNER_TEMP/hce-update.json"
+      - name: Attach the installer and notes to the draft
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          dist=modules/hce/build/distributions
+          python3 modules/hce/package_launcher.py --plugin "$dist/magento-hce.zip" --marketplace "$RUNNER_TEMP/hce-update.json" --output "$dist/magento-hce.pyz"
+          gh release upload "$RELEASE_TAG" modules/hce/build/distributions/magento-hce.pyz --repo "$GITHUB_REPOSITORY" --clobber
+          notes=".github/release-notes/$RELEASE_TAG.md"
+          if [[ -f "$notes" ]]; then
+            gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file "$notes"
+          fi
 
   publish-desktop:
     needs: build

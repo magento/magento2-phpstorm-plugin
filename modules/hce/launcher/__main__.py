@@ -75,6 +75,8 @@ def install_plugin(home, manifest, provided):
     if not plugin.exists():
         with tempfile.TemporaryDirectory(dir=home) as tmp:
             staging = Path(tmp)
+            if not manifest["url"] and not provided:
+                raise ValueError("This local preview requires --plugin-file pointing to the built plugin ZIP.")
             archive = obtain(manifest["url"], staging, provided)
             extracted = staging / "plugins"
             with zipfile.ZipFile(archive) as package:
