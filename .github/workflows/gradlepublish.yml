@@ -12,6 +12,8 @@ on:
 
 jobs:
   build:
+    outputs:
+      release_tag: ${{ steps.draft.outputs.tag || github.event.release.tag_name }}
     if: >-
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/5.4.0-develop') ||
       (github.event_name == 'release' && !startsWith(github.event.release.tag_name, 'hce-') &&
@@ -22,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_RELEASE_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' || github.event.release.prerelease }}
-      GITHUB_RELEASE_ID: ${{ inputs.draft_release_id || github.event.release.id }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
 
     steps:
       - uses: actions/checkout@v7.0.1
@@ -36,9 +38,11 @@ jobs:
             exit 1
           fi
       - name: Check the draft release target
+        id: draft
         if: github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_RELEASE_ID: ${{ inputs.draft_release_id }}
         run: |
           [[ "$GITHUB_RELEASE_ID" =~ ^[0-9]+$ ]]
           release=$(gh api "repos/$GITHUB_REPOSITORY/releases/$GITHUB_RELEASE_ID")
@@ -54,6 +58,7 @@ jobs:
             [[ $? == 2 && $(jq -r .target_commitish <<< "$release") == "$GITHUB_SHA" ]]
           fi
           echo "RELEASE_TAG=$tag" >> "$GITHUB_ENV"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - name: Set up JDK 25
         uses: actions/setup-java@v6.0.1
         with:
@@ -84,7 +89,9 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           python3 modules/hce/tests/download_runtime.py --output build/hce-runtime
-          ./gradlew -p modules/hce packageHcePlugin -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" --no-daemon
+          ./gradlew -p modules/hce packageHcePlugin \
+            -PhceRuntime="$PWD/build/hce-runtime/intellij-server-2027.1" \
+            -PdesktopPluginXml="$PWD/build/tmp/patchPluginXml/plugin.xml" --no-daemon
           dist=modules/hce/build/distributions
           python3 modules/hce/tests/check_archive.py "$dist/magento-hce.zip"
       - name: Submit the HCE alpha
@@ -117,7 +124,7 @@ jobs:
       contents: read
     env:
       GITHUB_RELEASE_PRERELEASE: ${{ github.event_name == 'workflow_dispatch' || github.event.release.prerelease }}
-      GITHUB_RELEASE_ID: ${{ inputs.draft_release_id || github.event.release.id }}
+      RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-java@v6.0.1

@@ -6,9 +6,12 @@ val baseVersion = providers.gradleProperty("pluginVersion").orElse(
     }
 ).get()
 version = if (providers.environmentVariable("GITHUB_RELEASE_PRERELEASE").orNull.toBoolean()) {
-    val releaseId = providers.environmentVariable("GITHUB_RELEASE_ID").orNull
-        ?: throw GradleException("GITHUB_RELEASE_ID is required when publishing a GitHub prerelease.")
-    "$baseVersion-alpha.$releaseId"
+    val tag = providers.environmentVariable("RELEASE_TAG").orNull
+        ?: throw GradleException("RELEASE_TAG is required when publishing a GitHub prerelease.")
+    require(tag.matches(Regex("${Regex.escape(baseVersion)}-alpha(-[0-9]+)?"))) {
+        "Expected an alpha release tag for $baseVersion, got '$tag'."
+    }
+    tag
 } else {
     baseVersion
 }

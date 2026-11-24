@@ -4,6 +4,7 @@
     <version>${pluginVersion}</version>
     <vendor>Magento Inc.</vendor>
     <description>Magento module discovery, XML diagnostics, and maintenance checks for JetBrains Headless Code Engine.</description>
+    <change-notes><![CDATA[${changeNotes}]]></change-notes>
     <idea-version since-build="271.2085" until-build="271.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.ls.plugin.mcp</depends>

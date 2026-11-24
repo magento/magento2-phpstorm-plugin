@@ -1,3 +1,5 @@
+import javax.xml.parsers.DocumentBuilderFactory
+
 plugins { alias(libs.plugins.kotlin) }
 
 group = "com.magento.idea"
@@ -21,10 +23,26 @@ sourceSets.main {
 // The core and its tests need no IDE or HCE distribution. Only this host adapter
 // compiles against the pinned engine API and is included in the plugin archive.
 val host = sourceSets.create("host")
-val releaseVersion = "${version}-hce"
+val desktopVersion = version.toString()
+val releaseVersion = "$desktopVersion-hce"
+val desktopDescriptor = providers.gradleProperty("desktopPluginXml").map { file(it) }
+val marketplaceNotes = providers.fileContents(layout.file(desktopDescriptor)).asText.map { xml ->
+    val parser = DocumentBuilderFactory.newInstance().apply {
+        setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+    }.newDocumentBuilder()
+    val descriptor = parser.parse(xml.byteInputStream())
+    require(descriptor.getElementsByTagName("version").item(0)?.textContent == desktopVersion) {
+        "Desktop descriptor must be built for $desktopVersion."
+    }
+    val notes = descriptor.getElementsByTagName("change-notes").item(0)?.textContent
+    require(!notes.isNullOrBlank()) { "Desktop descriptor is missing Marketplace change notes." }
+    notes.replace("]]>", "]]]]><![CDATA[>")
+}
 tasks.named<org.gradle.language.jvm.tasks.ProcessResources>(host.processResourcesTaskName) {
     inputs.property("pluginVersion", releaseVersion)
-    filesMatching("META-INF/plugin.xml") { expand(mapOf("pluginVersion" to releaseVersion)) }
+    val changeNotes = marketplaceNotes.getOrElse("")
+    inputs.property("changeNotes", changeNotes)
+    filesMatching("META-INF/plugin.xml") { expand(mapOf("pluginVersion" to releaseVersion, "changeNotes" to changeNotes)) }
 }
 kotlin.target.compilations.getByName("host").associateWith(kotlin.target.compilations.getByName("main"))
 val hceRuntime = providers.gradleProperty("hceRuntime")

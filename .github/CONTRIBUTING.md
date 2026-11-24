@@ -114,6 +114,10 @@ This opt-in test downloads release sources into a temporary IDE test cache; rout
 
 # Plugin publication
 
+For a paired alpha, stage the GitHub prerelease as a draft and run the release workflow with its numeric draft ID. The desktop build uses the draft's tag (for example, `2026.3.8-alpha`) on the `alpha` channel. The headless build appends `-hce` on `hce-alpha`. Both Marketplace updates include the current changelog and the setup command for that tag.
+
+When switching from `2026.3.7-alpha.453835098` to tag-based versions, use a higher base version for the next automatic IDE update. JetBrains orders `2026.3.7-alpha-3` below that published build and `2026.3.8-alpha` above it.
+
 1. [Build a new version of the plugin](https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/deploying_plugin.html)
 1. [Install the newly created archive/jar file from disk](https://www.jetbrains.com/help/idea/managing-plugins.html#installing-plugins-from-disk) for testing
 1. [Publish](https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/publishing_plugin.html)
