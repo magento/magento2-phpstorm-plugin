@@ -97,13 +97,13 @@ class LauncherTest(unittest.TestCase):
         jar = io.BytesIO()
         with zipfile.ZipFile(jar, "w") as archive:
             descriptor = (HCE / "src/host/resources/META-INF/plugin.xml").read_text()
-            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha.42-hce"))
+            archive.writestr("META-INF/plugin.xml", descriptor.replace("${pluginVersion}", "2026.3.7-alpha-2-hce"))
         with zipfile.ZipFile(self.plugin, "w") as archive:
             archive.writestr("magento-hce/lib/test.jar", jar.getvalue())
         self.launcher = self.root / "magento-hce.pyz"
         self.update = self.root / "marketplace-update.json"
         self.update.write_text(json.dumps({"id": 123, "pluginId": 8024, "channel": "hce-alpha",
-                                           "version": "2026.3.7-alpha.42-hce"}))
+                                           "version": "2026.3.7-alpha-2-hce"}))
         self.package = [sys.executable, str(HCE / "package_launcher.py"), "--plugin", str(self.plugin),
                         "--output", str(self.launcher)]
         subprocess.run([*self.package, "--marketplace", str(self.update)], check=True, stdout=subprocess.DEVNULL)

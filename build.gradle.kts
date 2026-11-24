@@ -169,14 +169,36 @@ intellijPlatform {
         }
 
         val changelog = project.changelog // local variable for configuration cache compatibility
+        val stagedAlpha = providers.environmentVariable("GITHUB_EVENT_NAME").orNull == "workflow_dispatch" &&
+            providers.environmentVariable("GITHUB_RELEASE_PRERELEASE").orNull.toBoolean()
+        val repositoryUrl = providers.environmentVariable("GITHUB_SERVER_URL")
+            .zip(providers.environmentVariable("GITHUB_REPOSITORY")) { server, repo -> "$server/$repo" }
+            .orElse(providers.gradleProperty("pluginRepositoryUrl")).get()
+        val installerUrl = "$repositoryUrl/releases/download/$releaseVersion/magento-hce.pyz"
+        val pluginId = providers.gradleProperty("pluginGroup").get()
+        val hceDownloadUrl = "https://plugins.jetbrains.com/plugin/download?pluginId=$pluginId&version=$releaseVersion-hce&channel=hce-alpha"
         changeNotes = basePluginVersion.map { pluginVersion ->
-            with(changelog) {
+            val changes = with(changelog) {
                 renderItem(
                     (getOrNull(pluginVersion) ?: getUnreleased())
                         .withHeader(false)
                         .withEmptySections(false),
                     Changelog.OutputType.HTML,
                 )
+            }
+            if (stagedAlpha) {
+                val setup = """
+                    To use Codex with JetBrains Headless Code Engine, run this command from the root of a Magento checkout with Composer dependencies installed.
+
+                    ```sh
+                    installer=$(mktemp) && curl -fLsS '$installerUrl' -o "${'$'}installer" && python3 "${'$'}installer" setup --client codex
+                    ```
+
+                    For Claude Code, use `--client claude`. The installer downloads this release’s [HCE plugin ZIP from JetBrains Marketplace]($hceDownloadUrl).
+                """.trimIndent()
+                changes + markdownToHTML(setup)
+            } else {
+                changes
             }
         }
 
@@ -194,7 +216,8 @@ intellijPlatform {
     publishing {
         token = providers.environmentVariable("MAGENTO_PHPSTORM_intellijPublishToken")
         channels = effectivePluginVersion.map {
-            listOf(it.replace(Regex("-p\\d+(?=-|$)"), "").substringAfter('-', "").substringBefore('.').ifEmpty { "default" })
+            val channel = it.replace(Regex("-p\\d+(?=-|$)"), "").substringAfter('-', "").substringBefore('.')
+            listOf(channel.replace(Regex("^alpha-\\d+$"), "alpha").ifEmpty { "default" })
         }
     }
 

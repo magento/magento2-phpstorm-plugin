@@ -6,13 +6,15 @@ Use Magento MCP tools from Codex or Claude Code on a development host. The headl
 
 Run setup as the developer who uses the Magento checkout. The alpha supports Linux x86-64 and Apple Silicon macOS with Python 3.12+ and curl. The pinned engine requires a valid IntelliJ IDEA Ultimate subscription or active JetBrains trial. For Adobe Commerce Cloud, use a development VM or workstation with the checkout and its Composer dependencies installed. Run the command from the directory containing Magento’s `composer.json`.
 
-**Set up Codex**
+**Set up Codex.** Choose a build on the [HCE alpha Marketplace channel](https://plugins.jetbrains.com/plugin/8024-magento-2-and-adobe-commerce/versions/hce-alpha) and copy the setup command from its release notes. For the already published `2026.3.7-alpha-2`, run:
 
 ```sh
 installer=$(mktemp) && curl -fLsS 'https://github.com/magento/magento2-phpstorm-plugin/releases/download/2026.3.7-alpha-2/magento-hce.pyz' -o "$installer" && python3 "$installer" setup --client codex
 ```
 
 For Claude Code, use `--client claude`. Use `--client stdio` to print the configuration for another MCP client.
+
+GitHub hosts the Python installer for each release tag. On a cache miss, the installer downloads the plugin ZIP from the exact Marketplace update recorded when the ZIP was uploaded. The command above uses [Marketplace update 1226125](https://plugins.jetbrains.com/plugin/8024-magento-2-and-adobe-commerce/versions/hce-alpha/1226125).
 
 **Branch preview.** The HCE host-package job produces the two files as separate artifacts. Extract both to the same directory and run this from the Magento checkout. A maintainer can also build the same files locally using the commands below.
 

@@ -1,5 +1,6 @@
 """Verify the HCE artifact's dependency/registration boundary without running HCE."""
 import io
+import os
 from pathlib import Path
 import sys
 import xml.etree.ElementTree as ET
@@ -49,6 +50,11 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
     descriptor = descriptors[0]
     assert descriptor.findtext("id") == "com.magento.idea.magento2plugin"
     assert descriptor.findtext("version").endswith("-hce")
+    if os.environ.get("GITHUB_RELEASE_PRERELEASE") == "true":
+        tag = os.environ["RELEASE_TAG"]
+        assert descriptor.findtext("version") == tag + "-hce"
+        notes = descriptor.findtext("change-notes") or ""
+        assert f"/releases/download/{tag}/magento-hce.pyz" in notes, "Missing tagged installer in Marketplace change notes"
     assert descriptor.find("idea-version").attrib == {"since-build": "271.2085", "until-build": "271.*"}
     assert {element.text for element in descriptor.findall("depends") if element.get("optional") != "true"} == {
         "com.intellij.modules.platform", "org.jetbrains.ls.plugin.mcp"}

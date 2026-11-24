@@ -3,7 +3,8 @@
     <name>Magento 2 and Adobe Commerce</name>
     <version>${pluginVersion}</version>
     <vendor>Magento Inc.</vendor>
-    <description>Magento module discovery, XML diagnostics, and maintenance checks for JetBrains Headless Code Engine.</description>
+    <description>Magento module discovery, XML diagnostics, and maintenance checks for JetBrains Headless Code Engine (HCE). Run the command-line installer from your Magento checkout to set up this build for Codex or Claude Code. For desktop use, install the desktop plugin through the IDE’s Marketplace.</description>
+    <change-notes><![CDATA[${changeNotes}]]></change-notes>
     <idea-version since-build="271.2085" until-build="271.*"/>
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.ls.plugin.mcp</depends>
