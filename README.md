@@ -7,6 +7,10 @@
 <!-- Plugin description -->
 # Magento 2 and Adobe Commerce
 
+Install the desktop plugin through **Settings > Plugins** in PhpStorm, WebStorm, or IntelliJ IDEA.
+
+For Codex or Claude Code using JetBrains Headless Code Engine (HCE), run the [headless setup command](https://github.com/magento/magento2-phpstorm-plugin/blob/5.4.0-develop/modules/hce/README.md#install-on-a-development-host) from your Magento checkout. The installer downloads the matching Magento plugin from JetBrains Marketplace for the headless engine.
+
 <table align="center" style="border-collapse: collapse; width: 100%; text-align: center;">
   <caption style="font-size: 1.2em; margin-bottom: 10px;">
     <strong>PhpStorm IDE Plugin</strong> for a better Magento 2 development workflow.
@@ -78,8 +82,6 @@
 ## Indexing exclusions
 
 Magento settings exclude generated and runtime outputs by default, including directories named `.cache` anywhere under the configured Magento root. Newly created cache directories are picked up automatically. Source beside these caches remains indexed. You can preview the paths, disable exclusions, or reset plugin-managed exclusions through settings or MCP; existing manual exclusions are preserved.
-
-For Codex or Claude Code on a development server, see the [headless setup guide](modules/hce/README.md#install-on-a-development-host).
 
 ## MCP tools
 

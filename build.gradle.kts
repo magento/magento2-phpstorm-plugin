@@ -188,7 +188,7 @@ intellijPlatform {
             }
             if (stagedAlpha) {
                 val setup = """
-                    From the root of a Magento checkout with Composer dependencies installed, run:
+                    To use Codex with JetBrains Headless Code Engine, run this command from the root of a Magento checkout with Composer dependencies installed.
 
                     ```sh
                     installer=$(mktemp) && curl -fLsS '$installerUrl' -o "${'$'}installer" && python3 "${'$'}installer" setup --client codex
