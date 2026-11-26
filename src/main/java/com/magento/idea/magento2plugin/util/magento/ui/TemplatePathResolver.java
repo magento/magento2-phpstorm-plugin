@@ -215,8 +215,13 @@ public class TemplatePathResolver {
         }
         final String filePath = virtualFile.getPath();
         final Project project = psiFile.getProject();
-        final Collection<String> moduleNames = FileBasedIndex.getInstance()
-                .getAllKeys(ModuleXmlIndex.KEY, project);
+        Collection<String> moduleNames;
+        try {
+            moduleNames = FileBasedIndex.getInstance()
+                    .getAllKeys(ModuleXmlIndex.KEY, project);
+        } catch (final UnsupportedOperationException ignored) {
+            moduleNames = java.util.Collections.emptyList();
+        }
 
         for (final String moduleName : moduleNames) {
             for (final String moduleRootPath : getModuleRootPaths(project, moduleName)) {
@@ -235,6 +240,7 @@ public class TemplatePathResolver {
             }
         }
         addTemplateRequireJsPathsFromFilePath(result, filePath);
+        addVendorTemplateRequireJsPathsFromFilePath(result, filePath);
         addThemeTemplateRequireJsPathsFromFilePath(result, filePath);
 
         return result;
@@ -269,6 +275,49 @@ public class TemplatePathResolver {
                 moduleName,
                 stripHtmlExtension(filePath.substring(webRootIndex + webRoot.length()))
         );
+    }
+
+    private void addVendorTemplateRequireJsPathsFromFilePath(
+            final @NotNull Set<String> result,
+            final @NotNull String filePath
+    ) {
+        final String vendorMarker = "/vendor/";
+        final int vendorIndex = filePath.indexOf(vendorMarker);
+
+        if (vendorIndex < 0) {
+            return;
+        }
+        final String moduleRelativePath = filePath.substring(vendorIndex + vendorMarker.length());
+        final String[] pathParts = moduleRelativePath.split("/");
+
+        if (pathParts.length < 7 || !"view".equals(pathParts[2]) || !"web".equals(pathParts[4])) {
+            return;
+        }
+        final String modulePart = pathParts[1].startsWith("module-")
+                ? pathParts[1].substring("module-".length())
+                : pathParts[1];
+        final String moduleName = kebabToPascal(pathParts[0]) + "_" + kebabToPascal(modulePart);
+        addTemplateRequireJsPathAliases(
+                result,
+                moduleName,
+                stripHtmlExtension(joinParts(pathParts, 5))
+        );
+    }
+
+    private @NotNull String kebabToPascal(final @NotNull String value) {
+        final StringBuilder builder = new StringBuilder();
+
+        for (final String part : value.split("-")) {
+            if (part.isBlank()) {
+                continue;
+            }
+            builder.append(Character.toUpperCase(part.charAt(0)));
+            if (part.length() > 1) {
+                builder.append(part.substring(1));
+            }
+        }
+
+        return builder.toString();
     }
 
     private void addThemeTemplateRequireJsPathsFromFilePath(

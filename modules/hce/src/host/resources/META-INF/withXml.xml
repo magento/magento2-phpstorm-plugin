@@ -4,6 +4,14 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex"/>
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex"/>
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex"/>
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex"/>
         <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.AnalysisToolset"/>
     </extensions>
 </idea-plugin>

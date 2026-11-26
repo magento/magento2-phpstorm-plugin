@@ -171,13 +171,13 @@ class MagentoMcpProjectToolset : McpToolset {
 
         "Available inspections:\n" +
         "- Shared queryType values are `module`, `module_dependencies`, `di_config`, `observers_for_event`, " +
-        "`layout_entities`, `ui_component`, `ui_template`, and `acl_or_menu`.\n" +
+        "`layout_entities`, `ui_component`, `ui_template`, `js_config`, and `acl_or_menu`.\n" +
         "- `plugins_for_method` additionally requires the JetBrains PHP plugin; `help` reports the " +
         "capabilities available in this IDE.\n\n" +
 
         "Structured results:\n" +
         "- Text is the default. For `module`, `di_config`, `observers_for_event`, `layout_entities`, " +
-        "`ui_component`, `acl_or_menu`, and `plugins_for_method`, " +
+        "`ui_component`, `js_config`, `acl_or_menu`, and `plugins_for_method`, " +
         "add \"format\":\"json\" to parametersJson for source records and a shared status, total, returned, " +
         "complete, and nextCursor. See `detailed_schema` for limit, cursor, and supported filters.\n" +
         "- `module_dependencies` and `ui_template` use their own response formats. Method-plugin JSON includes " +

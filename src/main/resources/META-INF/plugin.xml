@@ -133,10 +133,19 @@
                 nonDefaultProject="true"/>
 
         <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlCoreReferenceContributor"/>
+        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
+        <psi.referenceContributor language="JSON" implementation="com.magento.idea.magento2plugin.reference.json.JsonReferenceContributor"/>
+        <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
+        <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
+        <gotoDeclarationHandler implementation="com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler"/>
 
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlCoreCompletionContributor" id="magentoXmlCore"/>
+        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlJsCompletionContributor" id="magentoXmlJs"/>
         <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.SystemConfigurationContributor" id="magentoSystemConfiguration"/>
         <xml.tagNameProvider implementation="com.magento.idea.magento2plugin.completion.provider.xml.ConfigXmlTagNameProvider"/>
+
+        <codeInsight.lineMarkerProvider language="HTML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="XML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
 
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventObserverIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.EventNameIndex" />
@@ -160,6 +169,14 @@
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlSectionIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlGroupIndex" />
         <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.xml.SystemXmlFieldIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex" />
+        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
 
         <additionalLibraryRootsProvider implementation="com.magento.idea.magento2plugin.project.indexing.MagentoAdditionalLibraryRootsProvider"/>
         <readerModeMatcher implementation="com.magento.idea.magento2plugin.project.indexing.MagentoReaderModeMatcher"/>

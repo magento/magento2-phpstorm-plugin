@@ -5,6 +5,7 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
+import com.intellij.lang.javascript.psi.JSExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -17,6 +18,7 @@ import com.magento.idea.magento2plugin.reference.xml.PolyVariantReferenceBase;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
     @Override
@@ -28,7 +30,7 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
             return PsiReference.EMPTY_ARRAY;
         }
         final JSProperty property = PsiTreeUtil.getParentOfType(element, JSProperty.class);
-        final String templatePath = KnockoutTemplatePathResolver.getInstance().getTemplatePath(property);
+        final String templatePath = getTemplatePath(property);
 
         if (templatePath == null) {
             return PsiReference.EMPTY_ARRAY;
@@ -52,5 +54,20 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
                         targets
                 )
         };
+    }
+
+    private static @Nullable String getTemplatePath(final @Nullable JSProperty property) {
+        if (property == null) {
+            return null;
+        }
+        final JSExpression value = property.getValue();
+        final PsiElement parent = property.getParent();
+        final JSProperty parentProperty = parent == null ? null : PsiTreeUtil.getParentOfType(parent, JSProperty.class);
+
+        return KnockoutTemplatePathResolver.getInstance().getTemplatePath(
+                property.getName(),
+                parentProperty == null ? null : parentProperty.getName(),
+                value == null ? null : value.getText()
+        );
     }
 }

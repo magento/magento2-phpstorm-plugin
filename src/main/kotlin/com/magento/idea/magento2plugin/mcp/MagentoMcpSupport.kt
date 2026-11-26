@@ -111,8 +111,9 @@ internal object MagentoMcpSupport {
         if (design != null) return segments[design + 2]
 
         val view = segments.indices.lastOrNull { i ->
-            i + 3 < segments.size && segments[i] == "view" && segments[i + 1] in VIEW_AREAS &&
-                segments[i + 2] in THEME_MODULE_FOLDERS
+            i + 2 < segments.size && segments[i] == "view" && segments[i + 1] in VIEW_AREAS &&
+                (segments[i + 2] == "requirejs-config.js" ||
+                    (i + 3 < segments.size && segments[i + 2] in THEME_MODULE_FOLDERS))
         }
         if (view != null) return segments[view + 1]
 
@@ -123,7 +124,8 @@ internal object MagentoMcpSupport {
     fun themeOverrideModule(path: String): String? {
         val segments = path.replace('\\', '/').split('/')
         return segments.indices.firstOrNull { index ->
-            index + 1 < segments.size && MODULE_FOLDER.matches(segments[index]) && segments[index + 1] in THEME_MODULE_FOLDERS
+            index + 1 < segments.size && MODULE_FOLDER.matches(segments[index]) &&
+                (segments[index + 1] in THEME_MODULE_FOLDERS || segments[index + 1] == "requirejs-config.js")
         }?.let { segments[it] }
     }
 
@@ -139,11 +141,14 @@ internal object MagentoMcpSupport {
             for (index in text.indices) if (text[index] == '\n') add(index + 1)
         }
 
-        /** One-based line of an element in this file. */
-        fun lineOf(element: PsiElement): Int {
-            val found = starts.binarySearch(element.textOffset)
+        /** One-based line of a character offset in this file. */
+        fun lineAt(offset: Int): Int {
+            val found = starts.binarySearch(offset)
             return if (found >= 0) found + 1 else -found - 1
         }
+
+        /** One-based line of an element in this file. */
+        fun lineOf(element: PsiElement): Int = lineAt(element.textOffset)
     }
 
     fun relativePath(project: Project, virtualFile: VirtualFile): String {

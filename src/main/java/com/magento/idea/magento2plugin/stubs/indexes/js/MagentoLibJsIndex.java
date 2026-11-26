@@ -5,7 +5,6 @@
 
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
-import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -71,7 +70,7 @@ public class MagentoLibJsIndex extends ScalarIndexExtension<String> {
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
         return virtualFile -> (
-                virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)//NOPMD
+                "js".equalsIgnoreCase(virtualFile.getExtension())//NOPMD
                     && virtualFile.getPath().contains(Package.libWebRoot)
         );
     }

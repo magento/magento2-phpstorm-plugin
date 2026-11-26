@@ -9,12 +9,13 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.lang.javascript.JavaScriptFileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import java.util.Collection;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 
 public class RequireJsMappingCompletionProvider extends CompletionProvider<CompletionParameters> {
@@ -37,12 +38,12 @@ public class RequireJsMappingCompletionProvider extends CompletionProvider<Compl
         );
 
         requireJsKeys.removeIf(m -> !m.startsWith(prefix));
-        final JavaScriptFileType jsFileType = JavaScriptFileType.INSTANCE;
+        final Icon jsIcon = FileTypeManager.getInstance().getFileTypeByExtension("js").getIcon();
         for (final String requireJsKey : requireJsKeys) {
             result.addElement(
                     LookupElementBuilder
                             .create(requireJsKey)
-                            .withIcon(jsFileType.getIcon())
+                            .withIcon(jsIcon)
             );
         }
     }

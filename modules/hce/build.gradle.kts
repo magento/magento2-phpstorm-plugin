@@ -61,7 +61,7 @@ kotlin.sourceSets.named("host") {
     kotlin.exclude("**/MaintenanceDesktop.kt")
     listOf("MagentoModuleDependencyQueries", "MagentoXmlDiagnostics", "MagentoIndexKeys", "MagentoInspectionCommands", "MagentoInspectionResults", "MagentoModuleQueries", "MagentoDiQueries", "MagentoEventQueries",
         "MagentoEffectiveConfiguration", "MagentoModuleLoadOrder", "MagentoMcpProjectContext",
-        "MagentoViewQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
+        "MagentoViewQueries", "MagentoJsQueries", "MagentoMcpSnapshots", "MagentoMcpSupport", "MagentoMcpSetupGuidance",
         "MagentoMcpReadActionSupport", "MagentoMcpToolsetSupport", "MagentoMethodPluginQueryProvider", "MagentoSkillCommands",
         "MagentoMagerunQueries", "MagentoMagerunSupport", "MagentoMagerunProcess", "MagentoCliToolQueries",
         "MagentoIntelligenceToolset").forEach {
@@ -69,14 +69,28 @@ kotlin.sourceSets.named("host") {
     }
 }
 host.java.srcDir(shared.resolve("java"))
-listOf("util/magento/ui/TemplatePathResolver", "reference/provider/util/GetModuleFileUtil",
+listOf("util/magento/ui/TemplatePathResolver", "util/magento/ui/UiComponentScopeResolver",
+    "util/magento/ui/UiComponentTemplateResolver",
+    "util/magento/js/MagentoJsParser", "util/magento/js/JsLexer", "util/magento/js/JsObjectParser",
+    "util/magento/js/JsAst", "util/magento/js/JsObject", "util/magento/js/JsProperty",
+    "util/magento/js/RequireJsConfig", "util/magento/js/RequireJsConfigParser",
+    "util/magento/js/RequireJsPathResolver",
+    "util/magento/js/KnockoutTemplatePathResolver", "util/magento/js/KnockoutRegionResolver",
+    "reference/provider/util/GetModuleFileUtil",
     "reference/provider/util/GetModuleNameUtil", "util/magento/MagentoVfsUtil", "inspections/xml/CacheableFalseInDefaultLayoutInspection", "inspections/xml/ModuleDeclarationInModuleXmlInspection",
     "inspections/xml/fix/XmlRemoveCacheableAttributeQuickFix", "inspections/xml/fix/XmlModuleNameQuickFix",
     "inspections/util/GetEditableModuleNameByRootFileUtil", "bundles/InspectionBundle", "bundles/AbstractBundle",
-    "magento/files/LayoutXml", "magento/files/ModuleXml", "project/MagentoSkillInstaller", "indexes/ModuleIndex", "indexes/LayoutIndex", "indexes/UIComponentIndex", "project/Settings",
+    "magento/files/LayoutXml", "magento/files/ModuleXml", "magento/files/UiComponentXml", "project/MagentoSkillInstaller", "indexes/ModuleIndex", "indexes/LayoutIndex", "indexes/UIComponentIndex", "project/Settings",
     "magento/packages/Package", "magento/packages/File", "magento/files/ModuleFileInterface",
     "magento/files/ModuleDiXml", "magento/files/ModuleAclXml", "magento/files/ModuleMenuXml",
     "stubs/indexes/xml/ModuleXmlIndex", "stubs/indexes/xml/ThemeXmlIndex",
+    "stubs/indexes/js/RequireJsIndex", "stubs/indexes/js/JsMixinIndex",
+    "stubs/indexes/js/KnockoutTemplateIndex", "stubs/indexes/js/MagentoLibJsIndex",
+    "stubs/indexes/js/data/StringSetDataExternalizer",
+    "stubs/indexes/ui/DisplayAreaIndex", "stubs/indexes/ui/GetRegionUsageIndex",
+    "stubs/indexes/ui/UiComponentComponentDeclarationIndex", "stubs/indexes/ui/UiComponentTemplateDeclarationIndex",
+    "stubs/indexes/ui/UiComponentIndexingData",
+    "stubs/indexes/ui/data/UiComponentNavigationData", "stubs/indexes/ui/data/UiComponentNavigationDataSetExternalizer",
     "stubs/indexes/BlockNameIndex", "stubs/indexes/ContainerNameIndex",
     "stubs/indexes/NamedComponentIndex", "stubs/indexes/LayoutDataIndexer", "util/PhpNameUtil",
     "util/RegExUtil", "util/PluginVersionUtil", "util/magento/IsFileInEditableModuleUtil", "util/magento/MagentoPathUrlUtil").forEach {

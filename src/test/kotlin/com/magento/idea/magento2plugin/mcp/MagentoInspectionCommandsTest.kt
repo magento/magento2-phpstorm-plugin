@@ -110,6 +110,7 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             "layout_entities" to "name",
             "ui_component" to "name",
             "ui_template" to "templatePath",
+            "js_config" to "name",
             "acl_or_menu" to "identifier"
         )
         DumbModeTestUtils.runInDumbModeSynchronously(project) {
@@ -277,6 +278,83 @@ class MagentoInspectionCommandsTest : BaseProjectTestCase() {
             assertEquals(MagentoMcpSupport.INDEXES_NOT_READY_MESSAGE,
                 MagentoInspectionCommands.query(project, "di", "{\"className\":\"Missing\"}", supported))
         }
+    }
+
+    @Test
+    fun testJsConfigFindsRequireJsAndUiComponentUsages() {
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar2/view/frontend/requirejs-config.js",
+            """
+            var config = {
+                map: {
+                    '*': {
+                        'checkoutStepAlias': 'Foo_Bar2/js/view/checkout-step'
+                    }
+                },
+                paths: {
+                    'customLib': 'Foo_Bar2/js/lib/custom-lib'
+                },
+                config: {
+                    mixins: {
+                        'Foo_Bar2/js/view/checkout-step': {
+                            'Foo_Bar2/js/view/checkout-step-mixin': true
+                        }
+                    }
+                }
+            };
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar2/view/frontend/web/js/view/checkout-step.js",
+            """
+            define(['uiComponent'], function (Component) {
+                return Component.extend({
+                    defaults: {
+                        template: 'Foo_Bar2/checkout-step',
+                        displayArea: 'checkout-steps'
+                    }
+                });
+            });
+            """.trimIndent()
+        )
+        myFixture.addFileToProject(
+            "app/code/Foo/Bar2/view/frontend/web/template/checkout-step.html",
+            "<!-- ko foreach: getRegion('checkout-steps') --><!-- /ko -->"
+        )
+        com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(project)
+
+        val textResult = MagentoInspectionCommands.query(
+            project,
+            "requirejs",
+            """{"name":"checkout-step"}"""
+        )
+        assertContains(textResult, "mixins")
+        assertContains(textResult, "Foo_Bar2/js/view/checkout-step -> mixin=Foo_Bar2/js/view/checkout-step-mixin (enabled)")
+        assertContains(textResult, "map")
+        assertContains(textResult, "[*] checkoutStepAlias -> Foo_Bar2/js/view/checkout-step")
+        assertContains(textResult, "ui components and templates")
+        assertContains(textResult, "knockout_template: Foo_Bar2/checkout-step")
+        assertContains(textResult, "display_area: checkout-steps")
+        assertContains(textResult, "get_region: checkout-steps")
+
+        val jsonResult = JSONObject(
+            MagentoInspectionCommands.query(
+                project,
+                "js_config",
+                """{"name":"checkout-step","format":"json"}"""
+            )
+        )
+        assertEquals("ok", jsonResult.getString("status"))
+        val kinds = mutableSetOf<String>()
+        val records = jsonResult.getJSONArray("records")
+        for (i in 0 until records.length()) {
+            kinds += records.getJSONObject(i).getString("kind")
+        }
+        assertTrue(kinds.toString(), "js_mixin" in kinds)
+        assertTrue(kinds.toString(), "requirejs_map" in kinds)
+        assertTrue(kinds.toString(), "knockout_template" in kinds)
+        assertTrue(kinds.toString(), "display_area" in kinds)
+        assertTrue(kinds.toString(), "get_region" in kinds)
     }
 
     private fun assertContains(text: String, expected: String) {

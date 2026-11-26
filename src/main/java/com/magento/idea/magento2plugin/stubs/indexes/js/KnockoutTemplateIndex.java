@@ -5,8 +5,6 @@
 
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
-import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexExtension;
@@ -42,11 +40,10 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
             if (!Settings.isEnabled(inputData.getProject())) {
                 return map;
             }
-            final JSFile jsFile = (JSFile) inputData.getPsiFile();
             final String componentUrl = inputData.getFile().getUrl();
 
             for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
-                    .collectTemplatePaths(jsFile)) {
+                    .collectTemplatePaths(inputData.getContentAsText())) {
                 map.computeIfAbsent(templatePath, ignored -> new LinkedHashSet<>()).add(componentUrl);
             }
 
@@ -66,7 +63,7 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE);
+        return virtualFile -> "js".equalsIgnoreCase(virtualFile.getExtension());
     }
 
     @Override

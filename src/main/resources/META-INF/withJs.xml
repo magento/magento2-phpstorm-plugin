@@ -7,24 +7,8 @@
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
         <psi.referenceContributor language="JavaScript" implementation="com.magento.idea.magento2plugin.reference.js.JsReferenceContributor"/>
-        <psi.referenceContributor language="JSON" implementation="com.magento.idea.magento2plugin.reference.json.JsonReferenceContributor"/>
-        <psi.referenceContributor language="HTML" implementation="com.magento.idea.magento2plugin.reference.html.HtmlReferenceContributor"/>
-        <psi.referenceContributor language="TEXT" implementation="com.magento.idea.magento2plugin.reference.text.TextReferenceContributor"/>
-        <psi.referenceContributor language="XML" implementation="com.magento.idea.magento2plugin.reference.xml.XmlJsReferenceContributor"/>
-        <gotoDeclarationHandler implementation="com.magento.idea.magento2plugin.navigation.KnockoutRegionGotoDeclarationHandler"/>
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex" />
-        <fileBasedIndex implementation="com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex" />
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.JsMixinLineMarkerProvider"/>
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="HTML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <codeInsight.lineMarkerProvider language="XML" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
-        <completion.contributor language="XML" implementationClass="com.magento.idea.magento2plugin.completion.xml.XmlJsCompletionContributor" id="magentoXmlJs"/>
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
     </extensions>
 </idea-plugin>

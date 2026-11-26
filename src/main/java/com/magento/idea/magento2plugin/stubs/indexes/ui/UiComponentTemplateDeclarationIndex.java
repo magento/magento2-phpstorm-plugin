@@ -6,7 +6,6 @@
 package com.magento.idea.magento2plugin.stubs.indexes.ui;
 
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexExtension;
@@ -112,7 +111,7 @@ public class UiComponentTemplateDeclarationIndex
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
+        return virtualFile -> "js".equalsIgnoreCase(virtualFile.getExtension())
                 || virtualFile.getFileType().equals(XmlFileType.INSTANCE)
                 || "php".equals(virtualFile.getExtension());
     }

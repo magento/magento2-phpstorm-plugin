@@ -43,7 +43,7 @@ public class GetRegionUsageIndex extends FileBasedIndexExtension<String, Set<UiC
                 return map;
             }
             for (final UiComponentNavigationData usage : UiComponentScopeResolver.getInstance()
-                    .collectGetRegionUsages(inputData.getPsiFile())) {
+                    .collectGetRegionUsages(inputData.getFile(), inputData.getContentAsText())) {
                 map.computeIfAbsent(usage.getValue(), ignored -> new LinkedHashSet<>()).add(usage);
             }
 
