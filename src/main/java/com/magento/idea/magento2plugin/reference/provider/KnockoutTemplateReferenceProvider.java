@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.reference.provider;
 
 import com.intellij.lang.javascript.psi.JSExpression;
+import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -61,13 +62,16 @@ public class KnockoutTemplateReferenceProvider extends PsiReferenceProvider {
             return null;
         }
         final JSExpression value = property.getValue();
+        if (!(value instanceof JSLiteralExpression)) {
+            return null;
+        }
         final PsiElement parent = property.getParent();
         final JSProperty parentProperty = parent == null ? null : PsiTreeUtil.getParentOfType(parent, JSProperty.class);
 
         return KnockoutTemplatePathResolver.getInstance().getTemplatePath(
                 property.getName(),
                 parentProperty == null ? null : parentProperty.getName(),
-                value == null ? null : value.getText()
+                value.getText()
         );
     }
 }

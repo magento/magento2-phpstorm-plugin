@@ -27,6 +27,8 @@ class CorePluginTest : BaseProjectTestCase() {
             loader.loadClass("com.intellij.lang.javascript.psi.JSFile")
             fail("Main plugin must not be able to load disabled JavaScript classes")
         } catch (_: ClassNotFoundException) { }
+        assertNull(com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.getInstance())
+        assertEquals(0, com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.versionDelta())
         val contributors = CompletionContributor.forLanguage(XMLLanguage.INSTANCE).map { it.javaClass.name }
         assertTrue(contributors.any { it.endsWith(".XmlCoreCompletionContributor") })
         assertTrue(contributors.any { it.endsWith(".XmlJsCompletionContributor") })

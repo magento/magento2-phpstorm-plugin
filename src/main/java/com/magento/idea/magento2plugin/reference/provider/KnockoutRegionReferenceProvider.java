@@ -43,7 +43,10 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
             final @NotNull PsiElement element,
             final @NotNull List<PsiReference> references
     ) {
-        final String displayArea = UiComponentScopeResolver.getInstance().getDisplayAreaValue(element);
+        String displayArea = UiComponentScopeResolver.getInstance().getDisplayAreaValue(element);
+        if (displayArea == null) {
+            displayArea = KnockoutRegionResolver.getInstance().getDisplayAreaFromJsPsi(element);
+        }
 
         if (displayArea == null) {
             return;

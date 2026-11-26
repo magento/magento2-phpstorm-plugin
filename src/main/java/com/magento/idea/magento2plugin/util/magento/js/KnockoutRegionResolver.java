@@ -56,19 +56,77 @@ public class KnockoutRegionResolver {
     }
 
     public @Nullable String getDisplayArea(final @Nullable JsProperty property) {
-        if (property == null || !"displayArea".equals(property.getName()) || property.getValueObject() != null) {
+        if (property == null || !"displayArea".equals(property.getName())) {
             return null;
         }
-        if (property.getStringValue() != null) {
-            return property.getStringValue();
-        }
-        final String rawValue = property.getRawValueText();
+        final String value = property.getStringValue();
 
-        if (rawValue == null || !isQuotedText(rawValue)) {
+        return value == null || value.isBlank() ? null : value;
+    }
+
+    /**
+     * Optional JavaScript PSI adapter for embedded JS inside non-{@code .js} host files (e.g. {@code .phtml} /
+     * {@code .html}) without introducing a hard compile dependency on the JetBrains JavaScript plugin.
+     */
+    public @Nullable String getDisplayAreaFromJsPsi(final @Nullable PsiElement element) {
+        if (element == null) {
             return null;
         }
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        if (jsProvider != null) {
+            return jsProvider.getDisplayAreaValue(element);
+        }
+        PsiElement current = element.getParent();
+        while (current != null && !(current instanceof PsiFile)) {
+            if (implementsClassOrInterface(current.getClass(), "com.intellij.lang.javascript.psi.JSProperty")) {
+                return extractDisplayAreaFromJsPropertyPsi(current);
+            }
+            current = current.getParent();
+        }
+        return null;
+    }
 
-        return unquote(rawValue);
+    private @Nullable String extractDisplayAreaFromJsPropertyPsi(final @NotNull PsiElement jsProperty) {
+        try {
+            final Object nameObj = jsProperty.getClass().getMethod("getName").invoke(jsProperty);
+            if (!(nameObj instanceof String name) || !"displayArea".equals(name)) {
+                return null;
+            }
+            final Object valueObj = jsProperty.getClass().getMethod("getValue").invoke(jsProperty);
+            if (!(valueObj instanceof PsiElement valueElement)
+                    || !implementsClassOrInterface(
+                            valueElement.getClass(),
+                            "com.intellij.lang.javascript.psi.JSLiteralExpression"
+                    )) {
+                return null;
+            }
+            final String text = valueElement.getText();
+            if (text == null || !isQuotedText(text)) {
+                return null;
+            }
+            final String unquoted = unquote(text);
+            return unquoted.isBlank() ? null : unquoted;
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    private static boolean implementsClassOrInterface(
+            final @Nullable Class<?> type,
+            final @NotNull String expectedName
+    ) {
+        if (type == null) {
+            return false;
+        }
+        if (expectedName.equals(type.getName())) {
+            return true;
+        }
+        for (final Class<?> iface : type.getInterfaces()) {
+            if (implementsClassOrInterface(iface, expectedName)) {
+                return true;
+            }
+        }
+        return implementsClassOrInterface(type.getSuperclass(), expectedName);
     }
 
     public @NotNull List<RegionMatch> collectGetRegionMatches(final @NotNull String text) {
@@ -328,6 +386,19 @@ public class KnockoutRegionResolver {
             final @NotNull PsiFile jsFile,
             final @NotNull String displayArea
     ) {
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        if (jsProvider != null) {
+            final List<JsPsiSupportProvider.DisplayAreaAnchor> anchors =
+                    jsProvider.collectDisplayAreaAnchors(jsFile);
+            if (anchors != null) {
+                for (final JsPsiSupportProvider.DisplayAreaAnchor anchor : anchors) {
+                    if (displayArea.equals(anchor.displayArea())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
         if (!isJsFile(jsFile)) {
             return false;
         }

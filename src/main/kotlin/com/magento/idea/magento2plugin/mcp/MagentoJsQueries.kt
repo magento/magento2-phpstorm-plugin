@@ -10,6 +10,8 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.psi.PsiManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
@@ -19,12 +21,17 @@ import com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex
 import com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex
+import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver
 import com.magento.idea.magento2plugin.util.magento.ui.TemplatePathResolver
 import java.io.IOException
 
 internal object MagentoJsQueries {
+    private val COMPONENT_INDEX_KEY_PREFIXES = listOf("componentName:", "componentJsPath:")
+    private val TEMPLATE_INDEX_KEY_PREFIXES = listOf("templatePath:", "componentName:", "componentJsPath:")
+
     private data class MixinDecl(
         val target: String,
         val mixin: String,
@@ -57,7 +64,9 @@ internal object MagentoJsQueries {
         val value: String,
         val filePath: String,
         val line: Int?,
-        val candidates: List<String>
+        val candidates: List<String>,
+        val componentName: String? = null,
+        val componentJsPath: String? = null
     )
 
     /**
@@ -175,16 +184,19 @@ internal object MagentoJsQueries {
             )
         }
         for (decl in usages) {
+            val fields = linkedMapOf<String, Any?>(
+                "value" to decl.value,
+                "candidates" to decl.candidates
+            )
+            decl.componentName?.let { fields["componentName"] = it }
+            decl.componentJsPath?.let { fields["componentJsPath"] = it }
             records += InspectionRecord(
                 kind = decl.kind,
                 key = decl.value,
                 path = decl.filePath,
                 line = decl.line,
                 area = MagentoMcpSupport.viewArea(decl.filePath),
-                fields = linkedMapOf(
-                    "value" to decl.value,
-                    "candidates" to decl.candidates
-                ),
+                fields = fields,
                 moduleHint = MagentoMcpSupport.themeOverrideModule(decl.filePath)
             )
         }
@@ -199,6 +211,8 @@ internal object MagentoJsQueries {
         val maps = mutableListOf<MapDecl>()
         val paths = mutableListOf<PathDecl>()
         val jsResolver = RequireJsPathResolver.getInstance()
+        val jsProvider = JsPsiSupportProvider.getInstance()
+        val psiManager = if (jsProvider != null) PsiManager.getInstance(project) else null
         val resolvedJsCache = hashMapOf<String, List<String>>()
 
         fun resolveJsCandidates(jsPath: String): List<String> = resolvedJsCache.getOrPut(jsPath) {
@@ -214,7 +228,11 @@ internal object MagentoJsQueries {
         for (file in configFiles) {
             ProgressManager.checkCanceled()
             val text = readText(file) ?: continue
-            val parsed = MagentoJsParser.parseRequireJsConfig(text)
+            val parsed = (if (jsProvider != null && psiManager != null) {
+                psiManager.findFile(file)?.let { jsProvider.parseRequireJsConfig(it) }
+            } else {
+                null
+            }) ?: MagentoJsParser.parseRequireJsConfig(text)
             if (parsed.mixinEntries.isEmpty() && parsed.mapEntries.isEmpty() && parsed.pathEntries.isEmpty()) continue
             val filePath = MagentoMcpSupport.relativePath(project, file)
             val lineIndex = MagentoMcpSupport.LineIndex(text)
@@ -283,72 +301,161 @@ internal object MagentoJsQueries {
         val fileIndex = FileBasedIndex.getInstance()
         val jsResolver = RequireJsPathResolver.getInstance()
         val templateResolver = TemplatePathResolver.getInstance()
+        val virtualFileManager = VirtualFileManager.getInstance()
         val lineCache = hashMapOf<String, Pair<String, MagentoMcpSupport.LineIndex>>()
+        val jsCandidateCache = hashMapOf<String, List<String>>()
+        val templateCandidateCache = hashMapOf<String, List<String>>()
+
+        fun resolveJsCandidates(path: String): List<String> = jsCandidateCache.getOrPut(path) {
+            jsResolver.findJsFiles(project, path)
+                .map { MagentoMcpSupport.relativePath(project, it) }
+                .distinct()
+                .sorted()
+        }
+
+        fun resolveTemplateCandidates(path: String): List<String> = templateCandidateCache.getOrPut(path) {
+            templateResolver.findTemplateFiles(project, path)
+                .map { MagentoMcpSupport.relativePath(project, it) }
+                .distinct()
+                .sorted()
+        }
+
+        fun fileLineIndex(file: VirtualFile, relativePath: String): Pair<String, MagentoMcpSupport.LineIndex>? {
+            return lineCache[relativePath] ?: run {
+                val content = readText(file) ?: return@run null
+                val entry = content to MagentoMcpSupport.LineIndex(content)
+                lineCache[relativePath] = entry
+                entry
+            }
+        }
+
+        fun lineAtOffset(file: VirtualFile, relativePath: String, offset: Int): Int? {
+            if (offset < 0) return null
+            val (content, lineIndex) = fileLineIndex(file, relativePath) ?: return null
+            return lineIndex.lineAt(offset.coerceAtMost(content.length))
+        }
 
         fun findLine(file: VirtualFile, relativePath: String, needle: String): Int? {
-            val (text, lineIndex) = lineCache.getOrPut(relativePath) {
-                val content = readText(file) ?: return null
-                content to MagentoMcpSupport.LineIndex(content)
-            }
+            val (text, lineIndex) = fileLineIndex(file, relativePath) ?: return null
             val idx = text.indexOf(needle)
             return if (idx >= 0) lineIndex.lineAt(idx) else null
         }
 
-        fun <V> collectFromIndex(
-            indexId: ID<String, V>,
+        fun <V> readKeys(indexId: ID<String, V>): Collection<String> =
+            indexKeys?.keys(indexId, project) ?: fileIndex.getAllKeys(indexId, project)
+
+        fun collectNavigationDeclarations(
+            indexId: ID<String, Set<UiComponentNavigationData>>,
             kind: String,
-            resolveCandidates: (String) -> List<String>
+            prefixes: List<String>,
+            valueSelector: (UiComponentNavigationData) -> String,
+            candidatesSelector: (UiComponentNavigationData) -> List<String>
         ) {
-            val allKeys = try {
-                indexKeys?.keys(indexId, project) ?: fileIndex.getAllKeys(indexId, project)
-            } catch (_: Throwable) {
-                emptyList()
-            }
-            val matchedKeys = MagentoMcpSupport.prioritizeMatches(allKeys, query)
-            for (key in matchedKeys) {
+            val matchedRawKeys = matchingRawKeys(readKeys(indexId), query, prefixes)
+            for (rawKey in matchedRawKeys) {
                 ProgressManager.checkCanceled()
-                val candidates = resolveCandidates(key)
-                val files = fileIndex.getContainingFiles(indexId, key, scope)
-                    .sortedBy { MagentoMcpSupport.relativePath(project, it) }
-                for (file in files) {
-                    ProgressManager.checkCanceled()
-                    val relPath = MagentoMcpSupport.relativePath(project, file)
-                    val line = findLine(file, relPath, key)
-                    results += UiUsageDecl(
-                        kind = kind,
-                        value = key,
-                        filePath = relPath,
-                        line = line,
-                        candidates = candidates
-                    )
+                for (declSet in fileIndex.getValues(indexId, rawKey, scope)) {
+                    for (decl in declSet) {
+                        ProgressManager.checkCanceled()
+                        val file = virtualFileManager.findFileByUrl(decl.fileUrl) ?: continue
+                        val relPath = MagentoMcpSupport.relativePath(project, file)
+                        val value = valueSelector(decl)
+                        val line = lineAtOffset(file, relPath, decl.valueOffset) ?: findLine(file, relPath, value)
+                        results += UiUsageDecl(
+                            kind = kind,
+                            value = value,
+                            filePath = relPath,
+                            line = line,
+                            candidates = candidatesSelector(decl),
+                            componentName = decl.componentName,
+                            componentJsPath = decl.componentJsPath
+                        )
+                    }
                 }
             }
         }
 
-        collectFromIndex(UiComponentComponentDeclarationIndex.KEY, "ui_component_declaration") { key ->
-            jsResolver.findJsFiles(project, key)
-                .map { MagentoMcpSupport.relativePath(project, it) }
-                .distinct()
-                .sorted()
+        collectNavigationDeclarations(
+            indexId = UiComponentComponentDeclarationIndex.KEY,
+            kind = "ui_component_declaration",
+            prefixes = COMPONENT_INDEX_KEY_PREFIXES,
+            valueSelector = { decl -> decl.componentJsPath?.takeIf { it.isNotBlank() } ?: decl.value },
+            candidatesSelector = { decl ->
+                decl.componentJsPath?.takeIf { it.isNotBlank() }?.let(::resolveJsCandidates) ?: emptyList()
+            }
+        )
+        collectNavigationDeclarations(
+            indexId = UiComponentTemplateDeclarationIndex.KEY,
+            kind = "ui_template_declaration",
+            prefixes = TEMPLATE_INDEX_KEY_PREFIXES,
+            valueSelector = { decl -> decl.value },
+            candidatesSelector = { decl -> resolveTemplateCandidates(decl.value) }
+        )
+
+        val matchedKnockoutKeys = MagentoMcpSupport.prioritizeMatches(readKeys(KnockoutTemplateIndex.KEY), query)
+        for (key in matchedKnockoutKeys) {
+            ProgressManager.checkCanceled()
+            val candidates = resolveTemplateCandidates(key)
+            val files = fileIndex.getContainingFiles(KnockoutTemplateIndex.KEY, key, scope)
+                .sortedBy { MagentoMcpSupport.relativePath(project, it) }
+            for (file in files) {
+                ProgressManager.checkCanceled()
+                val relPath = MagentoMcpSupport.relativePath(project, file)
+                val line = findLine(file, relPath, key)
+                results += UiUsageDecl(
+                    kind = "knockout_template",
+                    value = key,
+                    filePath = relPath,
+                    line = line,
+                    candidates = candidates
+                )
+            }
         }
-        collectFromIndex(UiComponentTemplateDeclarationIndex.KEY, "ui_template_declaration") { key ->
-            templateResolver.findTemplateFiles(project, key)
-                .map { MagentoMcpSupport.relativePath(project, it) }
-                .distinct()
-                .sorted()
-        }
-        collectFromIndex(KnockoutTemplateIndex.KEY, "knockout_template") { key ->
-            templateResolver.findTemplateFiles(project, key)
-                .map { MagentoMcpSupport.relativePath(project, it) }
-                .distinct()
-                .sorted()
-        }
-        collectFromIndex(DisplayAreaIndex.KEY, "display_area") { emptyList() }
-        collectFromIndex(GetRegionUsageIndex.KEY, "get_region") { emptyList() }
+
+        collectNavigationDeclarations(
+            indexId = DisplayAreaIndex.KEY,
+            kind = "display_area",
+            prefixes = emptyList(),
+            valueSelector = { decl -> decl.value },
+            candidatesSelector = { emptyList() }
+        )
+        collectNavigationDeclarations(
+            indexId = GetRegionUsageIndex.KEY,
+            kind = "get_region",
+            prefixes = emptyList(),
+            valueSelector = { decl -> decl.value },
+            candidatesSelector = { emptyList() }
+        )
 
         return results
-            .distinctBy { Triple(it.kind, it.value, it.filePath) }
+            .distinctBy { listOf(it.kind, it.value, it.filePath, it.line) }
             .sortedWith(compareBy({ it.kind }, { it.value }, { it.filePath }, { it.line ?: 0 }))
+    }
+
+    private fun matchingRawKeys(
+        allKeys: Collection<String>,
+        query: String,
+        prefixes: List<String>
+    ): List<String> {
+        if (prefixes.isEmpty()) {
+            return MagentoMcpSupport.prioritizeMatches(allKeys, query)
+        }
+        val byPayload = linkedMapOf<String, MutableList<String>>()
+        for (rawKey in allKeys) {
+            val payload = stripPrefix(rawKey, prefixes)
+            byPayload.getOrPut(payload) { mutableListOf() }.add(rawKey)
+        }
+        return MagentoMcpSupport.prioritizeMatches(byPayload.keys, query)
+            .flatMap { payload -> byPayload[payload].orEmpty() }
+    }
+
+    private fun stripPrefix(key: String, prefixes: List<String>): String {
+        for (prefix in prefixes) {
+            if (key.startsWith(prefix)) {
+                return key.substring(prefix.length)
+            }
+        }
+        return key
     }
 
     private fun readText(file: VirtualFile): String? {

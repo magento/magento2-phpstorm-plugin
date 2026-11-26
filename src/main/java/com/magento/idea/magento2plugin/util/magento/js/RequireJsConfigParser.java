@@ -70,7 +70,7 @@ final class RequireJsConfigParser {
             final String context = contextProp.getName();
             for (final JsProperty mapping : mappingsObj.getProperties()) {
                 final String rawValue = mapping.getRawValueText();
-                final String target = extractMappingTarget(mapping.getName(), rawValue);
+                final String target = extractMappingTarget(mapping);
                 if (target != null && rawValue != null) {
                     results.add(new MapEntry(
                             context,
@@ -95,7 +95,7 @@ final class RequireJsConfigParser {
         }
         for (final JsProperty mapping : pathsObj.getProperties()) {
             final String rawValue = mapping.getRawValueText();
-            final String target = extractMappingTarget(mapping.getName(), rawValue);
+            final String target = extractMappingTarget(mapping);
             if (target != null && rawValue != null) {
                 results.add(new PathEntry(
                         mapping.getName(),
@@ -149,14 +149,15 @@ final class RequireJsConfigParser {
         return prop == null ? null : prop.getValueObject();
     }
 
-    private static @Nullable String extractMappingTarget(
-            final @NotNull String alias,
-            final @Nullable String rawValue
-    ) {
-        if (alias.isBlank() || rawValue == null || rawValue.isBlank()) {
+    private static @Nullable String extractMappingTarget(final @NotNull JsProperty mapping) {
+        if (mapping.getName().isBlank()) {
             return null;
         }
-        final String target = JsProperty.unquoteOrTrim(rawValue);
-        return target == null || target.isBlank() ? null : target;
+        final String stringValue = mapping.getStringValue();
+        if (stringValue == null) {
+            return null;
+        }
+        final String target = stringValue.trim();
+        return target.isEmpty() ? null : target;
     }
 }

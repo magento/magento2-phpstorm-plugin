@@ -16,6 +16,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsConfig;
 import java.util.HashMap;
@@ -43,19 +44,37 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
                 return map;
             }
 
-            map.putAll(getMixinMap(inputData.getContentAsText()));
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            final RequireJsConfig config = jsProvider != null
+                    ? jsProvider.parseRequireJsConfig(inputData.getPsiFile())
+                    : null;
+            if (config != null) {
+                map.putAll(toMixinMap(config));
+            } else {
+                map.putAll(getMixinMap(inputData.getContentAsText()));
+            }
 
             return map;
         };
     }
 
     public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull PsiFile psiFile) {
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        final RequireJsConfig config = jsProvider != null
+                ? jsProvider.parseRequireJsConfig(psiFile)
+                : null;
+        if (config != null) {
+            return toMixinMap(config);
+        }
         return getMixinMap(psiFile.getText());
     }
 
     public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull CharSequence source) {
+        return toMixinMap(MagentoJsParser.parseRequireJsConfig(source));
+    }
+
+    private static @NotNull Map<String, Set<String>> toMixinMap(final @NotNull RequireJsConfig config) {
         final Map<String, Set<String>> map = new HashMap<>();
-        final RequireJsConfig config = MagentoJsParser.parseRequireJsConfig(source);
 
         for (final RequireJsConfig.MixinEntry entry : config.mixinEntries()) {
             map.computeIfAbsent(entry.target(), ignored -> new LinkedHashSet<>()).add(entry.mixin());
@@ -76,7 +95,13 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> "requirejs-config.js".equals(virtualFile.getName());
+        return virtualFile -> {
+            if (!"requirejs-config.js".equals(virtualFile.getName())) {
+                return false;
+            }
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider == null || jsProvider.isJavaScriptFile(virtualFile);
+        };
     }
 
     @Override
@@ -86,6 +111,6 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 1 + JsPsiSupportProvider.versionDelta();
     }
 }

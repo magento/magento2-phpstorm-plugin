@@ -33,6 +33,9 @@
         <extensionPoint qualifiedName="com.magento.idea.magento2plugin.classExistenceValidator"
                         interface="com.magento.idea.magento2plugin.inspections.validator.ClassExistenceValidator"
                         dynamic="false"/>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.jsPsiSupportProvider"
+                        interface="com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider"
+                        dynamic="false"/>
     </extensionPoints>
 
     <actions>

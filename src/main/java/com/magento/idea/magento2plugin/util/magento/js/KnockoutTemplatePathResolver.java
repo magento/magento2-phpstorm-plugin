@@ -29,6 +29,16 @@ public class KnockoutTemplatePathResolver {
     }
 
     public @NotNull Set<String> collectTemplatePaths(final @Nullable PsiFile psiFile) {
+        if (psiFile == null) {
+            return Collections.emptySet();
+        }
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        if (jsProvider != null) {
+            final Set<String> provided = jsProvider.collectKnockoutTemplatePaths(psiFile);
+            if (provided != null) {
+                return provided;
+            }
+        }
         if (!isJsFile(psiFile)) {
             return Collections.emptySet();
         }
@@ -55,19 +65,12 @@ public class KnockoutTemplatePathResolver {
     }
 
     public @Nullable String getTemplatePath(final @Nullable JsProperty property) {
-        if (property == null || !isTemplateProperty(property) || property.getValueObject() != null) {
+        if (property == null || !isTemplateProperty(property)) {
             return null;
         }
-        if (property.getStringValue() != null) {
-            return normalizeTemplatePath(property.getStringValue());
-        }
-        final String rawValue = property.getRawValueText();
+        final String stringValue = property.getStringValue();
 
-        if (rawValue == null || !isQuotedText(rawValue)) {
-            return null;
-        }
-
-        return normalizeTemplatePath(rawValue);
+        return stringValue == null ? null : normalizeTemplatePath(stringValue);
     }
 
     public @Nullable String getTemplatePath(

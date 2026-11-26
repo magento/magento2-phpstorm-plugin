@@ -11,4 +11,7 @@
         <codeInsight.lineMarkerProvider language="JavaScript" implementationClass="com.magento.idea.magento2plugin.linemarker.js.KnockoutTemplateLineMarkerProvider"/>
         <defaultLiveTemplates file="/liveTemplates/MagentoPWA.xml"/>
     </extensions>
+    <extensions defaultExtensionNs="com.magento.idea.magento2plugin">
+        <jsPsiSupportProvider implementation="com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProviderImpl"/>
+    </extensions>
 </idea-plugin>

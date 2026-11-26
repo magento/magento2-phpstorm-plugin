@@ -13,6 +13,7 @@ import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsConfig;
 import java.util.HashMap;
@@ -34,8 +35,13 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
     public @NotNull DataIndexer<String, String, FileContent> getIndexer() {
         return inputData -> {
             final Map<String, String> map = new HashMap<>();
-            final RequireJsConfig config =
-                    MagentoJsParser.parseRequireJsConfig(inputData.getContentAsText());
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            RequireJsConfig config = jsProvider != null
+                    ? jsProvider.parseRequireJsConfig(inputData.getPsiFile())
+                    : null;
+            if (config == null) {
+                config = MagentoJsParser.parseRequireJsConfig(inputData.getContentAsText());
+            }
 
             for (final RequireJsConfig.MapEntry entry : config.mapEntries()) {
                 map.put(entry.alias(), entry.rawValueText());
@@ -55,7 +61,13 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> "requirejs-config.js".equals(virtualFile.getName());
+        return virtualFile -> {
+            if (!"requirejs-config.js".equals(virtualFile.getName())) {
+                return false;
+            }
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider == null || jsProvider.isJavaScriptFile(virtualFile);
+        };
     }
 
     @Override
@@ -65,7 +77,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 1 + JsPsiSupportProvider.versionDelta();
     }
 
     @Override

@@ -183,6 +183,7 @@ final class JsObjectParser {
                 bodyEnd.endOffset(),
                 valueText,
                 null,
+                null,
                 owner
         );
         owner.addProperty(prop);
@@ -209,6 +210,7 @@ final class JsObjectParser {
         final Token firstValToken = tokens.get(valStartIdx);
         final Token lastValToken = tokens.get(Math.max(valStartIdx, valEndIdx - 1));
         final String valueText = source.subSequence(firstValToken.startOffset(), lastValToken.endOffset()).toString();
+        final String stringValue = extractStaticStringLiteral(valStartIdx, valEndIdx, firstValToken);
 
         final JsProperty prop = new JsProperty(
                 unquoteKey(keyToken),
@@ -217,6 +219,7 @@ final class JsObjectParser {
                 firstValToken.startOffset(),
                 lastValToken.endOffset(),
                 valueText,
+                stringValue,
                 null,
                 owner
         );
@@ -230,6 +233,26 @@ final class JsObjectParser {
             parseBlock(valStartIdx, valEndIdx, prop);
         }
         return valEndIdx;
+    }
+
+    private static @Nullable String extractStaticStringLiteral(
+            final int valStartIdx,
+            final int valEndIdx,
+            final @NotNull Token firstValToken
+    ) {
+        if (valEndIdx != valStartIdx + 1 || firstValToken.type() != TokenType.STRING) {
+            return null;
+        }
+        final String text = firstValToken.text();
+        if (text.length() < 2) {
+            return null;
+        }
+        final char first = text.charAt(0);
+        final char last = text.charAt(text.length() - 1);
+        if ((first == '\'' && last == '\'') || (first == '"' && last == '"')) {
+            return text.substring(1, text.length() - 1);
+        }
+        return null;
     }
 
     private int skipEntry(

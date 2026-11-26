@@ -166,14 +166,63 @@ final class JsLexer {
         if (tokens.isEmpty()) {
             return true;
         }
-        final Token prev = tokens.get(tokens.size() - 1);
+        final int lastIndex = tokens.size() - 1;
+        final Token prev = tokens.get(lastIndex);
         return switch (prev.type()) {
             case LPAREN, LBRACKET, LBRACE, COLON, COMMA, SEMICOLON, EQUALS, PUNCTUATION -> true;
-            case IDENTIFIER -> "return".equals(prev.text())
-                    || "typeof".equals(prev.text())
-                    || "case".equals(prev.text());
+            case RPAREN -> isControlFlowHeaderEnd(lastIndex);
+            case IDENTIFIER -> isRegexPrefixKeyword(prev.text());
             default -> false;
         };
+    }
+
+    private boolean isControlFlowHeaderEnd(final int closeParenIndex) {
+        int depth = 0;
+        for (int i = closeParenIndex; i >= 0; i--) {
+            final TokenType type = tokens.get(i).type();
+            if (type == TokenType.RPAREN) {
+                depth++;
+            } else if (type == TokenType.LPAREN) {
+                depth--;
+                if (depth == 0) {
+                    if (i == 0) {
+                        return false;
+                    }
+                    if (i >= 2 && tokens.get(i - 2).type() == TokenType.PUNCTUATION
+                            && ".".equals(tokens.get(i - 2).text())) {
+                        return false;
+                    }
+                    final Token beforeParen = tokens.get(i - 1);
+                    return beforeParen.type() == TokenType.IDENTIFIER
+                            && isControlFlowParenKeyword(beforeParen.text());
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isControlFlowParenKeyword(final @NotNull String keyword) {
+        return "if".equals(keyword)
+                || "while".equals(keyword)
+                || "for".equals(keyword)
+                || "with".equals(keyword);
+    }
+
+    private static boolean isRegexPrefixKeyword(final @NotNull String keyword) {
+        return "return".equals(keyword)
+                || "typeof".equals(keyword)
+                || "case".equals(keyword)
+                || "else".equals(keyword)
+                || "do".equals(keyword)
+                || "throw".equals(keyword)
+                || "in".equals(keyword)
+                || "instanceof".equals(keyword)
+                || "of".equals(keyword)
+                || "new".equals(keyword)
+                || "delete".equals(keyword)
+                || "void".equals(keyword)
+                || "await".equals(keyword)
+                || "yield".equals(keyword);
     }
 
     private static @Nullable TokenType singleCharTokenType(final char c) {

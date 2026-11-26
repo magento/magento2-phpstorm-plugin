@@ -11,11 +11,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
+import com.intellij.testFramework.ExtensionTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.indexing.FileContent;
 import com.intellij.util.indexing.FileContentImpl;
 import com.magento.idea.magento2plugin.project.Settings;
+import com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
+import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +39,90 @@ public class UiComponentIndexingDataTest extends BasePlatformTestCase {
     }
 
     public void testJavascriptIndexesShareExtractionAndPreserveValues() {
+        assertNotNull("JsPsiSupportProvider should be registered when JS plugin is enabled",
+                JsPsiSupportProvider.getInstance());
         final CountingContent content = content("component.js", JS);
         assertIndexValues(content, JS);
-        assertEquals("The three indexes should extract declarations only once", 1, content.psiReads);
+        assertEquals("The three indexes should extract declarations only once via JS PSI", 1, content.psiReads);
+    }
+
+    public void testJavascriptFallbackWithoutJsPsiProviderAvoidsPsiAndMatchesResults() {
+        ExtensionTestUtil.maskExtensions(
+                JsPsiSupportProvider.EP_NAME,
+                Collections.emptyList(),
+                getTestRootDisposable()
+        );
+        assertNull(JsPsiSupportProvider.getInstance());
+
+        final CountingContent content = content("component-fallback.js", JS);
+        assertIndexValues(content, JS);
+        assertEquals("Fallback JS parsing should not construct PSI", 0, content.psiReads);
+    }
+
+    public void testDynamicJsExpressionsAreIgnoredInBothJsPsiAndFallbackModes() {
+        final String dynamicJs = """
+                define([], function () {
+                    return {
+                        defaults: {
+                            template: this.template,
+                            displayArea: regionName,
+                            childTemplate: chooseTemplate()
+                        }
+                    };
+                });
+                """;
+        final CountingContent psiContent = content("dynamic-psi.js", dynamicJs);
+        assertAllIndexesEmpty(psiContent);
+        assertEquals(1, psiContent.psiReads);
+        assertTrue(new KnockoutTemplateIndex().getIndexer().map(psiContent).isEmpty());
+        assertEquals(2, psiContent.psiReads);
+
+        ExtensionTestUtil.maskExtensions(
+                JsPsiSupportProvider.EP_NAME,
+                Collections.emptyList(),
+                getTestRootDisposable()
+        );
+        final CountingContent fallbackContent = content("dynamic-fallback.js", dynamicJs);
+        assertAllIndexesEmpty(fallbackContent);
+        assertTrue(new KnockoutTemplateIndex().getIndexer().map(fallbackContent).isEmpty());
+        assertEquals(0, fallbackContent.psiReads);
+    }
+
+    public void testRequireJsAndKnockoutIndexesMatchBetweenJsPsiAndFallbackModes() {
+        final String requireJs = """
+                require.config({
+                    map: { '*': { 'aliasA': 'Foo_Bar/js/a' } },
+                    paths: { 'pathB': 'Foo_Bar/js/b' },
+                    config: { mixins: { 'Foo_Bar/js/a': { 'Foo_Bar/js/a-mixin': true } } }
+                });
+                """;
+        final String componentJs = "define({defaults: {template: '" + TEMPLATE + "'}});";
+
+        final CountingContent requirePsi = projectContent("psi/requirejs-config.js", requireJs);
+        final CountingContent componentPsi = content("ko-component.js", componentJs);
+        final Map<String, String> expectedRequire = new RequireJsIndex().getIndexer().map(requirePsi);
+        final Map<String, Set<String>> expectedMixins = new JsMixinIndex().getIndexer().map(requirePsi);
+        final Map<String, Set<String>> expectedTemplates = new KnockoutTemplateIndex().getIndexer().map(componentPsi);
+        assertEquals("'Foo_Bar/js/a'", expectedRequire.get("aliasA"));
+        assertEquals("'Foo_Bar/js/b'", expectedRequire.get("pathB"));
+        assertEquals(Set.of("Foo_Bar/js/a-mixin"), expectedMixins.get("Foo_Bar/js/a"));
+        assertEquals(Set.of(componentPsi.getFile().getUrl()), expectedTemplates.get(TEMPLATE));
+
+        ExtensionTestUtil.maskExtensions(
+                JsPsiSupportProvider.EP_NAME,
+                Collections.emptyList(),
+                getTestRootDisposable()
+        );
+        final CountingContent requireFallback = projectContent("fallback/requirejs-config.js", requireJs);
+        final CountingContent componentFallback = content("fallback-ko-component.js", componentJs);
+        assertEquals(expectedRequire, new RequireJsIndex().getIndexer().map(requireFallback));
+        assertEquals(expectedMixins, new JsMixinIndex().getIndexer().map(requireFallback));
+        assertEquals(
+                Set.of(componentFallback.getFile().getUrl()),
+                new KnockoutTemplateIndex().getIndexer().map(componentFallback).get(TEMPLATE)
+        );
+        assertEquals(0, requireFallback.psiReads);
+        assertEquals(0, componentFallback.psiReads);
     }
 
     public void testXmlIndexesShareExtractionAndPreserveOffsets() {
@@ -115,6 +202,11 @@ public class UiComponentIndexingDataTest extends BasePlatformTestCase {
 
     private CountingContent content(final String name, final String text) {
         final VirtualFile file = myFixture.configureByText(name, text).getVirtualFile();
+        return new CountingContent(FileContentImpl.createByText(file, text, getProject()));
+    }
+
+    private CountingContent projectContent(final String relativePath, final String text) {
+        final VirtualFile file = myFixture.addFileToProject(relativePath, text).getVirtualFile();
         return new CountingContent(FileContentImpl.createByText(file, text, getProject()));
     }
 

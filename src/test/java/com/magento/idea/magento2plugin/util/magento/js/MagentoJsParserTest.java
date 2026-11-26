@@ -93,4 +93,95 @@ public class MagentoJsParserTest extends TestCase {
         final JsAst unclosedRegexAst = MagentoJsParser.parse("var r = /abc\\");
         assertNotNull(unclosedRegexAst);
     }
+
+    public void testRejectsDynamicExpressionsAsStringLiteralsWhileKeepingRawText() {
+        final String source = """
+                define(['uiComponent'], function (Component) {
+                    return Component.extend({
+                        defaults: {
+                            template: this.template,
+                            displayArea: regionName,
+                            childTemplate: chooseTemplate(),
+                            elementTmpl: 'Vendor_Module/' + name,
+                            component: config.component,
+                            enabled: true,
+                            timeout: 500,
+                            literal: 'Vendor_Module/static'
+                        }
+                    });
+                });
+                """;
+
+        final JsAst ast = MagentoJsParser.parse(source);
+        final KnockoutTemplatePathResolver templateResolver = KnockoutTemplatePathResolver.getInstance();
+        final KnockoutRegionResolver regionResolver = KnockoutRegionResolver.getInstance();
+
+        for (final JsProperty prop : ast.getProperties()) {
+            switch (prop.getName()) {
+                case "template", "childTemplate", "elementTmpl" -> {
+                    assertNull("Dynamic expression must not be treated as string literal: " + prop.getName(),
+                            prop.getStringValue());
+                    assertNotNull(prop.getRawValueText());
+                    assertNull(templateResolver.getTemplatePath(prop));
+                }
+                case "displayArea" -> {
+                    assertNull(prop.getStringValue());
+                    assertEquals("regionName", prop.getRawValueText());
+                    assertNull(regionResolver.getDisplayArea(prop));
+                }
+                case "component" -> {
+                    assertNull(prop.getStringValue());
+                    assertEquals("config.component", prop.getRawValueText());
+                }
+                case "enabled" -> {
+                    assertNull(prop.getStringValue());
+                    assertEquals("true", prop.getRawValueText());
+                }
+                case "timeout" -> {
+                    assertNull(prop.getStringValue());
+                    assertEquals("500", prop.getRawValueText());
+                }
+                case "literal" -> assertEquals("Vendor_Module/static", prop.getStringValue());
+                default -> { }
+            }
+        }
+        assertTrue(templateResolver.collectTemplatePaths(source).isEmpty());
+
+        final RequireJsConfig requireJsConfig = MagentoJsParser.parseRequireJsConfig("""
+                var config = {
+                    map: { '*': { aliasA: dynamicTarget, aliasB: 'Vendor_Module/' + suffix, aliasC: 'Vendor_Module/ok' } },
+                    paths: { pathA: getPath(), pathB: 'Vendor_Module/path-ok' }
+                };
+                """);
+        assertEquals(1, requireJsConfig.mapEntries().size());
+        assertEquals("aliasC", requireJsConfig.mapEntries().get(0).alias());
+        assertEquals(1, requireJsConfig.pathEntries().size());
+        assertEquals("pathB", requireJsConfig.pathEntries().get(0).alias());
+    }
+
+    public void testParsesComponentAfterRegexFollowingControlFlowParenthesis() {
+        final String source = """
+                define([], function () {
+                    if (window.foo) /['"]/.test(window.foo);
+                    while (cond()) /['"]/.test(bar);
+                    var ratio = obj.if(x) / 2;
+                    return {
+                        defaults: {
+                            template: 'Vendor_Module/main',
+                            ratio: ratio
+                        }
+                    };
+                });
+                """;
+
+        final JsAst ast = MagentoJsParser.parse(source);
+        final JsProperty templateProp = ast.getProperties().stream()
+                .filter(p -> "template".equals(p.getName()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Control-flow regex with quotes must not swallow subsequent properties", templateProp);
+        assertEquals("Vendor_Module/main", templateProp.getStringValue());
+        assertEquals("defaults", templateProp.getParentProperty().getName());
+    }
 }

@@ -15,6 +15,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -41,9 +42,16 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
                 return map;
             }
             final String componentUrl = inputData.getFile().getUrl();
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            Set<String> templatePaths = jsProvider != null
+                    ? jsProvider.collectKnockoutTemplatePaths(inputData.getPsiFile())
+                    : null;
+            if (templatePaths == null) {
+                templatePaths = KnockoutTemplatePathResolver.getInstance()
+                        .collectTemplatePaths(inputData.getContentAsText());
+            }
 
-            for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
-                    .collectTemplatePaths(inputData.getContentAsText())) {
+            for (final String templatePath : templatePaths) {
                 map.computeIfAbsent(templatePath, ignored -> new LinkedHashSet<>()).add(componentUrl);
             }
 
@@ -63,7 +71,12 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> "js".equalsIgnoreCase(virtualFile.getExtension());
+        return virtualFile -> {
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider != null
+                    ? jsProvider.isJavaScriptFile(virtualFile)
+                    : "js".equalsIgnoreCase(virtualFile.getExtension());
+        };
     }
 
     @Override
@@ -73,6 +86,6 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
 
     @Override
     public int getVersion() {
-        return 2;
+        return 2 + JsPsiSupportProvider.versionDelta();
     }
 }

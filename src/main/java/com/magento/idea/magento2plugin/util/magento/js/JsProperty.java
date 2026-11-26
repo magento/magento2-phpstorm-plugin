@@ -18,6 +18,7 @@ public final class JsProperty {
     private final int valueStartOffset;
     private final int valueEndOffset;
     private final @Nullable String rawValueText;
+    private final @Nullable String stringValue;
     private final JsObject containingObject;
     private @Nullable JsObject valueObject;
 
@@ -28,6 +29,7 @@ public final class JsProperty {
             final int valueStartOffset,
             final int valueEndOffset,
             final @Nullable String rawValueText,
+            final @Nullable String stringValue,
             final @Nullable JsObject valueObject,
             final @NotNull JsObject containingObject
     ) {
@@ -37,6 +39,7 @@ public final class JsProperty {
         this.valueStartOffset = valueStartOffset;
         this.valueEndOffset = valueEndOffset;
         this.rawValueText = rawValueText;
+        this.stringValue = stringValue;
         this.valueObject = valueObject;
         this.containingObject = containingObject;
     }
@@ -69,11 +72,12 @@ public final class JsProperty {
         return rawValueText;
     }
 
+    /**
+     * Returns the unquoted text only when this property value is a static quoted string literal
+     * ({@code '...'} or {@code "..."}), or {@code null} for objects and dynamic/non-string expressions.
+     */
     public @Nullable String getStringValue() {
-        if (valueObject != null || rawValueText == null) {
-            return null;
-        }
-        return unquoteOrTrim(rawValueText);
+        return valueObject != null ? null : stringValue;
     }
 
     public @Nullable JsObject getValueObject() {
@@ -86,21 +90,6 @@ public final class JsProperty {
 
     public @Nullable JsProperty getParentProperty() {
         return containingObject.getParentProperty();
-    }
-
-    static @Nullable String unquoteOrTrim(final @Nullable String rawValue) {
-        if (rawValue == null) {
-            return null;
-        }
-        final String trimmed = rawValue.trim();
-        if (trimmed.length() >= 2) {
-            final char first = trimmed.charAt(0);
-            final char last = trimmed.charAt(trimmed.length() - 1);
-            if ((first == '\'' && last == '\'') || (first == '"' && last == '"')) {
-                return trimmed.substring(1, trimmed.length() - 1).trim();
-            }
-        }
-        return normalizeRequirePath(trimmed);
     }
 
     static @Nullable String normalizeRequirePath(final @Nullable String path) {

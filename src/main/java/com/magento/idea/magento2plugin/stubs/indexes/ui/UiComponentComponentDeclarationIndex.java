@@ -17,6 +17,7 @@ import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationDataSetExternalizer;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -90,8 +91,15 @@ public class UiComponentComponentDeclarationIndex
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> "js".equalsIgnoreCase(virtualFile.getExtension())
-                || virtualFile.getFileType().equals(XmlFileType.INSTANCE);
+        return virtualFile -> {
+            if (virtualFile.getFileType().equals(XmlFileType.INSTANCE)) {
+                return true;
+            }
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider != null
+                    ? jsProvider.isJavaScriptFile(virtualFile)
+                    : "js".equalsIgnoreCase(virtualFile.getExtension());
+        };
     }
 
     @Override
@@ -101,7 +109,7 @@ public class UiComponentComponentDeclarationIndex
 
     @Override
     public int getVersion() {
-        return 4;
+        return 4 + JsPsiSupportProvider.versionDelta();
     }
 
     private interface KeyBuilder {

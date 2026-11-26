@@ -72,6 +72,7 @@ host.java.srcDir(shared.resolve("java"))
 listOf("util/magento/ui/TemplatePathResolver", "util/magento/ui/UiComponentScopeResolver",
     "util/magento/ui/UiComponentTemplateResolver",
     "util/magento/js/MagentoJsParser", "util/magento/js/JsLexer", "util/magento/js/JsObjectParser",
+    "util/magento/js/JsPsiSupportProvider",
     "util/magento/js/JsAst", "util/magento/js/JsObject", "util/magento/js/JsProperty",
     "util/magento/js/RequireJsConfig", "util/magento/js/RequireJsConfigParser",
     "util/magento/js/RequireJsPathResolver",

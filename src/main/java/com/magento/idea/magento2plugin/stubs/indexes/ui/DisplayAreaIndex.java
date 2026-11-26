@@ -17,6 +17,7 @@ import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationDataSetExternalizer;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -64,8 +65,15 @@ public class DisplayAreaIndex extends FileBasedIndexExtension<String, Set<UiComp
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> "js".equalsIgnoreCase(virtualFile.getExtension())
-                || virtualFile.getFileType().equals(XmlFileType.INSTANCE);
+        return virtualFile -> {
+            if (virtualFile.getFileType().equals(XmlFileType.INSTANCE)) {
+                return true;
+            }
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider != null
+                    ? jsProvider.isJavaScriptFile(virtualFile)
+                    : "js".equalsIgnoreCase(virtualFile.getExtension());
+        };
     }
 
     @Override
@@ -75,6 +83,6 @@ public class DisplayAreaIndex extends FileBasedIndexExtension<String, Set<UiComp
 
     @Override
     public int getVersion() {
-        return 3;
+        return 3 + JsPsiSupportProvider.versionDelta();
     }
 }

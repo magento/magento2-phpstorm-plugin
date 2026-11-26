@@ -32,6 +32,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigati
 import com.magento.idea.magento2plugin.util.magento.js.JsAst;
 import com.magento.idea.magento2plugin.util.magento.js.JsObject;
 import com.magento.idea.magento2plugin.util.magento.js.JsProperty;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
@@ -105,17 +106,25 @@ public class UiComponentScopeResolver {
     public @NotNull List<UiComponentNavigationData> collectComponentDeclarations(
             final @NotNull com.intellij.util.indexing.FileContent content
     ) {
-        if (content.getFileType() instanceof com.intellij.openapi.fileTypes.LanguageFileType) {
-            return collectComponentDeclarations(content.getPsiFile());
-        }
         final VirtualFile virtualFile = content.getFile();
         final String ext = virtualFile.getExtension();
 
         if ("js".equalsIgnoreCase(ext)) {
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            if (jsProvider != null) {
+                final List<UiComponentNavigationData> provided =
+                        jsProvider.collectUiComponentDeclarations(content.getPsiFile());
+                if (provided != null) {
+                    return provided;
+                }
+            }
             return collectJsComponentDeclarations(virtualFile, content.getContentAsText());
         }
         if ("php".equalsIgnoreCase(ext)) {
             return collectPhpComponentDeclarations(virtualFile, content.getContentAsText());
+        }
+        if (content.getFileType() instanceof com.intellij.openapi.fileTypes.LanguageFileType) {
+            return collectComponentDeclarations(content.getPsiFile());
         }
 
         return Collections.emptyList();
@@ -124,7 +133,15 @@ public class UiComponentScopeResolver {
     public @NotNull List<UiComponentNavigationData> collectComponentDeclarations(
             final @NotNull PsiFile psiFile
     ) {
-        if (isJsFile(psiFile)) {
+        if (isJsFile(psiFile) || isJavaScriptLanguage(psiFile.getLanguage())) {
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            if (jsProvider != null) {
+                final List<UiComponentNavigationData> provided =
+                        jsProvider.collectUiComponentDeclarations(psiFile);
+                if (provided != null) {
+                    return provided;
+                }
+            }
             return collectJsComponentDeclarations(psiFile);
         }
         if (psiFile instanceof XmlFile) {
@@ -181,6 +198,9 @@ public class UiComponentScopeResolver {
             final @NotNull PsiElement element
     ) {
         final PsiFile psiFile = element.getContainingFile();
+        if (psiFile == null) {
+            return null;
+        }
         final int startOffset = element.getTextRange().getStartOffset();
         final int endOffset = element.getTextRange().getEndOffset();
 
@@ -193,7 +213,74 @@ public class UiComponentScopeResolver {
             }
         }
 
+        if (!isJsFile(psiFile) && isJavaScriptLanguage(element.getLanguage())) {
+            final PsiElement jsScope = findEmbeddedJsScope(element, psiFile);
+            final VirtualFile virtualFile = psiFile.getVirtualFile() != null
+                    ? psiFile.getVirtualFile()
+                    : psiFile.getViewProvider().getVirtualFile();
+            if (jsScope != null && virtualFile != null) {
+                final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+                final List<UiComponentNavigationData> declarations;
+                if (jsProvider != null) {
+                    final List<UiComponentNavigationData> provided =
+                            jsProvider.collectEmbeddedUiComponentDeclarations(jsScope, virtualFile);
+                    declarations = provided != null
+                            ? provided
+                            : collectJsComponentDeclarations(
+                                    virtualFile,
+                                    jsScope.getText(),
+                                    jsScope == psiFile ? 0 : jsScope.getTextRange().getStartOffset()
+                            );
+                } else {
+                    final int baseOffset = jsScope == psiFile ? 0 : jsScope.getTextRange().getStartOffset();
+                    declarations = collectJsComponentDeclarations(virtualFile, jsScope.getText(), baseOffset);
+                }
+                for (final UiComponentNavigationData declaration : declarations) {
+                    if (UiComponentNavigationData.KIND_DISPLAY_AREA.equals(declaration.getKind())
+                            && overlapsValue(startOffset, endOffset, declaration)) {
+                        return declaration;
+                    }
+                }
+            }
+        }
+
         return null;
+    }
+
+    private static @Nullable PsiElement findEmbeddedJsScope(
+            final @NotNull PsiElement element,
+            final @NotNull PsiFile psiFile
+    ) {
+        PsiElement current = element;
+        PsiElement jsRoot = null;
+        while (current != null) {
+            if (isJavaScriptLanguage(current.getLanguage())) {
+                jsRoot = current;
+            } else if (jsRoot != null) {
+                break;
+            }
+            if (current == psiFile) {
+                break;
+            }
+            current = current.getParent();
+        }
+        return jsRoot;
+    }
+
+    private static boolean isJavaScriptLanguage(final @NotNull com.intellij.lang.Language language) {
+        final com.intellij.lang.Language jsLanguage = com.intellij.lang.Language.findLanguageByID("JavaScript");
+        if (jsLanguage != null && language.isKindOf(jsLanguage)) {
+            return true;
+        }
+        com.intellij.lang.Language current = language;
+        while (current != null) {
+            final String id = current.getID();
+            if ("JavaScript".equals(id) || "ECMAScript 6".equals(id)) {
+                return true;
+            }
+            current = current.getBaseLanguage();
+        }
+        return false;
     }
 
     public @Nullable String getDisplayAreaValue(final @NotNull PsiElement element) {
@@ -1040,14 +1127,22 @@ public class UiComponentScopeResolver {
             final @NotNull VirtualFile virtualFile,
             final @NotNull CharSequence text
     ) {
+        return collectJsComponentDeclarations(virtualFile, text, 0);
+    }
+
+    private @NotNull List<UiComponentNavigationData> collectJsComponentDeclarations(
+            final @NotNull VirtualFile virtualFile,
+            final @NotNull CharSequence text,
+            final int baseOffset
+    ) {
         final Set<UiComponentNavigationData> results = new LinkedHashSet<>();
         final String fileUrl = virtualFile.getUrl();
         final String fileComponentPath = getRequireJsPathFromFilePath(virtualFile);
         final JsAst ast = MagentoJsParser.parse(text);
 
-        collectJsObjectComponentDeclarations(ast, fileUrl, fileComponentPath, results);
-        collectDynamicJsLayoutChildDeclarations(ast, fileUrl, fileComponentPath, results);
-        collectJsFileDefaultDeclarations(ast, fileUrl, fileComponentPath, results);
+        collectJsObjectComponentDeclarations(ast, fileUrl, fileComponentPath, baseOffset, results);
+        collectDynamicJsLayoutChildDeclarations(ast, fileUrl, fileComponentPath, baseOffset, results);
+        collectJsFileDefaultDeclarations(ast, fileUrl, fileComponentPath, baseOffset, results);
 
         return new ArrayList<>(results);
     }
@@ -1056,6 +1151,7 @@ public class UiComponentScopeResolver {
             final @NotNull JsAst ast,
             final @NotNull String fileUrl,
             final @Nullable String fileComponentPath,
+            final int baseOffset,
             final @NotNull Set<UiComponentNavigationData> results
     ) {
         for (final JsProperty property : ast.getProperties()) {
@@ -1080,13 +1176,14 @@ public class UiComponentScopeResolver {
                     componentJsPath == null ? fileComponentPath : componentJsPath,
                     parentComponentJsPath,
                     null,
-                    property.getKeyStartOffset()
+                    baseOffset + property.getKeyStartOffset()
             ));
 
             addJsComponentValueDeclarations(
                     results,
                     objectLiteral,
                     fileUrl,
+                    baseOffset,
                     componentName,
                     parentComponentName,
                     componentJsPath == null ? fileComponentPath : componentJsPath,
@@ -1099,6 +1196,7 @@ public class UiComponentScopeResolver {
             final @NotNull JsAst ast,
             final @NotNull String fileUrl,
             final @Nullable String fileComponentPath,
+            final int baseOffset,
             final @NotNull Set<UiComponentNavigationData> results
     ) {
         for (final JsProperty property : ast.getProperties()) {
@@ -1115,6 +1213,7 @@ public class UiComponentScopeResolver {
                         results,
                         property,
                         fileUrl,
+                        baseOffset,
                         UiComponentNavigationData.KIND_DISPLAY_AREA,
                         fileComponentPath,
                         null,
@@ -1127,6 +1226,7 @@ public class UiComponentScopeResolver {
                         results,
                         property,
                         fileUrl,
+                        baseOffset,
                         UiComponentNavigationData.KIND_TEMPLATE,
                         fileComponentPath,
                         null,
@@ -1139,6 +1239,7 @@ public class UiComponentScopeResolver {
                         results,
                         property,
                         fileUrl,
+                        baseOffset,
                         UiComponentNavigationData.KIND_CHILD_TEMPLATE,
                         fileComponentPath,
                         null,
@@ -1151,6 +1252,7 @@ public class UiComponentScopeResolver {
                         results,
                         property,
                         fileUrl,
+                        baseOffset,
                         UiComponentNavigationData.KIND_ELEMENT_TEMPLATE,
                         fileComponentPath,
                         null,
@@ -1163,6 +1265,7 @@ public class UiComponentScopeResolver {
                         results,
                         property,
                         fileUrl,
+                        baseOffset,
                         fileComponentPath,
                         null,
                         fileComponentPath,
@@ -1176,16 +1279,21 @@ public class UiComponentScopeResolver {
             final @NotNull JsAst ast,
             final @NotNull String fileUrl,
             final @Nullable String fileComponentPath,
+            final int baseOffset,
             final @NotNull Set<UiComponentNavigationData> results
     ) {
-        if (fileComponentPath == null) {
-            return;
-        }
         for (final JsObject objectLiteral : ast.getObjects()) {
             if (!isDynamicJsLayoutChildObject(objectLiteral)) {
                 continue;
             }
-            final String componentName = buildDynamicJsLayoutComponentName(objectLiteral, fileComponentPath);
+            final String scopeComponentPath = fileComponentPath != null
+                    ? fileComponentPath
+                    : getDirectJsStringProperty(objectLiteral, "component");
+            final String componentName = buildDynamicJsLayoutComponentName(
+                    objectLiteral,
+                    scopeComponentPath != null ? scopeComponentPath : "dynamic",
+                    baseOffset
+            );
             final String componentJsPath = getDirectJsStringProperty(objectLiteral, "component");
 
             results.add(new UiComponentNavigationData(
@@ -1197,12 +1305,13 @@ public class UiComponentScopeResolver {
                     componentJsPath,
                     fileComponentPath,
                     null,
-                    objectLiteral.getStartOffset()
+                    baseOffset + objectLiteral.getStartOffset()
             ));
             addJsComponentValueDeclarations(
                     results,
                     objectLiteral,
                     fileUrl,
+                    baseOffset,
                     componentName,
                     fileComponentPath,
                     componentJsPath,
@@ -1215,6 +1324,7 @@ public class UiComponentScopeResolver {
             final @NotNull Set<UiComponentNavigationData> results,
             final @NotNull JsObject objectLiteral,
             final @NotNull String fileUrl,
+            final int baseOffset,
             final @NotNull String componentName,
             final @Nullable String parentComponentName,
             final @Nullable String componentJsPath,
@@ -1230,6 +1340,7 @@ public class UiComponentScopeResolver {
                 results,
                 displayArea,
                 fileUrl,
+                baseOffset,
                 UiComponentNavigationData.KIND_DISPLAY_AREA,
                 componentName,
                 parentComponentName,
@@ -1241,6 +1352,7 @@ public class UiComponentScopeResolver {
                 results,
                 template,
                 fileUrl,
+                baseOffset,
                 UiComponentNavigationData.KIND_TEMPLATE,
                 componentName,
                 parentComponentName,
@@ -1252,6 +1364,7 @@ public class UiComponentScopeResolver {
                 results,
                 childTemplate,
                 fileUrl,
+                baseOffset,
                 UiComponentNavigationData.KIND_CHILD_TEMPLATE,
                 componentName,
                 parentComponentName,
@@ -1263,6 +1376,7 @@ public class UiComponentScopeResolver {
                 results,
                 elementTemplate,
                 fileUrl,
+                baseOffset,
                 UiComponentNavigationData.KIND_ELEMENT_TEMPLATE,
                 componentName,
                 parentComponentName,
@@ -1274,6 +1388,7 @@ public class UiComponentScopeResolver {
                 results,
                 templates,
                 fileUrl,
+                baseOffset,
                 componentName,
                 parentComponentName,
                 componentJsPath,
@@ -1285,6 +1400,7 @@ public class UiComponentScopeResolver {
             final @NotNull Set<UiComponentNavigationData> results,
             final @Nullable JsProperty property,
             final @NotNull String fileUrl,
+            final int baseOffset,
             final @NotNull String kind,
             final @Nullable String componentName,
             final @Nullable String parentComponentName,
@@ -1295,14 +1411,7 @@ public class UiComponentScopeResolver {
         if (property == null || property.getValueObject() != null) {
             return;
         }
-        final String rawValueText = property.getRawValueText();
-
-        if (rawValueText == null || !isQuotedText(rawValueText)) {
-            return;
-        }
-        final String value = property.getStringValue() != null
-                ? property.getStringValue()
-                : normalizeValue(rawValueText);
+        final String value = property.getStringValue();
 
         if (value == null) {
             return;
@@ -1321,7 +1430,7 @@ public class UiComponentScopeResolver {
                 componentJsPath,
                 parentComponentJsPath,
                 templateKey,
-                property.getValueStartOffset() + 1
+                baseOffset + property.getValueStartOffset() + 1
         ));
     }
 
@@ -1329,6 +1438,7 @@ public class UiComponentScopeResolver {
             final @NotNull Set<UiComponentNavigationData> results,
             final @Nullable JsProperty templatesProperty,
             final @NotNull String fileUrl,
+            final int baseOffset,
             final @Nullable String componentName,
             final @Nullable String parentComponentName,
             final @Nullable String componentJsPath,
@@ -1344,6 +1454,7 @@ public class UiComponentScopeResolver {
                     results,
                     templateEntry,
                     fileUrl,
+                    baseOffset,
                     UiComponentNavigationData.KIND_TEMPLATES,
                     componentName,
                     parentComponentName,
@@ -1378,19 +1489,7 @@ public class UiComponentScopeResolver {
     ) {
         final JsProperty property = objectLiteral.findProperty(propertyName);
 
-        if (property == null || property.getValueObject() != null) {
-            return null;
-        }
-        if (property.getStringValue() != null) {
-            return property.getStringValue();
-        }
-        final String rawValueText = property.getRawValueText();
-
-        if (rawValueText == null || !isQuotedText(rawValueText)) {
-            return null;
-        }
-
-        return normalizeValue(rawValueText);
+        return property == null ? null : property.getStringValue();
     }
 
     private @Nullable String getDirectJsPropertyText(
@@ -1466,7 +1565,8 @@ public class UiComponentScopeResolver {
 
     private @NotNull String buildDynamicJsLayoutComponentName(
             final @NotNull JsObject objectLiteral,
-            final @NotNull String fileComponentPath
+            final @NotNull String fileComponentPath,
+            final int baseOffset
     ) {
         final String name = getDirectJsStringProperty(objectLiteral, "name");
 
@@ -1474,7 +1574,7 @@ public class UiComponentScopeResolver {
             return fileComponentPath + "." + name;
         }
 
-        return fileComponentPath + ".dynamic." + objectLiteral.getStartOffset();
+        return fileComponentPath + ".dynamic." + (baseOffset + objectLiteral.getStartOffset());
     }
 
     private boolean isInsideJsUiComponentContainer(final @NotNull JsProperty property) {
@@ -1507,9 +1607,7 @@ public class UiComponentScopeResolver {
         if (property == null || property.getValueObject() != null) {
             return false;
         }
-        final String rawValue = property.getStringValue() != null
-                ? property.getStringValue()
-                : normalizeValue(property.getRawValueText());
+        final String rawValue = property.getStringValue();
 
         return normalizeTemplateValueIfNeeded(kind, rawValue) != null;
     }
@@ -2071,7 +2169,7 @@ public class UiComponentScopeResolver {
         return getRequireJsPathFromFilePath(jsFile.getVirtualFile());
     }
 
-    private @Nullable String getRequireJsPathFromFilePath(final @Nullable VirtualFile virtualFile) {
+    public @Nullable String getRequireJsPathFromFilePath(final @Nullable VirtualFile virtualFile) {
         if (virtualFile == null || !"js".equalsIgnoreCase(virtualFile.getExtension())) {
             return null;
         }
@@ -2211,6 +2309,13 @@ public class UiComponentScopeResolver {
         }
 
         return trimmed.substring(1, trimmed.length() - 1);
+    }
+
+    public @Nullable String normalizeValueForKind(
+            final @NotNull String kind,
+            final @Nullable String rawValue
+    ) {
+        return normalizeTemplateValueIfNeeded(kind, rawValue);
     }
 
     private @Nullable String normalizeTemplateValueIfNeeded(

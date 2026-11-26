@@ -398,6 +398,17 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             final @NotNull PsiFile jsFile,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
+        final com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider jsProvider =
+                com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.getInstance();
+        final List<com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.DisplayAreaAnchor> anchors =
+                jsProvider != null ? jsProvider.collectDisplayAreaAnchors(jsFile) : null;
+        if (anchors != null) {
+            for (final com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.DisplayAreaAnchor anchor
+                    : anchors) {
+                addDisplayAreaLineMarker(jsFile, anchor.displayArea(), anchor.keyOffset(), collection);
+            }
+            return;
+        }
         final JsAst ast = MagentoJsParser.parse(jsFile.getText());
 
         for (final JsProperty property : ast.getProperties()) {
@@ -406,32 +417,41 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             if (displayArea == null) {
                 continue;
             }
-            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
-                    .resolveGetRegionTemplateFiles(jsFile.getProject(), displayArea);
-
-            if (targets.isEmpty()) {
-                continue;
-            }
-            final PsiElement anchor = jsFile.findElementAt(property.getKeyStartOffset());
-
-            if (anchor == null) {
-                continue;
-            }
-            final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
-
-            collection.add(NavigationGutterIconBuilder
-                    .create(HtmlFileType.INSTANCE.getIcon())
-                    .setTargets(preparedTargets)
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(
-                            anchor,
-                            LineMarkerTargetPresentationUtil.createNavigationHandler(
-                                    preparedTargets,
-                                    REGION_TEMPLATE_TOOLTIP_TEXT
-                            )
-                    ));
+            addDisplayAreaLineMarker(jsFile, displayArea, property.getKeyStartOffset(), collection);
         }
+    }
+
+    private void addDisplayAreaLineMarker(
+            final @NotNull PsiFile jsFile,
+            final @NotNull String displayArea,
+            final int keyStartOffset,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
+                .resolveGetRegionTemplateFiles(jsFile.getProject(), displayArea);
+
+        if (targets.isEmpty()) {
+            return;
+        }
+        final PsiElement anchor = jsFile.findElementAt(keyStartOffset);
+
+        if (anchor == null) {
+            return;
+        }
+        final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
+
+        collection.add(NavigationGutterIconBuilder
+                .create(HtmlFileType.INSTANCE.getIcon())
+                .setTargets(preparedTargets)
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
+                .createLineMarkerInfo(
+                        anchor,
+                        LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                preparedTargets,
+                                REGION_TEMPLATE_TOOLTIP_TEXT
+                        )
+                ));
     }
 
     private @NotNull List<PsiElement> collectTemplatesFromComponents(
