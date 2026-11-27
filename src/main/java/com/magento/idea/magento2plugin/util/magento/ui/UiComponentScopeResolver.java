@@ -118,10 +118,10 @@ public class UiComponentScopeResolver {
                     return provided;
                 }
             }
-            return collectJsComponentDeclarations(virtualFile, content.getContentAsText());
+            return collectJsComponentDeclarations(virtualFile, MagentoVfsUtil.getContentAsText(content));
         }
         if ("php".equalsIgnoreCase(ext)) {
-            return collectPhpComponentDeclarations(virtualFile, content.getContentAsText());
+            return collectPhpComponentDeclarations(virtualFile, MagentoVfsUtil.getContentAsText(content));
         }
         if (content.getFileType() instanceof com.intellij.openapi.fileTypes.LanguageFileType) {
             return collectComponentDeclarations(content.getPsiFile());

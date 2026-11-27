@@ -15,6 +15,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
                     : null;
             if (templatePaths == null) {
                 templatePaths = KnockoutTemplatePathResolver.getInstance()
-                        .collectTemplatePaths(inputData.getContentAsText());
+                        .collectTemplatePaths(MagentoVfsUtil.getContentAsText(inputData));
             }
 
             for (final String templatePath : templatePaths) {

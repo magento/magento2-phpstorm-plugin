@@ -13,6 +13,7 @@ import com.intellij.util.indexing.ID;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsConfig;
@@ -40,7 +41,7 @@ public class RequireJsIndex extends FileBasedIndexExtension<String, String> {
                     ? jsProvider.parseRequireJsConfig(inputData.getPsiFile())
                     : null;
             if (config == null) {
-                config = MagentoJsParser.parseRequireJsConfig(inputData.getContentAsText());
+                config = MagentoJsParser.parseRequireJsConfig(MagentoVfsUtil.getContentAsText(inputData));
             }
 
             for (final RequireJsConfig.MapEntry entry : config.mapEntries()) {

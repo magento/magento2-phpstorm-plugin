@@ -16,6 +16,7 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsConfig;
@@ -51,7 +52,7 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
             if (config != null) {
                 map.putAll(toMixinMap(config));
             } else {
-                map.putAll(getMixinMap(inputData.getContentAsText()));
+                map.putAll(getMixinMap(MagentoVfsUtil.getContentAsText(inputData)));
             }
 
             return map;

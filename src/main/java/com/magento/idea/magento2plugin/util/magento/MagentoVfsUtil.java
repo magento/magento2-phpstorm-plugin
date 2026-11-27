@@ -6,13 +6,18 @@
 package com.magento.idea.magento2plugin.util.magento;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtilRt;
+import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.intellij.util.indexing.FileContent;
 import com.magento.idea.magento2plugin.magento.packages.Package;
 import com.magento.idea.magento2plugin.project.Settings;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -31,6 +36,27 @@ public final class MagentoVfsUtil {
     );
 
     private MagentoVfsUtil() {
+    }
+
+    /**
+     * Reads text from an indexed {@link FileContent}, falling back to byte decoding when the host maps
+     * {@code .js} or {@code .php} to {@code UnknownFileType} ({@code isBinary() == true}), such as in HCE.
+     */
+    public static @NotNull CharSequence getContentAsText(final @NotNull FileContent content) {
+        if (!content.getFileType().isBinary()) {
+            try {
+                return content.getContentAsText();
+            } catch (final UnsupportedOperationException ignored) {
+                // Substituted binary file types still throw from FileContentImpl.getContentAsText().
+            }
+        }
+        final Charset charset = content.getFile().getCharset();
+        final String decoded = CharsetToolkit.bytesToString(
+                content.getContent(),
+                charset != null ? charset : StandardCharsets.UTF_8
+        );
+
+        return StringUtilRt.convertLineSeparators(decoded);
     }
 
     public static @NotNull Collection<VirtualFile> findMagentoFiles(

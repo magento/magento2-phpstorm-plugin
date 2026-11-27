@@ -6,6 +6,7 @@
 package com.magento.idea.magento2plugin.stubs.indexes.ui;
 
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.UnknownFileType;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
@@ -21,6 +22,7 @@ import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -125,6 +127,43 @@ public class UiComponentIndexingDataTest extends BasePlatformTestCase {
         assertEquals(0, componentFallback.psiReads);
     }
 
+    public void testUnknownBinaryFileTypeDecodesBytesWithoutThrowing() {
+        ExtensionTestUtil.maskExtensions(
+                JsPsiSupportProvider.EP_NAME,
+                Collections.emptyList(),
+                getTestRootDisposable()
+        );
+        final String requireJs = "var config = {map: {'*': {'aliasA': 'Foo_Bar/js/a'}}, "
+                + "config: {mixins: {'Foo_Bar/js/a': {'Foo_Bar/js/a-mixin': true}}}};\r\n";
+        final String phpModifier = "<?php\nreturn ['component' => '" + COMPONENT
+                + "', 'config' => ['template' => '" + TEMPLATE + "']];\n";
+
+        final BinaryUnknownContent componentUnknown = unknownBinaryContent("hce/component.js", JS);
+        assertIndexValues(componentUnknown, JS);
+        assertEquals(
+                Set.of(componentUnknown.getFile().getUrl()),
+                new KnockoutTemplateIndex().getIndexer().map(componentUnknown).get(TEMPLATE)
+        );
+
+        final BinaryUnknownContent requireUnknown = unknownBinaryContent("hce/requirejs-config.js", requireJs);
+        assertEquals("'Foo_Bar/js/a'", new RequireJsIndex().getIndexer().map(requireUnknown).get("aliasA"));
+        assertEquals(
+                Set.of("Foo_Bar/js/a-mixin"),
+                new JsMixinIndex().getIndexer().map(requireUnknown).get("Foo_Bar/js/a")
+        );
+
+        final BinaryUnknownContent phpUnknown = unknownBinaryContent("hce/Modifier.php", phpModifier);
+        assertTrue(new UiComponentTemplateDeclarationIndex().getIndexer().map(phpUnknown)
+                .containsKey(UiComponentTemplateDeclarationIndex.templatePathKey(TEMPLATE)));
+
+        final BinaryUnknownContent htmlUnknown = unknownBinaryContent(
+                "hce/template.html",
+                "<div data-bind=\"scope: getRegion('content')\"></div>"
+        );
+        assertTrue(new GetRegionUsageIndex().getInputFilter().acceptInput(htmlUnknown.getFile()));
+        assertTrue(new GetRegionUsageIndex().getIndexer().map(htmlUnknown).containsKey("content"));
+    }
+
     public void testXmlIndexesShareExtractionAndPreserveOffsets() {
         final String xml = "<config><item name=\"child\">"
                 + "<item name=\"component\">" + COMPONENT + "</item>"
@@ -179,7 +218,7 @@ public class UiComponentIndexingDataTest extends BasePlatformTestCase {
         assertTrue(new UiComponentComponentDeclarationIndex().getIndexer().map(content).isEmpty());
     }
 
-    private void assertIndexValues(final CountingContent content, final String text) {
+    private void assertIndexValues(final FileContent content, final String text) {
         final Set<UiComponentNavigationData> areas = new DisplayAreaIndex().getIndexer().map(content).get("content");
         assertNotNull(areas);
         assertEquals(1, areas.size());
@@ -208,6 +247,58 @@ public class UiComponentIndexingDataTest extends BasePlatformTestCase {
     private CountingContent projectContent(final String relativePath, final String text) {
         final VirtualFile file = myFixture.addFileToProject(relativePath, text).getVirtualFile();
         return new CountingContent(FileContentImpl.createByText(file, text, getProject()));
+    }
+
+    private BinaryUnknownContent unknownBinaryContent(final String relativePath, final String text) {
+        final VirtualFile file = myFixture.addFileToProject(relativePath, text).getVirtualFile();
+        return new BinaryUnknownContent(file, text.getBytes(StandardCharsets.UTF_8), getProject());
+    }
+
+    private static final class BinaryUnknownContent extends UserDataHolderBase implements FileContent {
+        private final VirtualFile file;
+        private final byte[] bytes;
+        private final Project project;
+
+        private BinaryUnknownContent(final VirtualFile file, final byte[] bytes, final Project project) {
+            this.file = file;
+            this.bytes = bytes;
+            this.project = project;
+        }
+
+        @Override
+        public @NotNull PsiFile getPsiFile() {
+            throw new AssertionError("UnknownFileType fallback must not request PSI");
+        }
+
+        @Override
+        public byte @NotNull [] getContent() {
+            return bytes;
+        }
+
+        @Override
+        public @NotNull CharSequence getContentAsText() {
+            throw new UnsupportedOperationException("Cannot obtain text for binary file type : Unknown");
+        }
+
+        @Override
+        public @NotNull FileType getFileType() {
+            return UnknownFileType.INSTANCE;
+        }
+
+        @Override
+        public @NotNull VirtualFile getFile() {
+            return file;
+        }
+
+        @Override
+        public @NotNull String getFileName() {
+            return file.getName();
+        }
+
+        @Override
+        public @NotNull Project getProject() {
+            return project;
+        }
     }
 
     private static final class CountingContent extends UserDataHolderBase implements FileContent {
