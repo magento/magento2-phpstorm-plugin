@@ -24,6 +24,7 @@ internal object MagentoInspectionCommands {
         "layout_entities",
         "ui_component",
         "ui_template",
+        "js_config",
         "acl_or_menu"
     )
 
@@ -35,11 +36,12 @@ internal object MagentoInspectionCommands {
         "observers_for_event" to setOf("module", "area", "path"),
         "layout_entities" to setOf("module", "area", "path"),
         "ui_component" to setOf("module", "area", "path"),
+        "js_config" to setOf("module", "area", "path"),
         "acl_or_menu" to setOf("module", "area", "path")
     )
 
     private val effectiveQueries = setOf("plugins_for_method", "observers_for_event")
-    private val viewQueries = setOf("layout_entities", "ui_component")
+    private val viewQueries = setOf("layout_entities", "ui_component", "js_config")
     private const val VIEW_AREA_HELP = "area: frontend, adminhtml or base, inferred from the Magento view path."
 
     private val filterHelp = mapOf(
@@ -56,6 +58,7 @@ internal object MagentoInspectionCommands {
         "observers_for_event" to "eventName",
         "layout_entities" to "name",
         "ui_component" to "name",
+        "js_config" to "name",
         "acl_or_menu" to "identifier"
     )
 
@@ -68,6 +71,7 @@ internal object MagentoInspectionCommands {
         "layout_entities" to "Find layout handles, block names, and container names.",
         "ui_component" to "Find UI component XML definitions by component file name.",
         "ui_template" to "Resolve a literal UI template alias to candidate HTML files.",
+        "js_config" to "Find RequireJS mixins, map, and paths declarations plus JS/XML/HTML UI component and Knockout template usages.",
         "acl_or_menu" to "Find ACL resource IDs and admin menu entries."
     )
 
@@ -235,6 +239,12 @@ internal object MagentoInspectionCommands {
                 templatePath = parameters.requireString("templatePath")
             )
 
+            "js_config" -> MagentoJsQueries.findJsConfig(
+                project = project,
+                name = parameters.requireString("name"),
+                indexKeys = indexKeys
+            )
+
             "acl_or_menu" -> MagentoViewQueries.findAclOrMenu(
                 project = project,
                 identifier = parameters.requireString("identifier")
@@ -280,6 +290,7 @@ internal object MagentoInspectionCommands {
                 "di_config" -> InspectionQueryResult(MagentoDiQueries.diConfigRecords(project, value))
                 "layout_entities" -> InspectionQueryResult(MagentoViewQueries.layoutRecords(project, value, indexKeys))
                 "ui_component" -> InspectionQueryResult(MagentoViewQueries.uiComponentRecords(project, value))
+                "js_config" -> InspectionQueryResult(MagentoJsQueries.jsConfigRecords(project, value, indexKeys))
                 "acl_or_menu" -> InspectionQueryResult(MagentoViewQueries.aclOrMenuRecords(project, value))
                 "plugins_for_method" -> {
                     val provider = MagentoMethodPluginQueryProvider.EP_NAME.extensionList.firstOrNull()
@@ -318,6 +329,7 @@ internal object MagentoInspectionCommands {
             "observers", "event_observers" -> "observers_for_event"
             "layout" -> "layout_entities"
             "ui", "ui_components" -> "ui_component"
+            "js", "requirejs", "requirejs_config", "js_mixins", "js_mixin" -> "js_config"
             "acl", "menu" -> "acl_or_menu"
             else -> queryType.trim().lowercase().replace('-', '_')
         }
@@ -407,6 +419,15 @@ internal object MagentoInspectionCommands {
             Candidates do not establish effective theme fallback, the active area, RequireJS maps, PHP semantics or runtime behavior.
             Example parametersJson:
             {"templatePath":"Magento_Ui/form/element/input"}
+        """.trimIndent()
+
+        "js_config" -> """
+            queryType: js_config
+            Finds RequireJS configuration (`mixins`, `map`, `paths` in `requirejs-config.js`) and JS/XML/HTML UI component & Knockout template declarations (`component`, `template`, `displayArea`, `getRegion`) by exact or partial module path, alias, mixin, component, or template name.
+            Required: name. Use a RequireJS path or alias such as `Magento_Checkout/js/action/place-order`, a mixin path, a UI component JS path, a Knockout template alias, or a displayArea name.
+            Works without the JetBrains JavaScript or PHP plugins.
+            Example parametersJson:
+            {"name":"Magento_Checkout/js/action/place-order"}
         """.trimIndent()
 
         "acl_or_menu" -> """

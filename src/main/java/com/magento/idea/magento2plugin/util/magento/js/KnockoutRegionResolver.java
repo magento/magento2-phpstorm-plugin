@@ -7,10 +7,6 @@ package com.magento.idea.magento2plugin.util.magento.js;
 
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSExpression;
-import com.intellij.lang.javascript.psi.JSFile;
-import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -59,17 +55,78 @@ public class KnockoutRegionResolver {
         return INSTANCE;
     }
 
-    public @Nullable String getDisplayArea(final @Nullable JSProperty property) {
+    public @Nullable String getDisplayArea(final @Nullable JsProperty property) {
         if (property == null || !"displayArea".equals(property.getName())) {
             return null;
         }
-        final JSExpression value = property.getValue();
+        final String value = property.getStringValue();
 
-        if (value == null || !isQuotedText(value.getText())) {
+        return value == null || value.isBlank() ? null : value;
+    }
+
+    /**
+     * Optional JavaScript PSI adapter for embedded JS inside non-{@code .js} host files (e.g. {@code .phtml} /
+     * {@code .html}) without introducing a hard compile dependency on the JetBrains JavaScript plugin.
+     */
+    public @Nullable String getDisplayAreaFromJsPsi(final @Nullable PsiElement element) {
+        if (element == null) {
             return null;
         }
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        if (jsProvider != null) {
+            return jsProvider.getDisplayAreaValue(element);
+        }
+        PsiElement current = element.getParent();
+        while (current != null && !(current instanceof PsiFile)) {
+            if (implementsClassOrInterface(current.getClass(), "com.intellij.lang.javascript.psi.JSProperty")) {
+                return extractDisplayAreaFromJsPropertyPsi(current);
+            }
+            current = current.getParent();
+        }
+        return null;
+    }
 
-        return unquote(value.getText());
+    private @Nullable String extractDisplayAreaFromJsPropertyPsi(final @NotNull PsiElement jsProperty) {
+        try {
+            final Object nameObj = jsProperty.getClass().getMethod("getName").invoke(jsProperty);
+            if (!(nameObj instanceof String name) || !"displayArea".equals(name)) {
+                return null;
+            }
+            final Object valueObj = jsProperty.getClass().getMethod("getValue").invoke(jsProperty);
+            if (!(valueObj instanceof PsiElement valueElement)
+                    || !implementsClassOrInterface(
+                            valueElement.getClass(),
+                            "com.intellij.lang.javascript.psi.JSLiteralExpression"
+                    )) {
+                return null;
+            }
+            final String text = valueElement.getText();
+            if (text == null || !isQuotedText(text)) {
+                return null;
+            }
+            final String unquoted = unquote(text);
+            return unquoted.isBlank() ? null : unquoted;
+        } catch (ReflectiveOperationException ignored) {
+            return null;
+        }
+    }
+
+    private static boolean implementsClassOrInterface(
+            final @Nullable Class<?> type,
+            final @NotNull String expectedName
+    ) {
+        if (type == null) {
+            return false;
+        }
+        if (expectedName.equals(type.getName())) {
+            return true;
+        }
+        for (final Class<?> iface : type.getInterfaces()) {
+            if (implementsClassOrInterface(iface, expectedName)) {
+                return true;
+            }
+        }
+        return implementsClassOrInterface(type.getSuperclass(), expectedName);
     }
 
     public @NotNull List<RegionMatch> collectGetRegionMatches(final @NotNull String text) {
@@ -106,15 +163,12 @@ public class KnockoutRegionResolver {
     ) {
         final Set<PsiElement> results = new LinkedHashSet<>();
         final PsiManager psiManager = PsiManager.getInstance(project);
-        final Collection<VirtualFile> files = FileTypeIndex.getFiles(
-                JavaScriptFileType.INSTANCE,
-                GlobalSearchScope.allScope(project)
-        );
+        final Collection<VirtualFile> files = FilenameIndex.getAllFilesByExt(project, "js");
 
         for (final VirtualFile file : files) {
             final PsiFile psiFile = psiManager.findFile(file);
 
-            if (!(psiFile instanceof JSFile) || !containsDisplayArea((JSFile) psiFile, displayArea)) {
+            if (psiFile == null || !containsDisplayArea(psiFile, displayArea)) {
                 continue;
             }
             results.add(psiFile);
@@ -217,7 +271,7 @@ public class KnockoutRegionResolver {
         )) {
             final PsiFile psiFile = psiManager.findFile(file);
 
-            if (!(psiFile instanceof JSFile) || !containsDisplayArea((JSFile) psiFile, displayArea)) {
+            if (psiFile == null || !containsDisplayArea(psiFile, displayArea)) {
                 continue;
             }
             results.add(psiFile);
@@ -329,21 +383,44 @@ public class KnockoutRegionResolver {
     }
 
     private boolean containsDisplayArea(
-            final @NotNull JSFile jsFile,
+            final @NotNull PsiFile jsFile,
             final @NotNull String displayArea
     ) {
-        final Collection<JSProperty> properties = PsiTreeUtil.findChildrenOfType(
-                jsFile,
-                JSProperty.class
-        );
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        if (jsProvider != null) {
+            final List<JsPsiSupportProvider.DisplayAreaAnchor> anchors =
+                    jsProvider.collectDisplayAreaAnchors(jsFile);
+            if (anchors != null) {
+                for (final JsPsiSupportProvider.DisplayAreaAnchor anchor : anchors) {
+                    if (displayArea.equals(anchor.displayArea())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        if (!isJsFile(jsFile)) {
+            return false;
+        }
+        final JsAst ast = MagentoJsParser.parse(jsFile.getText());
 
-        for (final JSProperty property : properties) {
+        for (final JsProperty property : ast.getProperties()) {
             if (displayArea.equals(getDisplayArea(property))) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private static boolean isJsFile(final @NotNull PsiFile psiFile) {
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (virtualFile != null) {
+            return "js".equalsIgnoreCase(virtualFile.getExtension());
+        }
+
+        return psiFile.getName().toLowerCase().endsWith(".js");
     }
 
     private void addLayoutXmlDisplayAreaComponentFiles(
@@ -399,9 +476,9 @@ public class KnockoutRegionResolver {
                     xmlFile.getProject(),
                     componentPath
             )) {
-                if (component instanceof JSFile) {
+                if (component instanceof PsiFile && isJsFile((PsiFile) component)) {
                     for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
-                            .collectTemplatePaths((JSFile) component)) {
+                            .collectTemplatePaths((PsiFile) component)) {
                         results.addAll(KnockoutTemplatePathResolver.getInstance().resolveTemplateFiles(
                                 xmlFile.getProject(),
                                 templatePath
@@ -442,8 +519,14 @@ public class KnockoutRegionResolver {
     private @NotNull List<LayoutComponentDeclaration> collectPhpLayoutComponentDeclarations(
             final @NotNull PsiFile psiFile
     ) {
+        return collectPhpLayoutComponentDeclarations(psiFile, psiFile.getText());
+    }
+
+    public @NotNull List<LayoutComponentDeclaration> collectPhpLayoutComponentDeclarations(
+            final @Nullable PsiFile psiFile,
+            final @NotNull String text
+    ) {
         final List<LayoutComponentDeclaration> results = new ArrayList<>();
-        final String text = psiFile.getText();
         final Matcher matcher = PHP_LAYOUT_PAIR_PATTERN.matcher(text);
         final Set<String> processedRanges = new LinkedHashSet<>();
 
@@ -468,7 +551,7 @@ public class KnockoutRegionResolver {
     }
 
     private @Nullable LayoutComponentDeclaration createPhpLayoutComponentDeclaration(
-            final @NotNull PsiFile psiFile,
+            final @Nullable PsiFile psiFile,
             final @NotNull String containerText,
             final int containerStartOffset
     ) {
@@ -572,7 +655,8 @@ public class KnockoutRegionResolver {
         final Set<String> keys = new LinkedHashSet<>();
 
         for (final LayoutComponentDeclaration declaration : declarations) {
-            final String key = declaration.getSourceFile().getVirtualFile() + "|"
+            final VirtualFile vf = declaration.getSourceFile() == null ? null : declaration.getSourceFile().getVirtualFile();
+            final String key = vf + "|"
                     + declaration.getComponentPath() + "|"
                     + declaration.getTemplatePath() + "|"
                     + declaration.getDisplayArea() + "|"
@@ -756,7 +840,7 @@ public class KnockoutRegionResolver {
         private final int displayAreaOffset;
 
         LayoutComponentDeclaration(
-                final @NotNull PsiFile sourceFile,
+                final @Nullable PsiFile sourceFile,
                 final @Nullable String componentPath,
                 final @Nullable String templatePath,
                 final @Nullable String displayArea,
@@ -771,7 +855,7 @@ public class KnockoutRegionResolver {
             this.displayAreaOffset = displayAreaOffset;
         }
 
-        public @NotNull PsiFile getSourceFile() {
+        public @Nullable PsiFile getSourceFile() {
             return sourceFile;
         }
 

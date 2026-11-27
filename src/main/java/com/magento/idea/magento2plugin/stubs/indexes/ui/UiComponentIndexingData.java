@@ -27,7 +27,7 @@ final class UiComponentIndexingData {
             List<UiComponentNavigationData> declarations = content.getUserData(DECLARATIONS);
             if (declarations == null) {
                 declarations = List.copyOf(UiComponentScopeResolver.getInstance()
-                        .collectComponentDeclarations(content.getPsiFile()));
+                        .collectComponentDeclarations(content));
                 content.putUserData(DECLARATIONS, declarations);
             }
             return declarations;

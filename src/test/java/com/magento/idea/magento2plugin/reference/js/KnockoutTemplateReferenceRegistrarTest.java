@@ -900,6 +900,73 @@ public class KnockoutTemplateReferenceRegistrarTest extends ReferenceJsFixtureTe
                 .isEmpty());
     }
 
+    /**
+     * Embedded JavaScript in HTML templates must keep displayArea references working.
+     */
+    public void testDisplayAreaInEmbeddedHtmlScriptMustHaveReference() {
+        addTemplate("embedded-html-parent", "<!-- ko foreach: getRegion('embeddedHtmlRegion') -->\n<!-- /ko -->");
+        myFixture.configureByText(
+                "embedded-layout.html",
+                "<script>\n"
+                        + "layout([{\n"
+                        + "    name: 'example',\n"
+                        + "    component: 'uiComponent',\n"
+                        + "    displayArea: 'embeddedHtml<caret>Region'\n"
+                        + "}]);\n"
+                        + "</script>"
+        );
+
+        assertHasReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/template/embedded-html-parent.html",
+                KnockoutRegionReferenceProvider.class
+        );
+    }
+
+    /**
+     * Embedded JavaScript in PHTML templates must keep displayArea references working.
+     */
+    public void testDisplayAreaInEmbeddedPhtmlScriptMustHaveReference() {
+        addTemplate("embedded-phtml-parent", "<!-- ko foreach: getRegion('embeddedPhtmlRegion') -->\n<!-- /ko -->");
+        myFixture.configureByText(
+                "embedded-layout.phtml",
+                "<div><?php /* @noEscape */ echo $block->getTitle(); ?></div>\n"
+                        + "<script>\n"
+                        + "layout([{\n"
+                        + "    name: 'example',\n"
+                        + "    component: 'uiComponent',\n"
+                        + "    displayArea: 'embeddedPhtml<caret>Region'\n"
+                        + "}]);\n"
+                        + "</script>"
+        );
+
+        assertHasReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/template/embedded-phtml-parent.html",
+                KnockoutRegionReferenceProvider.class
+        );
+    }
+
+    /**
+     * Concatenated template expressions must not produce static Knockout template references.
+     */
+    public void testConcatenatedTemplateExpressionMustNotHaveTemplateReference() {
+        addTemplate("concat-a", "<span>a</span>");
+        myFixture.configureByText(
+                "concat-component.js",
+                "define(['uiComponent'], function (Component) {\n"
+                        + "    return Component.extend({\n"
+                        + "        defaults: {\n"
+                        + "            template: 'Foo_Bar/template/concat-<caret>a' + 'Foo_Bar/template/concat-b'\n"
+                        + "        }\n"
+                        + "    });\n"
+                        + "});"
+        );
+
+        assertHasNoReferenceToFile(
+                "app/code/Foo/Bar/view/frontend/web/template/concat-a.html",
+                KnockoutTemplateReferenceProvider.class
+        );
+    }
+
     private void addTemplate(final String name, final String content) {
         myFixture.addFileToProject(
                 "app/code/Foo/Bar/view/frontend/web/template/" + name + ".html",

@@ -427,12 +427,22 @@ class HceRuntimeContracts(unittest.TestCase):
         override = "src/app/code/Foo/Bar/etc/adminhtml/events.xml"
         self.file(project, override,
             '<config><event name="test_event_in_test_class"><observer name="test_observer" disabled="true"/></event></config>')
+        requirejs = self.file(project, "src/app/code/Foo/Bar2/view/frontend/requirejs-config.js",
+            "var config = {map: {'*': {'hceWidgetAlias': 'Foo_Bar2/js/hce-widget'}}, "
+            "config: {mixins: {'Foo_Bar2/js/hce-widget': {'Foo_Bar2/js/hce-widget-mixin': true}}}};\n")
+        widget_js = self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/js/hce-widget.js",
+            "define(['uiComponent'], function (Component) { return Component.extend({defaults: "
+            "{template: 'Foo_Bar2/hce-widget', displayArea: 'hce-region'}}); });\n")
+        self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/js/hce-widget-mixin.js",
+            "define([], function () { return function (target) { return target; }; });\n")
+        self.file(project, "src/app/code/Foo/Bar2/view/frontend/web/template/hce-widget.html",
+            "<div data-bind=\"scope: getRegion('hce-region')\"></div>\n")
         with self.client(project) as client:
             def inspect(kind, parameters):
                 return client.call_text("magento_inspect", mode="query", queryType=kind,
                     parametersJson=json.dumps(parameters))
             help_text = client.call_text("magento_inspect", mode="help")
-            for kind in ["module", "module_dependencies", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "acl_or_menu"]:
+            for kind in ["module", "module_dependencies", "layout_entities", "di_config", "observers_for_event", "ui_component", "ui_template", "js_config", "acl_or_menu"]:
                 self.assertIn("- `" + kind + "`", help_text)
                 self.assertIn("queryType: " + kind, client.call_text("magento_inspect", mode="detailed_schema", queryType=kind))
             for kind in ["plugins_for_method"]:
@@ -469,14 +479,26 @@ class HceRuntimeContracts(unittest.TestCase):
             self.assertIn("title=HCE Menu", menu)
             self.assertIn("src/app/code/Foo/Bar/etc/adminhtml/menu.xml", menu)
             self.assertIn("recently_viewed_2", inspect("ui_component", {"name": "recently_viewed_2"}))
+            js_json = json.loads(inspect("js_config", {"name": "hce-widget", "format": "json"}))
+            self.assertEqual("ok", js_json["status"], js_json)
+            self.assertTrue({"js_mixin", "requirejs_map", "knockout_template", "ui_template_declaration"}
+                <= {r["kind"] for r in js_json["records"]}, js_json)
+            self.assertIn("Foo_Bar2/js/hce-widget", inspect("js_config", {"name": "hceWidgetAlias"}))
+            region_text = inspect("js_config", {"name": "hce-region"})
+            self.assertIn("display_area: hce-region", region_text)
+            self.assertIn("get_region: hce-region", region_text)
             self.assertIn("No Magento events matched", inspect("observers_for_event", {"eventName": "__absent__"}))
             self.assertIn("Missing required parameter", inspect("di_config", {}))
             for kind in ["plugins_for_method"]:
                 self.assertIn("unavailable in this host", inspect(kind, {}))
             events = project / "src/vendor/magento/module-catalog/etc/events.xml"
             events.write_text(events.read_text().replace('name="test_observer"', 'name="updated_observer"'))
+            requirejs.write_text(requirejs.read_text().replace("hceWidgetAlias", "hceUpdatedAlias"))
+            widget_js.write_text(widget_js.read_text().replace("hce-region", "hce-updated-region"))
             client.request("workspace/executeCommand", {"command": "wait-for-highwatermark", "arguments": []})
             self.assertIn("observer=updated_observer", inspect("observers_for_event", {"eventName": "test_event_in_test_class"}))
+            self.assertIn("Foo_Bar2/js/hce-widget", inspect("js_config", {"name": "hceUpdatedAlias"}))
+            self.assertIn("display_area: hce-updated-region", inspect("js_config", {"name": "hce-updated-region"}))
 
     def test_ddev_override_refresh_and_invalid_configuration(self):
         project = self.fixture("ddev-project")

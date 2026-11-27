@@ -10,9 +10,7 @@ import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSFile;
-import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,7 +18,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlFile;
@@ -29,8 +27,11 @@ import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import com.magento.idea.magento2plugin.util.magento.js.JsAst;
+import com.magento.idea.magento2plugin.util.magento.js.JsProperty;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutRegionResolver;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
+import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
 import com.magento.idea.magento2plugin.util.magento.js.RequireJsPathResolver;
 import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import com.magento.idea.magento2plugin.util.magento.ui.UiComponentTemplateResolver;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,8 +102,8 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             final @NotNull PsiFile psiFile,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
-        if (psiFile instanceof JSFile) {
-            addDisplayAreaLineMarkers((JSFile) psiFile, collection);
+        if (isJsFile(psiFile)) {
+            addDisplayAreaLineMarkers(psiFile, collection);
             return;
         }
         final VirtualFile virtualFile = psiFile.getVirtualFile();
@@ -156,7 +158,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
 
         collection.add(NavigationGutterIconBuilder
-                .create(JavaScriptFileType.INSTANCE.getIcon())
+                .create(getJsIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
                 .setTooltipText(MAGENTO_UI_COMPONENT_TOOLTIP_TEXT)
@@ -377,7 +379,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> preparedComponentTargets = LineMarkerTargetPresentationUtil.prepareTargets(componentTargets);
 
         collection.add(NavigationGutterIconBuilder
-                .create(JavaScriptFileType.INSTANCE.getIcon())
+                .create(getJsIcon())
                 .setTargets(preparedComponentTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
                 .setTooltipText(REGION_COMPONENT_TOOLTIP_TEXT)
@@ -393,40 +395,63 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
     }
 
     private void addDisplayAreaLineMarkers(
-            final @NotNull JSFile jsFile,
+            final @NotNull PsiFile jsFile,
             final @NotNull Collection<? super LineMarkerInfo<?>> collection
     ) {
-        final Collection<JSProperty> properties = PsiTreeUtil.findChildrenOfType(jsFile, JSProperty.class);
+        final com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider jsProvider =
+                com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.getInstance();
+        final List<com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.DisplayAreaAnchor> anchors =
+                jsProvider != null ? jsProvider.collectDisplayAreaAnchors(jsFile) : null;
+        if (anchors != null) {
+            for (final com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider.DisplayAreaAnchor anchor
+                    : anchors) {
+                addDisplayAreaLineMarker(jsFile, anchor.displayArea(), anchor.keyOffset(), collection);
+            }
+            return;
+        }
+        final JsAst ast = MagentoJsParser.parse(jsFile.getText());
 
-        for (final JSProperty property : properties) {
+        for (final JsProperty property : ast.getProperties()) {
             final String displayArea = KnockoutRegionResolver.getInstance().getDisplayArea(property);
 
             if (displayArea == null) {
                 continue;
             }
-            final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
-                    .resolveGetRegionTemplateFiles(jsFile.getProject(), displayArea);
-
-            if (targets.isEmpty()) {
-                continue;
-            }
-            final PsiElement nameIdentifier = property.getNameIdentifier();
-            final PsiElement anchor = nameIdentifier == null ? property : nameIdentifier;
-            final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
-
-            collection.add(NavigationGutterIconBuilder
-                    .create(HtmlFileType.INSTANCE.getIcon())
-                    .setTargets(preparedTargets)
-                    .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
-                    .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
-                    .createLineMarkerInfo(
-                            anchor,
-                            LineMarkerTargetPresentationUtil.createNavigationHandler(
-                                    preparedTargets,
-                                    REGION_TEMPLATE_TOOLTIP_TEXT
-                            )
-                    ));
+            addDisplayAreaLineMarker(jsFile, displayArea, property.getKeyStartOffset(), collection);
         }
+    }
+
+    private void addDisplayAreaLineMarker(
+            final @NotNull PsiFile jsFile,
+            final @NotNull String displayArea,
+            final int keyStartOffset,
+            final @NotNull Collection<? super LineMarkerInfo<?>> collection
+    ) {
+        final List<PsiElement> targets = KnockoutRegionResolver.getInstance()
+                .resolveGetRegionTemplateFiles(jsFile.getProject(), displayArea);
+
+        if (targets.isEmpty()) {
+            return;
+        }
+        final PsiElement anchor = jsFile.findElementAt(keyStartOffset);
+
+        if (anchor == null) {
+            return;
+        }
+        final List<PsiElement> preparedTargets = LineMarkerTargetPresentationUtil.prepareTargets(targets);
+
+        collection.add(NavigationGutterIconBuilder
+                .create(HtmlFileType.INSTANCE.getIcon())
+                .setTargets(preparedTargets)
+                .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
+                .setTooltipText(REGION_TEMPLATE_TOOLTIP_TEXT)
+                .createLineMarkerInfo(
+                        anchor,
+                        LineMarkerTargetPresentationUtil.createNavigationHandler(
+                                preparedTargets,
+                                REGION_TEMPLATE_TOOLTIP_TEXT
+                        )
+                ));
     }
 
     private @NotNull List<PsiElement> collectTemplatesFromComponents(
@@ -435,8 +460,8 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         final List<PsiElement> results = new ArrayList<>();
 
         for (final PsiElement component : components) {
-            if (component instanceof JSFile) {
-                results.addAll(collectTemplates((JSFile) component));
+            if (component instanceof PsiFile && isJsFile((PsiFile) component)) {
+                results.addAll(collectTemplates((PsiFile) component));
             }
         }
 
@@ -460,8 +485,8 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
             final @NotNull PsiElement anchor,
             final @NotNull PsiFile psiFile
     ) {
-        if (psiFile instanceof JSFile) {
-            final ComponentNavigationTargets componentTargets = collectComponentNavigationTargets((JSFile) psiFile);
+        if (isJsFile(psiFile)) {
+            final ComponentNavigationTargets componentTargets = collectComponentNavigationTargets(psiFile);
 
             if (componentTargets.getTargets().isEmpty()) {
                 return null;
@@ -502,7 +527,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
 
         return NavigationGutterIconBuilder
                 .create(templateTargets.hasComponentTargets()
-                        ? JavaScriptFileType.INSTANCE.getIcon()
+                        ? getJsIcon()
                         : XmlFileType.INSTANCE.getIcon())
                 .setTargets(preparedTargets)
                 .setNamer(LineMarkerTargetPresentationUtil::getPresentableTargetName)
@@ -513,7 +538,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                 );
     }
 
-    private @NotNull ComponentNavigationTargets collectComponentNavigationTargets(final @NotNull JSFile jsFile) {
+    private @NotNull ComponentNavigationTargets collectComponentNavigationTargets(final @NotNull PsiFile jsFile) {
         final Set<PsiElement> results = new LinkedHashSet<>();
         boolean hasTemplateTargets = false;
 
@@ -560,7 +585,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         return new ComponentNavigationTargets(new ArrayList<>(results), hasTemplateTargets);
     }
 
-    private @NotNull List<PsiElement> collectTemplates(final @NotNull JSFile jsFile) {
+    private @NotNull List<PsiElement> collectTemplates(final @NotNull PsiFile jsFile) {
         final List<PsiElement> results = new ArrayList<>();
 
         for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
@@ -631,7 +656,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
                     ? (PsiFile) target
                     : target.getContainingFile();
 
-            if (containingFile instanceof JSFile) {
+            if (containingFile != null && isJsFile(containingFile)) {
                 results.add(containingFile);
                 continue;
             }
@@ -656,7 +681,7 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         if (declarationFile == null || declarationFile.equals(sourceFile)) {
             return;
         }
-        if (declarationFile instanceof JSFile) {
+        if (isJsFile(declarationFile)) {
             results.add(declarationFile);
             return;
         }
@@ -715,11 +740,11 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         )) {
             final PsiFile psiFile = psiManager.findFile(file);
 
-            if (!(psiFile instanceof JSFile)) {
+            if (psiFile == null || !isJsFile(psiFile)) {
                 continue;
             }
             final Set<String> componentTemplatePaths = KnockoutTemplatePathResolver.getInstance()
-                    .collectTemplatePaths((JSFile) psiFile);
+                    .collectTemplatePaths(psiFile);
 
             for (final String templatePath : templatePaths) {
                 if (componentTemplatePaths.contains(templatePath)) {
@@ -740,17 +765,14 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         }
         final PsiManager psiManager = PsiManager.getInstance(project);
 
-        for (final VirtualFile file : FileTypeIndex.getFiles(
-                JavaScriptFileType.INSTANCE,
-                GlobalSearchScope.allScope(project)
-        )) {
+        for (final VirtualFile file : FilenameIndex.getAllFilesByExt(project, "js")) {
             final PsiFile psiFile = psiManager.findFile(file);
 
-            if (!(psiFile instanceof JSFile)) {
+            if (psiFile == null || !isJsFile(psiFile)) {
                 continue;
             }
             final Set<String> componentTemplatePaths = KnockoutTemplatePathResolver.getInstance()
-                    .collectTemplatePaths((JSFile) psiFile);
+                    .collectTemplatePaths(psiFile);
 
             for (final String templatePath : templatePaths) {
                 if (componentTemplatePaths.contains(templatePath)) {
@@ -787,12 +809,31 @@ public class KnockoutTemplateLineMarkerProvider implements LineMarkerProvider {
         }
     }
 
-    private boolean isSupportedFile(final @NotNull PsiFile psiFile) {
+    private boolean isSupportedFile(final @Nullable PsiFile psiFile) {
+        if (psiFile == null) {
+            return false;
+        }
         final VirtualFile virtualFile = psiFile.getVirtualFile();
 
-        return psiFile instanceof JSFile
+        return isJsFile(psiFile)
                 || psiFile instanceof XmlFile
                 || (virtualFile != null && "html".equals(virtualFile.getExtension()));
+    }
+
+    private static boolean isJsFile(final @NotNull PsiFile psiFile) {
+        final VirtualFile virtualFile = psiFile.getVirtualFile();
+
+        if (virtualFile != null) {
+            return "js".equalsIgnoreCase(virtualFile.getExtension());
+        }
+
+        return psiFile.getName().toLowerCase().endsWith(".js");
+    }
+
+    private static @NotNull Icon getJsIcon() {
+        final Icon icon = FileTypeManager.getInstance().getFileTypeByExtension("js").getIcon();
+
+        return icon == null ? HtmlFileType.INSTANCE.getIcon() : icon;
     }
 
     private @NotNull List<PsiElement> prepareFileTargets(final @NotNull List<PsiElement> targets) {

@@ -5,14 +5,12 @@
 
 package com.magento.idea.magento2plugin.reference.provider;
 
-import com.intellij.lang.javascript.JavascriptLanguage;
-import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.lang.Language;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.psi.xml.XmlComment;
 import com.intellij.util.ProcessingContext;
@@ -45,17 +43,14 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
             final @NotNull PsiElement element,
             final @NotNull List<PsiReference> references
     ) {
-        final JSProperty property = PsiTreeUtil.getParentOfType(element, JSProperty.class);
-        String resolvedDisplayArea = property == null ? null : KnockoutRegionResolver.getInstance().getDisplayArea(property);
-
-        if (resolvedDisplayArea == null) {
-            resolvedDisplayArea = UiComponentScopeResolver.getInstance().getDisplayAreaValue(element);
+        String displayArea = UiComponentScopeResolver.getInstance().getDisplayAreaValue(element);
+        if (displayArea == null) {
+            displayArea = KnockoutRegionResolver.getInstance().getDisplayAreaFromJsPsi(element);
         }
 
-        if (resolvedDisplayArea == null) {
+        if (displayArea == null) {
             return;
         }
-        final String displayArea = resolvedDisplayArea;
         final List<PsiElement> targets = UiComponentScopeResolver.getInstance()
                 .resolveGetRegionTargetsForDisplayArea(element, displayArea);
 
@@ -156,7 +151,27 @@ public class KnockoutRegionReferenceProvider extends PsiReferenceProvider {
     private boolean isGetRegionReferenceHost(final @NotNull PsiElement element) {
         return element instanceof XmlComment
                 || element instanceof XmlAttributeValue
-                || element.getLanguage().isKindOf(JavascriptLanguage.INSTANCE);
+                || isJavaScriptLanguage(element.getLanguage());
+    }
+
+    private static boolean isJavaScriptLanguage(final @NotNull Language language) {
+        final Language jsLanguage = Language.findLanguageByID("JavaScript");
+
+        if (jsLanguage != null && language.isKindOf(jsLanguage)) {
+            return true;
+        }
+        Language current = language;
+
+        while (current != null) {
+            final String id = current.getID();
+
+            if ("JavaScript".equals(id) || "ECMAScript 6".equals(id)) {
+                return true;
+            }
+            current = current.getBaseLanguage();
+        }
+
+        return false;
     }
 
     private TextRange getRegionReferenceRange(

@@ -5,8 +5,6 @@
 
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
-import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSFile;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexExtension;
@@ -17,6 +15,8 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
 import com.magento.idea.magento2plugin.util.magento.js.KnockoutTemplatePathResolver;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -42,11 +42,17 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
             if (!Settings.isEnabled(inputData.getProject())) {
                 return map;
             }
-            final JSFile jsFile = (JSFile) inputData.getPsiFile();
             final String componentUrl = inputData.getFile().getUrl();
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            Set<String> templatePaths = jsProvider != null
+                    ? jsProvider.collectKnockoutTemplatePaths(inputData.getPsiFile())
+                    : null;
+            if (templatePaths == null) {
+                templatePaths = KnockoutTemplatePathResolver.getInstance()
+                        .collectTemplatePaths(MagentoVfsUtil.getContentAsText(inputData));
+            }
 
-            for (final String templatePath : KnockoutTemplatePathResolver.getInstance()
-                    .collectTemplatePaths(jsFile)) {
+            for (final String templatePath : templatePaths) {
                 map.computeIfAbsent(templatePath, ignored -> new LinkedHashSet<>()).add(componentUrl);
             }
 
@@ -66,7 +72,12 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE);
+        return virtualFile -> {
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider != null
+                    ? jsProvider.isJavaScriptFile(virtualFile)
+                    : "js".equalsIgnoreCase(virtualFile.getExtension());
+        };
     }
 
     @Override
@@ -76,6 +87,6 @@ public class KnockoutTemplateIndex extends FileBasedIndexExtension<String, Set<S
 
     @Override
     public int getVersion() {
-        return 2;
+        return 2 + JsPsiSupportProvider.versionDelta();
     }
 }

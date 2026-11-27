@@ -166,18 +166,25 @@ public class RequireJsPathResolver {
         final String libPath = getLibRequireJsPath(psiFile.getProject(), filePath);
 
         if (libPath != null) {
-        } else {
+            return libPath;
         }
 
-        return libPath;
+        return com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver
+                .getInstance()
+                .getRequireJsPath(psiFile);
     }
 
     private @Nullable String getModuleRequireJsPath(
             final @NotNull Project project,
             final @NotNull String filePath
     ) {
-        final Collection<String> moduleNames = FileBasedIndex.getInstance()
-                .getAllKeys(ModuleXmlIndex.KEY, project);
+        final Collection<String> moduleNames;
+        try {
+            moduleNames = FileBasedIndex.getInstance()
+                    .getAllKeys(ModuleXmlIndex.KEY, project);
+        } catch (final UnsupportedOperationException ignored) {
+            return null;
+        }
 
         for (final String moduleName : moduleNames) {
             final Collection<String> moduleRootPaths = getModuleRootPaths(project, moduleName);

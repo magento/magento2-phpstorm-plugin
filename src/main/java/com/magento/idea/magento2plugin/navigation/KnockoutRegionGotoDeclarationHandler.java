@@ -6,7 +6,7 @@
 package com.magento.idea.magento2plugin.navigation;
 
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationHandler;
-import com.intellij.lang.javascript.JavascriptLanguage;
+import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class KnockoutRegionGotoDeclarationHandler implements GotoDeclarationHandler {
@@ -70,7 +71,27 @@ public class KnockoutRegionGotoDeclarationHandler implements GotoDeclarationHand
     private boolean isGetRegionReferenceHost(final PsiElement element) {
         return element instanceof XmlComment
                 || element instanceof XmlAttributeValue
-                || element.getLanguage().isKindOf(JavascriptLanguage.INSTANCE);
+                || isJavaScriptLanguage(element.getLanguage());
+    }
+
+    private static boolean isJavaScriptLanguage(final @NotNull Language language) {
+        final Language jsLanguage = Language.findLanguageByID("JavaScript");
+
+        if (jsLanguage != null && language.isKindOf(jsLanguage)) {
+            return true;
+        }
+        Language current = language;
+
+        while (current != null) {
+            final String id = current.getID();
+
+            if ("JavaScript".equals(id) || "ECMAScript 6".equals(id)) {
+                return true;
+            }
+            current = current.getBaseLanguage();
+        }
+
+        return false;
     }
 
     private List<PsiElement> resolveTargets(

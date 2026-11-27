@@ -35,7 +35,10 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                 assert not any("MaintenanceDesktop" in name or "MaintenanceWidget" in name for name in names)
                 assert "magento2/inspection.properties" in names
                 assert "com/magento/idea/magento2plugin/util/magento/ui/TemplatePathResolver.class" in names
-                assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" not in names
+                assert "com/magento/idea/magento2plugin/util/magento/js/KnockoutTemplatePathResolver.class" in names
+                assert "com/magento/idea/magento2plugin/util/magento/js/JsPsiSupportProvider.class" in names
+                assert "com/magento/idea/magento2plugin/util/magento/js/JsPsiSupportProviderImpl.class" not in names
+                assert "com/magento/idea/magento2plugin/mcp/MagentoJsQueries.class" in names
                 assert "com/magento/idea/magento2plugin/mcp/MagentoModuleDependencyQueries.class" in names
                 assert "META-INF/withJson.xml" in names
                 assert "META-INF/withXml.xml" in names
@@ -43,7 +46,15 @@ with zipfile.ZipFile(Path(sys.argv[1])) as archive:
                 assert {e.get("implementation") for e in xml.findall(".//fileBasedIndex")} == {
                     "com.magento.idea.magento2plugin.stubs.indexes.xml.ModuleXmlIndex",
                     "com.magento.idea.magento2plugin.stubs.indexes.BlockNameIndex",
-                    "com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex"}
+                    "com.magento.idea.magento2plugin.stubs.indexes.ContainerNameIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.js.RequireJsIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.js.JsMixinIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.js.KnockoutTemplateIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.ui.DisplayAreaIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.ui.GetRegionUsageIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentComponentDeclarationIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.ui.UiComponentTemplateDeclarationIndex",
+                    "com.magento.idea.magento2plugin.stubs.indexes.js.MagentoLibJsIndex"}
                 assert xml.find(".//projectService").get("serviceImplementation") == \
                     "com.magento.idea.magento2plugin.hce.AnalysisSettings"
     assert len(descriptors) == 1

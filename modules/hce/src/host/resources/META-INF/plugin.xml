@@ -13,6 +13,8 @@
     <extensionPoints>
         <extensionPoint qualifiedName="com.magento.idea.magento2plugin.methodPluginQueryProvider"
                         interface="com.magento.idea.magento2plugin.mcp.MagentoMethodPluginQueryProvider"/>
+        <extensionPoint qualifiedName="com.magento.idea.magento2plugin.jsPsiSupportProvider"
+                        interface="com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider"/>
     </extensionPoints>
     <extensions defaultExtensionNs="com.intellij">
         <mcpServer.mcpToolset implementation="com.magento.idea.magento2plugin.hce.ProjectToolset"/>

@@ -17,6 +17,7 @@ import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationData;
 import com.magento.idea.magento2plugin.stubs.indexes.ui.data.UiComponentNavigationDataSetExternalizer;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
 import com.magento.idea.magento2plugin.util.magento.ui.UiComponentScopeResolver;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -43,7 +44,7 @@ public class GetRegionUsageIndex extends FileBasedIndexExtension<String, Set<UiC
                 return map;
             }
             for (final UiComponentNavigationData usage : UiComponentScopeResolver.getInstance()
-                    .collectGetRegionUsages(inputData.getPsiFile())) {
+                    .collectGetRegionUsages(inputData.getFile(), MagentoVfsUtil.getContentAsText(inputData))) {
                 map.computeIfAbsent(usage.getValue(), ignored -> new LinkedHashSet<>()).add(usage);
             }
 
@@ -63,7 +64,8 @@ public class GetRegionUsageIndex extends FileBasedIndexExtension<String, Set<UiC
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> virtualFile.getFileType().equals(HtmlFileType.INSTANCE);
+        return virtualFile -> virtualFile.getFileType().equals(HtmlFileType.INSTANCE)
+                || "html".equalsIgnoreCase(virtualFile.getExtension());
     }
 
     @Override
@@ -73,6 +75,6 @@ public class GetRegionUsageIndex extends FileBasedIndexExtension<String, Set<UiC
 
     @Override
     public int getVersion() {
-        return 1;
+        return 2;
     }
 }

@@ -5,14 +5,7 @@
 
 package com.magento.idea.magento2plugin.stubs.indexes.js;
 
-import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSExpression;
-import com.intellij.lang.javascript.psi.JSFile;
-import com.intellij.lang.javascript.psi.JSObjectLiteralExpression;
-import com.intellij.lang.javascript.psi.JSProperty;
-import com.intellij.lang.javascript.psi.JSVarStatement;
-import com.intellij.lang.javascript.psi.JSVariable;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.indexing.DataIndexer;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.indexing.FileBasedIndexExtension;
@@ -23,12 +16,15 @@ import com.intellij.util.io.EnumeratorStringDescriptor;
 import com.intellij.util.io.KeyDescriptor;
 import com.magento.idea.magento2plugin.project.Settings;
 import com.magento.idea.magento2plugin.stubs.indexes.js.data.StringSetDataExternalizer;
+import com.magento.idea.magento2plugin.util.magento.MagentoVfsUtil;
+import com.magento.idea.magento2plugin.util.magento.js.JsPsiSupportProvider;
+import com.magento.idea.magento2plugin.util.magento.js.MagentoJsParser;
+import com.magento.idea.magento2plugin.util.magento.js.RequireJsConfig;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
     public static final ID<String, Set<String>> KEY = ID.create(
@@ -49,90 +45,43 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
                 return map;
             }
 
-            final JSFile jsFile = (JSFile) inputData.getPsiFile();
-            map.putAll(getMixinMap(jsFile));
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            final RequireJsConfig config = jsProvider != null
+                    ? jsProvider.parseRequireJsConfig(inputData.getPsiFile())
+                    : null;
+            if (config != null) {
+                map.putAll(toMixinMap(config));
+            } else {
+                map.putAll(getMixinMap(MagentoVfsUtil.getContentAsText(inputData)));
+            }
 
             return map;
         };
     }
 
-    public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull JSFile jsFile) {
-        final Map<String, Set<String>> map = new HashMap<>();
-        final JSVarStatement jsVarStatement = PsiTreeUtil.getChildOfType(
-                jsFile,
-                JSVarStatement.class
-        );
-
-        if (jsVarStatement == null) {
-            return map;
+    public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull PsiFile psiFile) {
+        final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+        final RequireJsConfig config = jsProvider != null
+                ? jsProvider.parseRequireJsConfig(psiFile)
+                : null;
+        if (config != null) {
+            return toMixinMap(config);
         }
+        return getMixinMap(psiFile.getText());
+    }
 
-        for (final JSVariable jsVariable : jsVarStatement.getVariables()) {
-            if (!"config".equals(jsVariable.getName())) {
-                continue;
-            }
-            final JSObjectLiteralExpression config = PsiTreeUtil.getChildOfType(
-                    jsVariable,
-                    JSObjectLiteralExpression.class
-            );
+    public static @NotNull Map<String, Set<String>> getMixinMap(final @NotNull CharSequence source) {
+        return toMixinMap(MagentoJsParser.parseRequireJsConfig(source));
+    }
 
-            if (config != null) {
-                parseMixins(map, config);
-            }
+    private static @NotNull Map<String, Set<String>> toMixinMap(final @NotNull RequireJsConfig config) {
+        final Map<String, Set<String>> map = new HashMap<>();
+
+        for (final RequireJsConfig.MixinEntry entry : config.mixinEntries()) {
+            map.computeIfAbsent(entry.target(), ignored -> new LinkedHashSet<>()).add(entry.mixin());
         }
 
         return map;
-    }
-
-    private static void parseMixins(
-            final @NotNull Map<String, Set<String>> map,
-            final @NotNull JSObjectLiteralExpression rootConfig
-    ) {
-        final JSObjectLiteralExpression config = getObjectValue(rootConfig.findProperty("config"));
-
-        if (config == null) {
-            return;
-        }
-
-        final JSObjectLiteralExpression mixins = getObjectValue(config.findProperty("mixins"));
-
-        if (mixins == null) {
-            return;
-        }
-
-        for (final JSProperty targetProperty : mixins.getProperties()) {
-            final String target = normalizePath(targetProperty.getName());
-            final JSObjectLiteralExpression mixinDeclarations = getObjectValue(targetProperty);
-
-            if (target == null || mixinDeclarations == null) {
-                continue;
-            }
-
-            for (final JSProperty mixinProperty : mixinDeclarations.getProperties()) {
-                final String mixin = normalizePath(mixinProperty.getName());
-
-                if (mixin != null) {
-                    map.computeIfAbsent(target, ignored -> new LinkedHashSet<>()).add(mixin);
-                }
-            }
-        }
-    }
-
-    private static @Nullable JSObjectLiteralExpression getObjectValue(final @Nullable JSProperty property) {
-        if (property == null) {
-            return null;
-        }
-        final JSExpression value = property.getValue();
-
-        return value instanceof JSObjectLiteralExpression ? (JSObjectLiteralExpression) value : null;
-    }
-
-    private static @Nullable String normalizePath(final @Nullable String path) {
-        if (path == null || path.isBlank()) {
-            return null;
-        }
-
-        return path.replace("\"", "").replace("'", "");
     }
 
     @Override
@@ -147,8 +96,13 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @Override
     public @NotNull FileBasedIndex.InputFilter getInputFilter() {
-        return virtualFile -> virtualFile.getFileType().equals(JavaScriptFileType.INSTANCE)
-                && "requirejs-config.js".equals(virtualFile.getName());
+        return virtualFile -> {
+            if (!"requirejs-config.js".equals(virtualFile.getName())) {
+                return false;
+            }
+            final JsPsiSupportProvider jsProvider = JsPsiSupportProvider.getInstance();
+            return jsProvider == null || jsProvider.isJavaScriptFile(virtualFile);
+        };
     }
 
     @Override
@@ -158,6 +112,6 @@ public class JsMixinIndex extends FileBasedIndexExtension<String, Set<String>> {
 
     @Override
     public int getVersion() {
-        return 1;
+        return 1 + JsPsiSupportProvider.versionDelta();
     }
 }
